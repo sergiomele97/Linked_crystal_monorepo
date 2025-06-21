@@ -25,7 +25,7 @@ class MiApp(App):
         return self.layout
 
     def update_label(self, ticks):
-        self.label.text = f'PyBoy corriendo\nTicks ejecutados: {ticks}'
+        self.label.text = f'PyBoy corriendo\nTicks: {ticks}'
 
     def capture_image(self, pyboy):
         """Captura una imagen del emulador y la muestra en la interfaz de Kivy."""
