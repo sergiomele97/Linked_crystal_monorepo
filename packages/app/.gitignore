@@ -1,0 +1,5 @@
+# Buildozer build folder
+.buildozer/
+
+# Output binaries (APK, etc.)
+bin/
