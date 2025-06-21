@@ -4,3 +4,6 @@ venv/
 
 # PyCharm/JetBrains configuration
 .idea/
+
+# Python bytecode cache
+__pycache__/
