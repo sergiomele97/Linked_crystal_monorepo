@@ -10,7 +10,7 @@ package.name = myapp
 package.domain = org.test
 
 # (str) Source code where the main.py live
-source.dir = ../src
+source.dir = ./src
 
 # (list) Source files to include (let empty to include all the files)
 source.include_exts = py,png,jpg,kv,atlas,GBC,pxd,pyx,ttf,bin
@@ -38,13 +38,13 @@ version = 0.1
 
 # (list) Application requirements
 # comma separated e.g. requirements = sqlite3,kivy
-requirements = python3,kivy,numpy,pillow,cython==3.0.6,pyboy
+requirements = python3,kivy,androidstorage4kivy,setuptools,pillow,cython,pyboy
 
 # (str) Custom source folders for requirements
 # Sets custom source for any requirements with recipes
 # requirements.source.kivy = ../../kivy
 
-cython_include_dirs = /home/sergio/mi_app_prueba/.buildozer/android/platform/build-arm64-v8a/build/other_builds/cython/arm64-v8a__ndk_target_21/cython/Cython/Includes
+cython_include_dirs = /home/sergio/linked_crystal/packages/app/APKbuilder/.buildozer/android/platform/build-arm64-v8a/build/other_builds/cython/arm64-v8a__ndk_target_21/cython/Cython/Includes/
 
 
 # (str) Presplash of the application
@@ -100,7 +100,7 @@ fullscreen = 0
 # (list) Permissions
 # (See https://python-for-android.readthedocs.io/en/latest/buildoptions/#build-options-1 for all the supported syntaxes and properties)
 #android.permissions = android.permission.INTERNET, (name=android.permission.WRITE_EXTERNAL_STORAGE;maxSdkVersion=18)
-android.permissions = INTERNET,RECORD_AUDIO,MODIFY_AUDIO_SETTINGS
+android.permissions = READ_EXTERNAL_STORAGE,WRITE_EXTERNAL_STORAGE,INTERNET,RECORD_AUDIO,MODIFY_AUDIO_SETTINGS
 
 # (list) features (adds uses-feature -tags to manifest)
 #android.features = android.hardware.usb.host
