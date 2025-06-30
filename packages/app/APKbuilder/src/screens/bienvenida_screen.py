@@ -63,7 +63,7 @@ if platform == 'android':
         return None
 
 else:
-    rootpath = ""
+    rootpath = "/"
     def solicitar_permisos():
         pass
 
@@ -77,6 +77,31 @@ class BienvenidaScreen(Screen):
     servidor_elegido = BooleanProperty(False)
     rom_path = StringProperty("")
     current_path = StringProperty(rootpath)
+
+    def abrir_explorador_desktop(self):
+        from kivy.uix.filechooser import FileChooserListView
+        contenido = BoxLayout(orientation='vertical')
+        selector = FileChooserListView(filters=["*.GBC"], path="/sdcard/")  # Ajusta path si quieres
+        btn_select = Button(text="Seleccionar ROM", size_hint_y=None, height="40dp")
+
+        def seleccionar_archivo(instance):
+            selected = selector.selection
+            if selected and selected[0].endswith(".GBC"):
+                self.rom_path = selected[0]
+                self.ids.label_rom.text = f"ROM seleccionada:\n{os.path.basename(self.rom_path)}"
+                self.rom_cargado = True
+                popup.dismiss()
+            else:
+                self.ids.label_rom.text = "Archivo no válido."
+
+        btn_select.bind(on_release=seleccionar_archivo)
+        contenido.add_widget(selector)
+        contenido.add_widget(btn_select)
+
+        popup = Popup(title="Selecciona un ROM .gbc",
+                        content=contenido,
+                        size_hint=(0.9, 0.9))
+        popup.open()
 
     def abrir_explorador(self):
         solicitar_permisos()
@@ -93,8 +118,7 @@ class BienvenidaScreen(Screen):
                         self.ids.label_rom.text = "Archivo no válido."
             abrir_selector_nativo(cuando_selecciona_archivo)
         else:
-            popup = self._crear_popup_explorador()
-            popup.open()
+            self.abrir_explorador_desktop()
 
     def _crear_popup_explorador(self):
         contenido = BoxLayout(orientation='vertical')
