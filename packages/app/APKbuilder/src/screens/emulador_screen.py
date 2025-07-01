@@ -5,7 +5,6 @@ from kivy.uix.boxlayout import BoxLayout
 from kivy.clock import Clock
 from kivy.core.image import Image as CoreImage
 from kivy.properties import StringProperty
-from kivy.resources import resource_find
 from kivy.utils import platform
 
 from pyboy import PyBoy
@@ -17,10 +16,7 @@ from io import BytesIO
 
 # ANDROID ENVIRONMENT VARIABLES ------------------------------------------------------------------
 if platform == 'android':
-    rootpath = "/storage/emulated/0/"
     from android.permissions import request_permissions, Permission
-    from jnius import autoclass, cast
-    from android import activity
 
     def solicitar_permisos():
         request_permissions([
@@ -33,12 +29,17 @@ else:
     def solicitar_permisos():
         pass
 
-# EmuladorScreen CLASS ----------------------------------------------------------------------------
+
 class EmuladorScreen(Screen):
 
     rom_path = StringProperty("")
 
     def on_enter(self):
+        # Para evitar añadir widgets múltiples veces
+        if hasattr(self, 'layout'):
+            # Ya está inicializado
+            return
+
         self.layout = BoxLayout(orientation='vertical')
         self.label = Label(text='Iniciando PyBoy…')
         self.image_widget = Image(size_hint=(None, None), size=(320, 288))
@@ -62,13 +63,24 @@ class EmuladorScreen(Screen):
         self.image_widget.texture = kivy_image.texture
 
     def run_pyboy(self):
-        solicitar_permisos();
-        rom_path = resource_find(self.rom_path)
+        solicitar_permisos()
+        rom_path = self.rom_path
 
-        print(f"[INFO] ROM encontrada en: {rom_path}")
+        if not os.path.exists(rom_path):
+            print(f"[ERROR] ROM no encontrada o acceso denegado: {rom_path}")
+            Clock.schedule_once(lambda dt: setattr(self.label, 'text', "No se puede acceder al archivo ROM."), 0)
+            return
 
-        pyboy = PyBoy(rom_path, window="null", sound_emulated=True, sound=True)
-        pyboy.set_emulation_speed(1)
+        try:
+            pyboy = PyBoy(rom_path, window="null", sound_emulated=True, sound=True)
+            pyboy.set_emulation_speed(1)
+        except Exception as e:
+            print(f"[ERROR] PyBoy no pudo cargar el ROM: {e}")
+            Clock.schedule_once(lambda dt: setattr(self.label, 'text', "Error al cargar el ROM."), 0)
+            return
+
+        print(f"[INFO] ROM cargada desde: {rom_path}")
+
         ticks = 0
         last_time = time.time()
 
