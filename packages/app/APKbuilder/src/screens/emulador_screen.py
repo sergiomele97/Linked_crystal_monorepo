@@ -4,19 +4,40 @@ from kivy.uix.image import Image
 from kivy.uix.boxlayout import BoxLayout
 from kivy.clock import Clock
 from kivy.core.image import Image as CoreImage
+from kivy.properties import StringProperty
+from kivy.resources import resource_find
+from kivy.utils import platform
 
 from pyboy import PyBoy
 import threading
 import time
 import os
 from io import BytesIO
-from kivy.resources import resource_find
 
 
-ROM_FILENAME = "resources/PandorasBlocks.GBC"  # Asegúrate de que la ruta sea relativa al root de ejecución
+# ANDROID ENVIRONMENT VARIABLES ------------------------------------------------------------------
+if platform == 'android':
+    rootpath = "/storage/emulated/0/"
+    from android.permissions import request_permissions, Permission
+    from jnius import autoclass, cast
+    from android import activity
 
+    def solicitar_permisos():
+        request_permissions([
+            Permission.READ_EXTERNAL_STORAGE,
+            Permission.WRITE_EXTERNAL_STORAGE
+        ])
 
+# DESKTOP ENVIRONMENT VARIABLES ------------------------------------------------------------------
+else:
+    def solicitar_permisos():
+        pass
+
+# EmuladorScreen CLASS ----------------------------------------------------------------------------
 class EmuladorScreen(Screen):
+
+    rom_path = StringProperty("")
+
     def on_enter(self):
         self.layout = BoxLayout(orientation='vertical')
         self.label = Label(text='Iniciando PyBoy…')
@@ -41,13 +62,8 @@ class EmuladorScreen(Screen):
         self.image_widget.texture = kivy_image.texture
 
     def run_pyboy(self):
-        rom_path = resource_find(ROM_FILENAME)
-
-        if rom_path is None or not os.path.exists(rom_path):
-            error_msg = f"[ERROR] ROM no encontrada: {ROM_FILENAME}"
-            print(error_msg)
-            Clock.schedule_once(lambda dt: setattr(self.label, 'text', error_msg), 0)
-            return
+        solicitar_permisos();
+        rom_path = resource_find(self.rom_path)
 
         print(f"[INFO] ROM encontrada en: {rom_path}")
 
