@@ -37,15 +37,18 @@ class EmuladorScreen(Screen):
     def on_enter(self):
         # Para evitar añadir widgets múltiples veces
         if hasattr(self, 'layout'):
-            # Ya está inicializado
             return
 
         self.layout = BoxLayout(orientation='vertical')
-        self.label = Label(text='Iniciando PyBoy…')
-        self.image_widget = Image(size_hint=(None, None), size=(320, 288))
 
-        self.layout.add_widget(self.label)
+        # Imagen ocupa la mitad superior
+        self.image_widget = Image(size_hint=(1, 0.5), allow_stretch=True, keep_ratio=True)
+
+        # Label ocupa parte inferior (puedes ajustar el size_hint como gustes)
+        self.label = Label(text='Iniciando PyBoy…', size_hint=(1, 0.5))
+
         self.layout.add_widget(self.image_widget)
+        self.layout.add_widget(self.label)
 
         self.add_widget(self.layout)
 
