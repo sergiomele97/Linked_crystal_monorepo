@@ -88,6 +88,9 @@ class EmuladorScreen(Screen):
             nonlocal ticks, last_time
             if pyboy.tick():
                 ticks += 1
+                # Capturar la imagen actual cada tick
+                Clock.schedule_once(lambda dt: self.capture_image(pyboy), 0)
+
                 current_time = time.time()
                 if current_time - last_time >= 1:
                     Clock.schedule_once(lambda dt, t=ticks: self.update_label(t), 0)
@@ -96,6 +99,7 @@ class EmuladorScreen(Screen):
                 pyboy.stop(save=False)
                 print("[PyBoy] Emulación finalizada")
                 Clock.schedule_once(lambda dt: setattr(self.label, 'text', "Emulación finalizada"), 0)
+
 
         Clock.schedule_interval(emular, 1 / 60)
         Clock.schedule_once(lambda dt: self.capture_image(pyboy), 5)
