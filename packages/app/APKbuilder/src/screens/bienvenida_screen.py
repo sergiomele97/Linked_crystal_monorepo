@@ -5,6 +5,9 @@ from kivy.uix.button import Button
 from kivy.properties import StringProperty, BooleanProperty
 from kivy.lang import Builder
 from kivy.utils import platform
+from kivy.core.audio import SoundLoader
+from kivy.clock import Clock
+from kivy.resources import resource_find
 import os
 
 Builder.load_file("screens/bienvenida_screen.kv")
@@ -105,13 +108,33 @@ class BienvenidaScreen(Screen):
     servidor_elegido = BooleanProperty(False)
     rom_path = StringProperty("")
     current_path = StringProperty(rootpath)
+    sound = None  # Para mantener la referencia del audio
+
+    def on_enter(self):
+        # Reproducir audio con un pequeño delay para no bloquear la UI
+        Clock.schedule_once(lambda dt: self.play_audio_prueba(), 0.5)
+
+    def play_audio_prueba(self):
+        audio_path = resource_find("audio-prueba.ogg")
+        if not audio_path:
+            print("[WARN] Archivo de audio .ogg no encontrado.")
+            return
+        try:
+            sound = SoundLoader.load(audio_path)
+            if sound:
+                sound.play()
+                print("[INFO] Reproduciendo audio prueba (ogg).")
+            else:
+                print("[WARN] No se pudo cargar el archivo .ogg.")
+        except Exception as e:
+            print(f"[ERROR] Excepción al reproducir audio .ogg: {e}")
+
 
     def copiar_rom_a_storage_interno(self, uri):
         if platform == 'android':
             destino_dir = app_storage_path()
             if not os.path.exists(destino_dir):
                 os.makedirs(destino_dir)
-            # Puedes asignar un nombre fijo o intentar extraer nombre desde URI
             nombre_archivo = "rom_seleccionada.gbc"
             destino_path = os.path.join(destino_dir, nombre_archivo)
             try:
@@ -122,7 +145,6 @@ class BienvenidaScreen(Screen):
                 print(f"[ERROR] No se pudo copiar ROM: {e}")
                 return None
         else:
-            # En escritorio ya es un path normal
             return uri
 
     def abrir_explorador(self):

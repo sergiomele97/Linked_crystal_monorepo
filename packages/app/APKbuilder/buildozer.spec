@@ -13,7 +13,7 @@ package.domain = org.test
 source.dir = ./src
 
 # (list) Source files to include (let empty to include all the files)
-source.include_exts = py,png,jpg,kv,atlas,GBC,pxd,pyx,ttf,bin
+source.include_exts = py,png,jpg,kv,atlas,GBC,pxd,pyx,ttf,bin,ogg
 
 
 # (list) List of inclusions using pattern matching

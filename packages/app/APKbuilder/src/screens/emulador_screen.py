@@ -77,6 +77,7 @@ class EmuladorScreen(Screen):
         try:
             pyboy = PyBoy(rom_path, window="null", sound_emulated=True, sound=True)
             pyboy.set_emulation_speed(1)
+
         except Exception as e:
             print(f"[ERROR] PyBoy no pudo cargar el ROM: {e}")
             Clock.schedule_once(lambda dt: setattr(self.label, 'text', "Error al cargar el ROM."), 0)
