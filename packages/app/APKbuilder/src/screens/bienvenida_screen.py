@@ -120,15 +120,23 @@ class BienvenidaScreen(Screen):
             print("[WARN] Archivo de audio .ogg no encontrado.")
             return
         try:
-            sound = SoundLoader.load(audio_path)
-            if sound:
-                sound.play()
+            self.sound = SoundLoader.load(audio_path)
+            if self.sound:
+                self.sound.play()
                 print("[INFO] Reproduciendo audio prueba (ogg).")
+                # Detener después de 3 segundos (ajusta el tiempo si quieres)
+                Clock.schedule_once(lambda dt: self.detener_audio(), 3)
             else:
                 print("[WARN] No se pudo cargar el archivo .ogg.")
         except Exception as e:
             print(f"[ERROR] Excepción al reproducir audio .ogg: {e}")
 
+    def detener_audio(self):
+        if self.sound:
+            self.sound.stop()
+            self.sound.unload()
+            self.sound = None
+            print("[INFO] Audio detenido.")
 
     def copiar_rom_a_storage_interno(self, uri):
         if platform == 'android':
