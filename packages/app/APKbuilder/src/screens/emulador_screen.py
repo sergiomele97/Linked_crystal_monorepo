@@ -1,11 +1,13 @@
 from kivy.uix.screenmanager import Screen
 from kivy.uix.label import Label
 from kivy.uix.image import Image
-from kivy.uix.boxlayout import BoxLayout
+from kivy.uix.floatlayout import FloatLayout
+from kivy.uix.button import Button
 from kivy.clock import Clock
 from kivy.core.image import Image as CoreImage
 from kivy.properties import StringProperty
 from kivy.utils import platform
+from kivy.uix.behaviors import ButtonBehavior
 
 from pyboy import PyBoy
 import threading
@@ -16,7 +18,7 @@ import numpy as np
 
 if platform == 'android':
     from android.permissions import request_permissions, Permission
-    from jnius import autoclass, cast
+    from jnius import autoclass
 
     def solicitar_permisos():
         request_permissions([
@@ -30,8 +32,17 @@ if platform == 'android':
 else:
     import sounddevice as sd
 
+    from kivy.config import Config
+    Config.set('graphics', 'width', '360')
+    Config.set('graphics', 'height', '640')
+    Config.set('graphics', 'resizable', False)
+
     def solicitar_permisos():
         pass
+
+
+class ImageButton(ButtonBehavior, Image):
+    pass
 
 
 class EmuladorScreen(Screen):
@@ -41,12 +52,35 @@ class EmuladorScreen(Screen):
         if hasattr(self, 'layout'):
             return
 
-        self.layout = BoxLayout(orientation='vertical')
-        self.image_widget = Image(size_hint=(1, 0.5), allow_stretch=True, keep_ratio=True)
-        self.label = Label(text='Iniciando PyBoy…', size_hint=(1, 0.5))
+        self.layout = FloatLayout()
+
+        # Imagen ocupa mitad superior
+        self.image_widget = Image(
+            size_hint=(1, 0.5),
+            pos_hint={"x": 0, "top": 1},
+            allow_stretch=True,
+            keep_ratio=True
+        )
+
+        # Label centrado en parte inferior
+        self.label = Label(
+            text='Iniciando PyBoy…',
+            size_hint=(0.6, 0.1),
+            pos_hint={"x": 0, "y": 0.2}
+        )
+
+        ruta_imagen = os.path.join('resources', 'a-button.png')
+        self.example_button = ImageButton(
+            source=ruta_imagen,
+            size_hint=(0.3, 0.2),
+            pos_hint={'x': 0.5, 'y': 0.5}
+        )
+
+        self.example_button.bind(on_press=self.on_example_button)
 
         self.layout.add_widget(self.image_widget)
         self.layout.add_widget(self.label)
+        self.layout.add_widget(self.example_button)
         self.add_widget(self.layout)
 
         self.audio_buffer = None
@@ -55,6 +89,9 @@ class EmuladorScreen(Screen):
         self.android_audio_initialized = False
 
         threading.Thread(target=self.run_pyboy, daemon=True).start()
+
+    def on_example_button(self, instance):
+        self.label.text = "Botón presionado"
 
     def update_label(self, ticks):
         self.label.text = f'PyBoy\nTicks ejecutados: {ticks}'
