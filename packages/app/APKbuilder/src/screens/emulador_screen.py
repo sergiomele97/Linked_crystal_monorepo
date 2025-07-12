@@ -69,7 +69,7 @@ class EmuladorScreen(Screen):
             pos_hint={"x": 0, "y": 0.2}
         )
 
-        ruta_imagen = os.path.join('resources', 'a-button.png')
+        ruta_imagen = os.path.join('resources', 'image', 'a-button.png')
         self.example_button = ImageButton(
             source=ruta_imagen,
             size_hint=(0.3, 0.2),

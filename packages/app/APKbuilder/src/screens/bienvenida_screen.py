@@ -5,7 +5,6 @@ from kivy.uix.button import Button
 from kivy.properties import StringProperty, BooleanProperty
 from kivy.lang import Builder
 from kivy.utils import platform
-from kivy.core.audio import SoundLoader
 from kivy.clock import Clock
 from kivy.resources import resource_find
 import os
@@ -108,35 +107,6 @@ class BienvenidaScreen(Screen):
     servidor_elegido = BooleanProperty(False)
     rom_path = StringProperty("")
     current_path = StringProperty(rootpath)
-    sound = None  # Para mantener la referencia del audio
-
-    def on_enter(self):
-        # Reproducir audio con un pequeño delay para no bloquear la UI
-        Clock.schedule_once(lambda dt: self.play_audio_prueba(), 0.5)
-
-    def play_audio_prueba(self):
-        audio_path = resource_find("audio-prueba.ogg")
-        if not audio_path:
-            print("[WARN] Archivo de audio .ogg no encontrado.")
-            return
-        try:
-            self.sound = SoundLoader.load(audio_path)
-            if self.sound:
-                self.sound.play()
-                print("[INFO] Reproduciendo audio prueba (ogg).")
-                # Detener después de 3 segundos (ajusta el tiempo si quieres)
-                Clock.schedule_once(lambda dt: self.detener_audio(), 3)
-            else:
-                print("[WARN] No se pudo cargar el archivo .ogg.")
-        except Exception as e:
-            print(f"[ERROR] Excepción al reproducir audio .ogg: {e}")
-
-    def detener_audio(self):
-        if self.sound:
-            self.sound.stop()
-            self.sound.unload()
-            self.sound = None
-            print("[INFO] Audio detenido.")
 
     def copiar_rom_a_storage_interno(self, uri):
         if platform == 'android':
