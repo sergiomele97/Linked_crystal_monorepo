@@ -1,0 +1,22 @@
+<EmulatorScreen>:
+    FloatLayout:
+        id: layout
+
+        Image:
+            id: image_widget
+            size_hint: 1, 0.5
+            pos_hint: {"x": 0, "top": 1}
+            allow_stretch: True
+            keep_ratio: True
+
+        Label:
+            id: label
+            text: 'Iniciando PyBoy…'
+            size_hint: 0.6, 0.1
+            pos_hint: {"x": 0, "y": 0.2}
+
+        ImageButton:
+            id: example_button
+            source: 'resources/image/a-button.png'
+            size_hint: 0.3, 0.2
+            pos_hint: {'x': 0.5, 'y': 0.5}

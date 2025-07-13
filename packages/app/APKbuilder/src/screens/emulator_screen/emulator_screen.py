@@ -1,13 +1,12 @@
 from kivy.uix.screenmanager import Screen
-from kivy.uix.label import Label
 from kivy.uix.image import Image
-from kivy.uix.floatlayout import FloatLayout
-from kivy.uix.button import Button
+from kivy.uix.label import Label
+from kivy.uix.behaviors import ButtonBehavior
 from kivy.clock import Clock
 from kivy.core.image import Image as CoreImage
 from kivy.properties import StringProperty
 from kivy.utils import platform
-from kivy.uix.behaviors import ButtonBehavior
+from kivy.lang import Builder
 
 from pyboy import PyBoy
 import threading
@@ -16,22 +15,18 @@ import os
 from io import BytesIO
 import numpy as np
 
+from screens.emulator_screen.audio_manager import AudioManagerKivy
+
+
 if platform == 'android':
     from android.permissions import request_permissions, Permission
-    from jnius import autoclass
 
     def solicitar_permisos():
         request_permissions([
             Permission.READ_EXTERNAL_STORAGE,
             Permission.WRITE_EXTERNAL_STORAGE
         ])
-
-    AudioTrack = autoclass("android.media.AudioTrack")
-    AudioFormat = autoclass("android.media.AudioFormat")
-    AudioManager = autoclass("android.media.AudioManager")
 else:
-    import sounddevice as sd
-
     from kivy.config import Config
     Config.set('graphics', 'width', '360')
     Config.set('graphics', 'height', '640')
@@ -45,50 +40,29 @@ class ImageButton(ButtonBehavior, Image):
     pass
 
 
+Builder.load_file("screens/emulator_screen/emulator_screen.kv")
+
+
 class EmulatorScreen(Screen):
     rom_path = StringProperty("")
 
     def on_enter(self):
-        if hasattr(self, 'layout'):
+        if hasattr(self, '_initialized'):
             return
+        self._initialized = True
 
-        self.layout = FloatLayout()
-
-        # Imagen ocupa mitad superior
-        self.image_widget = Image(
-            size_hint=(1, 0.5),
-            pos_hint={"x": 0, "top": 1},
-            allow_stretch=True,
-            keep_ratio=True
-        )
-
-        # Label centrado en parte inferior
-        self.label = Label(
-            text='Iniciando PyBoy…',
-            size_hint=(0.6, 0.1),
-            pos_hint={"x": 0, "y": 0.2}
-        )
-
-        ruta_imagen = os.path.join('resources', 'image', 'a-button.png')
-        self.example_button = ImageButton(
-            source=ruta_imagen,
-            size_hint=(0.3, 0.2),
-            pos_hint={'x': 0.5, 'y': 0.5}
-        )
+        # Referenciamos los widgets del kv
+        self.image_widget = self.ids.image_widget
+        self.label = self.ids.label
+        self.example_button = self.ids.example_button
 
         self.example_button.bind(on_press=self.on_example_button)
 
-        self.layout.add_widget(self.image_widget)
-        self.layout.add_widget(self.label)
-        self.layout.add_widget(self.example_button)
-        self.add_widget(self.layout)
+        # Instancia del manejador de audio
+        self.audio_manager = AudioManagerKivy()
 
-        self.audio_buffer = None
-        self.audio_stream = None
-        self.audio_track = None
-        self.android_audio_initialized = False
-
-        threading.Thread(target=self.run_pyboy, daemon=True).start()
+        # Iniciamos el hilo de la emulación
+        threading.Thread(target=self._run_pyboy_thread, daemon=True).start()
 
     def on_example_button(self, instance):
         self.label.text = "Botón presionado"
@@ -104,73 +78,10 @@ class EmulatorScreen(Screen):
             kivy_image = CoreImage(byte_io, ext="png")
         self.image_widget.texture = kivy_image.texture
 
-    def init_audio_stream(self, sample_rate, channels):
-        if platform == 'android':
-            channel_config = AudioFormat.CHANNEL_OUT_MONO if channels == 1 else AudioFormat.CHANNEL_OUT_STEREO
-            encoding = AudioFormat.ENCODING_PCM_16BIT
-            buffer_size = AudioTrack.getMinBufferSize(sample_rate, channel_config, encoding)
-
-            self.audio_track = AudioTrack(
-                AudioManager.STREAM_MUSIC,
-                sample_rate,
-                channel_config,
-                encoding,
-                buffer_size,
-                AudioTrack.MODE_STREAM
-            )
-            self.audio_track.play()
-            self.android_audio_initialized = True
-        else:
-            self.audio_buffer = np.empty((0, channels), dtype=np.int16)
-            self.audio_stream = sd.OutputStream(
-                samplerate=sample_rate,
-                channels=channels,
-                dtype='int16',
-                callback=self.audio_callback,
-                finished_callback=lambda: print("[Audio] Stream terminado")
-            )
-            self.audio_stream.start()
-
-    def audio_callback(self, outdata, frames, time, status):
-        if status:
-            print(f'[Audio Callback Status] {status}')
-
-        if len(self.audio_buffer) >= frames:
-            outdata[:] = self.audio_buffer[:frames]
-            self.audio_buffer = self.audio_buffer[frames:]
-        else:
-            needed = frames - len(self.audio_buffer)
-            outdata[:len(self.audio_buffer)] = self.audio_buffer
-            outdata[len(self.audio_buffer):] = np.zeros((needed, outdata.shape[1]), dtype=np.int16)
-            self.audio_buffer = np.empty((0, outdata.shape[1]), dtype=np.int16)
-
     def play_audio_buffer(self, audio_array, sample_rate):
-        if audio_array is None or len(audio_array) == 0:
-            return
+        self.audio_manager.play_audio_buffer(audio_array, sample_rate)
 
-        channels = 1 if audio_array.ndim == 1 else audio_array.shape[1]
-        if (platform == 'android' and not self.android_audio_initialized) or (platform != 'android' and self.audio_stream is None):
-            self.init_audio_stream(sample_rate, channels)
-
-        audio_float = audio_array.astype(np.float32)
-        for ch in range(audio_float.shape[1]):
-            center = (audio_float[:, ch].max() + audio_float[:, ch].min()) / 2
-            audio_float[:, ch] -= center
-
-        max_abs = np.max(np.abs(audio_float), axis=0)
-        max_abs[max_abs == 0] = 1
-        audio_norm = audio_float / max_abs
-        audio_int16 = (audio_norm * 32767).astype(np.int16)
-
-        if platform == 'android':
-            if audio_int16.ndim == 2:
-                audio_int16 = audio_int16.flatten()
-            audio_bytes = audio_int16.tobytes()
-            self.audio_track.write(audio_bytes, 0, len(audio_bytes))
-        else:
-            self.audio_buffer = np.concatenate((self.audio_buffer, audio_int16))
-
-    def run_pyboy(self):
+    def _run_pyboy_thread(self):
         solicitar_permisos()
         rom_path = self.rom_path
 
