@@ -9,7 +9,7 @@ from kivy.clock import Clock
 from kivy.resources import resource_find
 import os
 
-Builder.load_file("screens/bienvenida_screen.kv")
+Builder.load_file("screens/menu_screen/menu_screen.kv")
 
 # ANDROID ENVIRONMENT VARIABLES ------------------------------------------------------------------
 if platform == 'android':
@@ -102,7 +102,7 @@ else:
                       size_hint=(0.9, 0.9))
         popup.open()
 
-class BienvenidaScreen(Screen):
+class MenuScreen(Screen):
     rom_cargado = BooleanProperty(False)
     servidor_elegido = BooleanProperty(False)
     rom_path = StringProperty("")
@@ -157,7 +157,7 @@ class BienvenidaScreen(Screen):
         if self.ids.get("label_estado"):
             self.ids.label_estado.text = f"¡Iniciando juego con {os.path.basename(self.rom_path)} y servidor elegido!"
 
-        emulador_screen = self.manager.get_screen('emulador')
-        emulador_screen.rom_path = self.rom_path
+        emulator_screen = self.manager.get_screen('emulator')
+        emulator_screen.rom_path = self.rom_path
 
-        self.manager.current = 'emulador'
+        self.manager.current = 'emulator'

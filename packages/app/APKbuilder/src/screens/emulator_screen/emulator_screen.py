@@ -45,7 +45,7 @@ class ImageButton(ButtonBehavior, Image):
     pass
 
 
-class EmuladorScreen(Screen):
+class EmulatorScreen(Screen):
     rom_path = StringProperty("")
 
     def on_enter(self):

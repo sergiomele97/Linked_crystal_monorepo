@@ -1,8 +1,8 @@
 from kivy.app import App
 from kivy.uix.screenmanager import ScreenManager
 
-from screens.bienvenida_screen import BienvenidaScreen
-from screens.emulador_screen import EmuladorScreen
+from screens.menu_screen.menu_screen import MenuScreen
+from screens.emulator_screen.emulator_screen import EmulatorScreen
 
 class MyScreenManager(ScreenManager):
     pass
@@ -10,8 +10,8 @@ class MyScreenManager(ScreenManager):
 class MiApp(App):
     def build(self):
         sm = MyScreenManager()
-        sm.add_widget(BienvenidaScreen(name='bienvenida'))
-        sm.add_widget(EmuladorScreen(name='emulador'))
+        sm.add_widget(MenuScreen(name='bienvenida'))
+        sm.add_widget(EmulatorScreen(name='emulator'))
         return sm
 
 if __name__ == '__main__':
