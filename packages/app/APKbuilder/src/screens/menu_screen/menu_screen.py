@@ -3,7 +3,7 @@ from kivy.properties import StringProperty, BooleanProperty
 from kivy.lang import Builder
 import os
 
-from .environment_rom_selection import select_rom
+from screens.menu_screen.components.rom_selector import select_rom
 
 Builder.load_file("screens/menu_screen/menu_screen.kv")
 

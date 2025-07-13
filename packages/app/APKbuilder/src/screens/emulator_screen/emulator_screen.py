@@ -15,25 +15,8 @@ import os
 from io import BytesIO
 import numpy as np
 
-from screens.emulator_screen.audio_manager import AudioManagerKivy
-
-
-if platform == 'android':
-    from android.permissions import request_permissions, Permission
-
-    def solicitar_permisos():
-        request_permissions([
-            Permission.READ_EXTERNAL_STORAGE,
-            Permission.WRITE_EXTERNAL_STORAGE
-        ])
-else:
-    from kivy.config import Config
-    Config.set('graphics', 'width', '360')
-    Config.set('graphics', 'height', '640')
-    Config.set('graphics', 'resizable', False)
-
-    def solicitar_permisos():
-        pass
+from screens.emulator_screen.components.audio_manager import AudioManagerKivy
+from screens.emulator_screen.components.environment_manager import solicitar_permisos
 
 
 class ImageButton(ButtonBehavior, Image):
@@ -125,4 +108,3 @@ class EmulatorScreen(Screen):
                 Clock.schedule_once(lambda dt: setattr(self.label, 'text', "Emulación finalizada"), 0)
 
         Clock.schedule_interval(emular, 1 / 60)
-        Clock.schedule_once(lambda dt: self.capture_image(pyboy), 5)
