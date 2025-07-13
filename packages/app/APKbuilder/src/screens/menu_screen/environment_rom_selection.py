@@ -1,6 +1,8 @@
 from kivy.utils import platform
 import os
 
+
+# Android ----------------------------------------------------------------------------------------
 if platform == 'android':
     from android.permissions import request_permissions, Permission
     from android import activity
@@ -63,6 +65,8 @@ if platform == 'android':
     def abrir_explorador_desktop(screen_instance):
         pass  # No usado en Android
 
+
+# Desktop ----------------------------------------------------------------------------------------
 else:
     def solicitar_permisos(callback=None):
         if callback:
@@ -106,8 +110,9 @@ else:
                       size_hint=(0.9, 0.9))
         popup.open()
 
-# Función común para ambos entornos
-def seleccionar_rom(screen_instance, callback):
+
+# Global export ----------------------------------------------------------------------------------------
+def select_rom(screen_instance, callback):
     def handle_selection(uri):
         if uri:
             path = copiar_rom_a_storage_interno(uri)

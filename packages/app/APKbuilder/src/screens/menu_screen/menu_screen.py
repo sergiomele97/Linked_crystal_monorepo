@@ -3,7 +3,7 @@ from kivy.properties import StringProperty, BooleanProperty
 from kivy.lang import Builder
 import os
 
-from .environment import seleccionar_rom
+from .environment_rom_selection import select_rom
 
 Builder.load_file("screens/menu_screen/menu_screen.kv")
 
@@ -22,7 +22,7 @@ class MenuScreen(Screen):
             else:
                 self.ids.label_rom.text = "Archivo no válido."
 
-        seleccionar_rom(self, cuando_selecciona_archivo)
+        select_rom(self, cuando_selecciona_archivo)
 
     def elegir_servidor(self):
         self.servidor_elegido = True
