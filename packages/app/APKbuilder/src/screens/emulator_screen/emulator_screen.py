@@ -17,13 +17,13 @@ import numpy as np
 
 from screens.emulator_screen.components.audio_manager import AudioManagerKivy
 from screens.emulator_screen.components.environment_manager import solicitar_permisos
-
+from screens.emulator_screen.components.controlpad import ControlPad
 
 class ImageButton(ButtonBehavior, Image):
     pass
 
-
 Builder.load_file("screens/emulator_screen/emulator_screen.kv")
+Builder.load_file("screens/emulator_screen/components/controlpad.kv")
 
 
 class EmulatorScreen(Screen):
@@ -34,21 +34,33 @@ class EmulatorScreen(Screen):
             return
         self._initialized = True
 
-        # Referenciamos los widgets del kv
         self.image_widget = self.ids.image_widget
         self.label = self.ids.label
         self.example_button = self.ids.example_button
+        self.controlpad = self.ids.control_pad
 
         self.example_button.bind(on_press=self.on_example_button)
 
-        # Instancia del manejador de audio
+        self.controlpad.on_button_press = self.on_button_press
+        self.controlpad.on_button_release = self.on_button_release
+
         self.audio_manager = AudioManagerKivy()
 
-        # Iniciamos el hilo de la emulación
         threading.Thread(target=self._run_pyboy_thread, daemon=True).start()
 
     def on_example_button(self, instance):
         self.label.text = "Botón presionado"
+
+    def on_button_press(self, button_name):
+        if hasattr(self, 'pyboy'):
+            #self.pyboy.send_input(button_name, True)
+            print("boton presionado")
+            pass
+
+    def on_button_release(self, button_name):
+        if hasattr(self, 'pyboy'):
+            #self.pyboy.send_input(button_name, False)
+            pass
 
     def update_label(self, ticks):
         self.label.text = f'PyBoy\nTicks ejecutados: {ticks}'
@@ -69,42 +81,35 @@ class EmulatorScreen(Screen):
         rom_path = self.rom_path
 
         if not os.path.exists(rom_path):
-            print(f"[ERROR] ROM no encontrada: {rom_path}")
-            Clock.schedule_once(lambda dt: setattr(self.label, 'text', "No se puede acceder al archivo ROM."), 0)
+            Clock.schedule_once(lambda dt: setattr(self.label, 'text', "ROM no encontrada"), 0)
             return
 
         try:
-            pyboy = PyBoy(rom_path, window="null", sound_emulated=True, sound_volume=100)
-            pyboy.set_emulation_speed(1)
+            self.pyboy = PyBoy(rom_path, window="null", sound_emulated=True, sound_volume=100)
+            self.pyboy.set_emulation_speed(1)
         except Exception as e:
-            print(f"[ERROR] PyBoy no pudo cargar el ROM: {e}")
-            Clock.schedule_once(lambda dt: setattr(self.label, 'text', "Error al cargar el ROM."), 0)
+            Clock.schedule_once(lambda dt: setattr(self.label, 'text', f"Error al cargar ROM: {e}"), 0)
             return
-
-        print(f"[INFO] ROM cargada desde: {rom_path}")
 
         ticks = 0
         last_time = time.time()
 
         def emular(dt):
             nonlocal ticks, last_time
-            if pyboy.tick():
+            if self.pyboy.tick():
                 ticks += 1
-                Clock.schedule_once(lambda dt: self.capture_image(pyboy), 0)
+                Clock.schedule_once(lambda dt: self.capture_image(self.pyboy), 0)
 
-                valid_length = pyboy.sound.raw_buffer_head
+                valid_length = self.pyboy.sound.raw_buffer_head
                 if valid_length > 0:
-                    audio_buffer = pyboy.sound.ndarray[:valid_length]
-                    sample_rate = pyboy.sound.sample_rate
-                    self.play_audio_buffer(audio_buffer, sample_rate)
+                    audio_buffer = self.pyboy.sound.ndarray[:valid_length]
+                    self.play_audio_buffer(audio_buffer, self.pyboy.sound.sample_rate)
 
-                current_time = time.time()
-                if current_time - last_time >= 1:
+                if time.time() - last_time >= 1:
                     Clock.schedule_once(lambda dt, t=ticks: self.update_label(t), 0)
-                    last_time = current_time
+                    last_time = time.time()
             else:
-                pyboy.stop(save=False)
-                print("[PyBoy] Emulación finalizada")
+                self.pyboy.stop(save=False)
                 Clock.schedule_once(lambda dt: setattr(self.label, 'text', "Emulación finalizada"), 0)
 
         Clock.schedule_interval(emular, 1 / 60)
