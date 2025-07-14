@@ -1,21 +1,11 @@
 from kivy.uix.screenmanager import Screen
-from kivy.uix.label import Label
-from kivy.clock import Clock
 from kivy.properties import StringProperty
 from kivy.lang import Builder
-from kivy.utils import platform
 
-from pyboy import PyBoy
-import threading
-import time
-import os
-import numpy as np
-
-from screens.emulator_screen.components.environment_manager import solicitar_permisos
-from screens.emulator_screen.components.audio_manager import AudioManagerKivy
 from screens.emulator_screen.components.controlpad import ControlPad
 from screens.emulator_screen.components.video_display import VideoDisplay
-
+from screens.emulator_screen.components.audio_manager import AudioManagerKivy
+from screens.emulator_screen.components.emulator_core_interface import EmulatorCoreInterface
 
 Builder.load_file("screens/emulator_screen/emulator_screen.kv")
 Builder.load_file("screens/emulator_screen/components/controlpad.kv")
@@ -31,65 +21,16 @@ class EmulatorScreen(Screen):
         self._initialized = True
 
         self.video_display = self.ids.video_display
-        self.label = self.ids.label
         self.controlpad = self.ids.control_pad
-
-        self.controlpad.on_button_press = self.on_button_press
-        self.controlpad.on_button_release = self.on_button_release
-
         self.audio_manager = AudioManagerKivy()
-        threading.Thread(target=self._run_pyboy_thread, daemon=True).start()
+        self.emulator = EmulatorCoreInterface(
+            rom_path=self.rom_path,
+            on_frame=self.video_display.update_frame,
+            on_text_output=self.video_display.display_message,
+            on_audio=self.audio_manager.play_audio_buffer
+        )
 
-    def on_button_press(self, button_name):
-        if hasattr(self, 'pyboy'):
-            # self.pyboy.send_input(button_name, True)
-            print("botón presionado")
+        self.controlpad.on_button_press = self.emulator.send_input_press
+        self.controlpad.on_button_release = self.emulator.send_input_release
 
-    def on_button_release(self, button_name):
-        if hasattr(self, 'pyboy'):
-            # self.pyboy.send_input(button_name, False)
-            pass
-
-    def update_label(self, ticks):
-        self.label.text = f'PyBoy\nTicks ejecutados: {ticks}'
-
-    def play_audio_buffer(self, audio_array, sample_rate):
-        self.audio_manager.play_audio_buffer(audio_array, sample_rate)
-
-    def _run_pyboy_thread(self):
-        solicitar_permisos()
-        rom_path = self.rom_path
-
-        if not os.path.exists(rom_path):
-            Clock.schedule_once(lambda dt: setattr(self.label, 'text', "ROM no encontrada"), 0)
-            return
-
-        try:
-            self.pyboy = PyBoy(rom_path, window="null", sound_emulated=True, sound_volume=100)
-            self.pyboy.set_emulation_speed(1)
-        except Exception as e:
-            Clock.schedule_once(lambda dt: setattr(self.label, 'text', f"Error al cargar ROM: {e}"), 0)
-            return
-
-        ticks = 0
-        last_time = time.time()
-
-        def emular(dt):
-            nonlocal ticks, last_time
-            if self.pyboy.tick():
-                ticks += 1
-                self.video_display.update_frame(self.pyboy)
-
-                valid_length = self.pyboy.sound.raw_buffer_head
-                if valid_length > 0:
-                    audio_buffer = self.pyboy.sound.ndarray[:valid_length]
-                    self.play_audio_buffer(audio_buffer, self.pyboy.sound.sample_rate)
-
-                if time.time() - last_time >= 1:
-                    Clock.schedule_once(lambda dt, t=ticks: self.update_label(t), 0)
-                    last_time = time.time()
-            else:
-                self.pyboy.stop(save=False)
-                Clock.schedule_once(lambda dt: setattr(self.label, 'text', "Emulación finalizada"), 0)
-
-        Clock.schedule_interval(emular, 1 / 60)
+        self.emulator.start()
