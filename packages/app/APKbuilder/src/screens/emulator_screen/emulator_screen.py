@@ -1,7 +1,5 @@
 from kivy.uix.screenmanager import Screen
-from kivy.uix.image import Image
 from kivy.uix.label import Label
-from kivy.uix.behaviors import ButtonBehavior
 from kivy.clock import Clock
 from kivy.core.image import Image as CoreImage
 from kivy.properties import StringProperty
@@ -19,8 +17,6 @@ from screens.emulator_screen.components.audio_manager import AudioManagerKivy
 from screens.emulator_screen.components.environment_manager import solicitar_permisos
 from screens.emulator_screen.components.controlpad import ControlPad
 
-class ImageButton(ButtonBehavior, Image):
-    pass
 
 Builder.load_file("screens/emulator_screen/emulator_screen.kv")
 Builder.load_file("screens/emulator_screen/components/controlpad.kv")
@@ -36,10 +32,7 @@ class EmulatorScreen(Screen):
 
         self.image_widget = self.ids.image_widget
         self.label = self.ids.label
-        self.example_button = self.ids.example_button
         self.controlpad = self.ids.control_pad
-
-        self.example_button.bind(on_press=self.on_example_button)
 
         self.controlpad.on_button_press = self.on_button_press
         self.controlpad.on_button_release = self.on_button_release
@@ -48,8 +41,6 @@ class EmulatorScreen(Screen):
 
         threading.Thread(target=self._run_pyboy_thread, daemon=True).start()
 
-    def on_example_button(self, instance):
-        self.label.text = "Botón presionado"
 
     def on_button_press(self, button_name):
         if hasattr(self, 'pyboy'):

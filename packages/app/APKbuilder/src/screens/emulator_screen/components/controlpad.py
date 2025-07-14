@@ -1,5 +1,12 @@
 from kivy.uix.floatlayout import FloatLayout
 from kivy.properties import ObjectProperty
+from kivy.uix.image import Image
+from kivy.uix.behaviors import ButtonBehavior
+
+
+class ImageButton(ButtonBehavior, Image):
+    pass
+
 
 class ControlPad(FloatLayout):
     on_button_press = ObjectProperty(None)
