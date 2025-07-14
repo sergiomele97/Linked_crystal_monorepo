@@ -1,25 +1,25 @@
 from kivy.uix.screenmanager import Screen
 from kivy.uix.label import Label
 from kivy.clock import Clock
-from kivy.core.image import Image as CoreImage
 from kivy.properties import StringProperty
-from kivy.utils import platform
 from kivy.lang import Builder
+from kivy.utils import platform
 
 from pyboy import PyBoy
 import threading
 import time
 import os
-from io import BytesIO
 import numpy as np
 
-from screens.emulator_screen.components.audio_manager import AudioManagerKivy
 from screens.emulator_screen.components.environment_manager import solicitar_permisos
+from screens.emulator_screen.components.audio_manager import AudioManagerKivy
 from screens.emulator_screen.components.controlpad import ControlPad
+from screens.emulator_screen.components.video_display import VideoDisplay
 
 
 Builder.load_file("screens/emulator_screen/emulator_screen.kv")
 Builder.load_file("screens/emulator_screen/components/controlpad.kv")
+Builder.load_file("screens/emulator_screen/components/video_display.kv")
 
 
 class EmulatorScreen(Screen):
@@ -30,7 +30,7 @@ class EmulatorScreen(Screen):
             return
         self._initialized = True
 
-        self.image_widget = self.ids.image_widget
+        self.video_display = self.ids.video_display
         self.label = self.ids.label
         self.controlpad = self.ids.control_pad
 
@@ -38,31 +38,20 @@ class EmulatorScreen(Screen):
         self.controlpad.on_button_release = self.on_button_release
 
         self.audio_manager = AudioManagerKivy()
-
         threading.Thread(target=self._run_pyboy_thread, daemon=True).start()
-
 
     def on_button_press(self, button_name):
         if hasattr(self, 'pyboy'):
-            #self.pyboy.send_input(button_name, True)
-            print("boton presionado")
-            pass
+            # self.pyboy.send_input(button_name, True)
+            print("botón presionado")
 
     def on_button_release(self, button_name):
         if hasattr(self, 'pyboy'):
-            #self.pyboy.send_input(button_name, False)
+            # self.pyboy.send_input(button_name, False)
             pass
 
     def update_label(self, ticks):
         self.label.text = f'PyBoy\nTicks ejecutados: {ticks}'
-
-    def capture_image(self, pyboy):
-        image = pyboy.screen.image
-        with BytesIO() as byte_io:
-            image.save(byte_io, format='PNG')
-            byte_io.seek(0)
-            kivy_image = CoreImage(byte_io, ext="png")
-        self.image_widget.texture = kivy_image.texture
 
     def play_audio_buffer(self, audio_array, sample_rate):
         self.audio_manager.play_audio_buffer(audio_array, sample_rate)
@@ -89,7 +78,7 @@ class EmulatorScreen(Screen):
             nonlocal ticks, last_time
             if self.pyboy.tick():
                 ticks += 1
-                Clock.schedule_once(lambda dt: self.capture_image(self.pyboy), 0)
+                self.video_display.update_frame(self.pyboy)
 
                 valid_length = self.pyboy.sound.raw_buffer_head
                 if valid_length > 0:
