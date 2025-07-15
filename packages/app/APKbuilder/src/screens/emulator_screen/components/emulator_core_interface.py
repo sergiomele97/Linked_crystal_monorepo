@@ -58,15 +58,9 @@ class EmulatorCoreInterface:
                 Clock.schedule_once(lambda dt: self.on_text_output("Emulación finalizada"), 0)
             return False
 
-
-    def send_input(self, button_name, pressed):
-        if self.pyboy:
-            # self.pyboy.send_input(button_name, pressed)
-            print(f"Input {button_name}: {'Pressed' if pressed else 'Released'}")
-
     def send_input_press(self, button_name):
-        self.send_input(button_name, True)
+        self.pyboy.button_press(button_name)
 
     def send_input_release(self, button_name):
-        self.send_input(button_name, False)
+        self.pyboy.button_release(button_name)
 
