@@ -3,7 +3,6 @@ from kivy.utils import platform
 
 if platform == 'android':
     from jnius import autoclass
-
     AudioTrack = autoclass("android.media.AudioTrack")
     AudioFormat = autoclass("android.media.AudioFormat")
     AudioManager = autoclass("android.media.AudioManager")
@@ -18,17 +17,24 @@ class AudioManagerKivy:
         self.audio_stream = None
         self.audio_track = None
         self.android_audio_initialized = False
+        self._channels = 2 
 
     def init_audio_stream(self, sample_rate, channels):
+        self._channels = channels
         if self.platform == 'android':
             self._init_android_audio(sample_rate, channels)
         else:
             self._init_desktop_audio(sample_rate, channels)
 
     def _init_android_audio(self, sample_rate, channels):
-        channel_config = AudioFormat.CHANNEL_OUT_MONO if channels == 1 else AudioFormat.CHANNEL_OUT_STEREO
+        channel_config = (
+            AudioFormat.CHANNEL_OUT_MONO if channels == 1 else AudioFormat.CHANNEL_OUT_STEREO
+        )
         encoding = AudioFormat.ENCODING_PCM_16BIT
         buffer_size = AudioTrack.getMinBufferSize(sample_rate, channel_config, encoding)
+
+        if buffer_size <= 0:
+            buffer_size = max(sample_rate * channels // 8, 4096)
 
         self.audio_track = AudioTrack(
             AudioManager.STREAM_MUSIC,
@@ -73,24 +79,34 @@ class AudioManagerKivy:
 
         # Inicializar audio si no está listo
         if (self.platform == 'android' and not self.android_audio_initialized) or \
-           (self.platform != 'android' and self.audio_stream is None):
+        (self.platform != 'android' and self.audio_stream is None):
             self.init_audio_stream(sample_rate, channels)
 
-        # Normalizar audio (centrar y escalar)
+        # --- Normalization ---
         audio_float = audio_array.astype(np.float32)
-        for ch in range(audio_float.shape[1]):
-            center = (audio_float[:, ch].max() + audio_float[:, ch].min()) / 2
-            audio_float[:, ch] -= center
 
-        max_abs = np.max(np.abs(audio_float), axis=0)
-        max_abs[max_abs == 0] = 1
+        if audio_float.ndim == 1: 
+            audio_float -= (audio_float.max() + audio_float.min()) / 2
+        else: 
+            for ch in range(audio_float.shape[1]):
+                center = (audio_float[:, ch].max() + audio_float[:, ch].min()) / 2
+                audio_float[:, ch] -= center
+
+        max_abs = np.max(np.abs(audio_float))
+        if max_abs == 0:
+            max_abs = 1.0
         audio_norm = audio_float / max_abs
         audio_int16 = (audio_norm * 32767).astype(np.int16)
 
+        # --- Android ---
         if self.platform == 'android':
             if audio_int16.ndim == 2:
                 audio_int16 = audio_int16.flatten()
             audio_bytes = audio_int16.tobytes()
             self.audio_track.write(audio_bytes, 0, len(audio_bytes))
+
+        # --- Desktop ---
         else:
+            if audio_int16.ndim == 1:
+                audio_int16 = audio_int16[:, np.newaxis]
             self.audio_buffer = np.concatenate((self.audio_buffer, audio_int16))
