@@ -1,5 +1,6 @@
 from pyboy import PyBoy
 from kivy.clock import Clock
+from kivy.utils import platform
 import threading
 import os
 
@@ -29,8 +30,8 @@ class EmulatorCoreInterface:
             self.pyboy = PyBoy(self.rom_path, window="null", sound_emulated=True, sound_volume=100)
             self.pyboy.set_emulation_speed(1)
         except Exception as e:
-            if self.on_end:
-                Clock.schedule_once(lambda dt: self.on_end(f"Error al cargar ROM: {e}"), 0)
+            if self.on_text_output:
+                print(f"Error al cargar ROM: {e}")
             return
 
         Clock.schedule_interval(self._emulate, 1 / 60)
@@ -53,14 +54,33 @@ class EmulatorCoreInterface:
                 self.on_audio(audio_buffer, sample_rate)
 
         else:
-            self.pyboy.stop(save=False)
+            self.pyboy.stop()
             if self.on_text_output:
                 Clock.schedule_once(lambda dt: self.on_text_output("Emulación finalizada"), 0)
             return False
 
     def send_input_press(self, button_name):
-        self.pyboy.button_press(button_name)
+        if self.pyboy:
+            self.pyboy.button_press(button_name)
 
     def send_input_release(self, button_name):
-        self.pyboy.button_release(button_name)
+        if self.pyboy:
+            self.pyboy.button_release(button_name)
+
+    def save_RAM(self):
+        try:
+            rom_dir = os.path.dirname(self.rom_path)
+            RAMfile = (
+                os.path.join(rom_dir, "rom_seleccionada.gbc") if platform == "android" else self.rom_path
+            ) + ".ram"
+
+            with open(RAMfile, "wb") as f:
+                self.pyboy.save_state(f, True)
+
+            file_size = os.path.getsize(RAMfile)
+            print(f"[DEBUG] Ram guardada: {RAMfile} ({file_size} bytes)")
+
+        except Exception as e:
+            if self.on_text_output:
+                Clock.schedule_once(lambda dt, err=e: self.on_text_output(f"Error guardando RAM: {err}"), 0)
 

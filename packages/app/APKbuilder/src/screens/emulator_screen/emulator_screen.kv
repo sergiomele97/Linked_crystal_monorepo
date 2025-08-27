@@ -3,10 +3,17 @@
 
         VideoDisplay:
             id: video_display
-            size_hint: 1, 0.5
+            size_hint: 1, 0.45
             pos_hint: {"x": 0, "top": 1}
 
         ControlPad:
             id: control_pad
-            size_hint: 1, 0.5
+            size_hint: 1, 0.45
             pos_hint: {"x": 0, "y": 0}
+
+        Button:
+            text: "Debug button"
+            size_hint: 0.4, 0.08
+            pos_hint: {"center_x": 0.5, "y": 0.46}
+            on_release: root.emulator.save_RAM()
+
