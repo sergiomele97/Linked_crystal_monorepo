@@ -34,6 +34,12 @@ class EmulatorScreen(Screen):
         self.controlpad.on_button_release = self.emulator.send_input_release
 
         self.emulator.start()
+
+    def onChatPressed(self):
+        print("Chat button pressed")
+    
+    def onMenuPressed(self):
+        print("Menu button pressed")
     
     # def on_request_close(self, *args):
     #     self.emulator.save_RAM()

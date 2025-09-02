@@ -1,19 +1,34 @@
 <EmulatorScreen>:
     FloatLayout:
 
+        ControlPad:
+            id: control_pad
+            size_hint: 1, 0.55
+            pos_hint: {"x": 0, "y": 0}
+        
+        Button:
+            text: "Debug button"
+            size_hint: 0.4, 0.08
+            pos_hint: {"center_x": 0.5, "y": 0.40}
+            on_release: root.emulator.save_RAM()
+        
+        ImageButton:
+            id: select
+            source: 'resources/image/chat.png'
+            size_hint: 0.1, 0.1
+            pos_hint: {"x": 0.05, "y": 0.45}
+            on_press: root.onChatPressed()
+
+        ImageButton:
+            id: select
+            source: 'resources/image/opciones.png'
+            size_hint: 0.1, 0.1
+            pos_hint: {"x": 0.85, "y": 0.45}
+            on_press: root.onMenuPressed()
+
         VideoDisplay:
             id: video_display
             size_hint: 1, 0.45
             pos_hint: {"x": 0, "top": 1}
 
-        ControlPad:
-            id: control_pad
-            size_hint: 1, 0.45
-            pos_hint: {"x": 0, "y": 0}
-
-        Button:
-            text: "Debug button"
-            size_hint: 0.4, 0.08
-            pos_hint: {"center_x": 0.5, "y": 0.46}
-            on_release: root.emulator.save_RAM()
 
