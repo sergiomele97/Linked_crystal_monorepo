@@ -13,15 +13,15 @@
             on_release: root.emulator.save_RAM()
         
         ImageButton:
-            id: select
+            id: chatButton
             source: 'resources/image/chat.png'
             size_hint: 0.1, 0.1
             pos_hint: {"x": 0.05, "y": 0.45}
             on_press: root.onChatPressed()
 
         ImageButton:
-            id: select
-            source: 'resources/image/opciones.png'
+            id: menuButton
+            source: 'resources/image/menu.png'
             size_hint: 0.1, 0.1
             pos_hint: {"x": 0.85, "y": 0.45}
             on_press: root.onMenuPressed()

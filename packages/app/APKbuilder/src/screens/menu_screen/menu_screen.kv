@@ -1,47 +1,55 @@
 <MenuScreen>:
-    BoxLayout:
-        orientation: 'vertical'
-        padding: 20
-        spacing: 10
+    FloatLayout:
+        BoxLayout:
+            orientation: 'vertical'
+            padding: 20
+            spacing: 10
 
-        Label:
-            text: "Bienvenido a la app"
-            font_size: '24sp'
-            size_hint_y: None
-            height: self.texture_size[1]
+            Label:
+                text: "Bienvenido a la app"
+                font_size: '24sp'
+                size_hint_y: None
+                height: self.texture_size[1]
 
-        Button:
-            text: "1. Cargar ROM (.gbc)"
-            on_release: root.abrir_explorador()
+            Button:
+                text: "1. Cargar ROM (.gbc)"
+                on_release: root.abrir_explorador()
 
-        Label:
-            id: label_rom
-            text: "Ningún ROM seleccionado"
-            size_hint_y: None
-            height: self.texture_size[1]
+            Label:
+                id: label_rom
+                text: "Ningún ROM seleccionado"
+                size_hint_y: None
+                height: self.texture_size[1]
 
-        Button:
-            text: "2. Elegir servidor"
-            on_release: root.elegir_servidor()
-            disabled: not root.rom_cargado
+            Button:
+                text: "2. Elegir servidor"
+                on_release: root.elegir_servidor()
+                disabled: not root.rom_cargado
 
-        Label:
-            id: label_servidor
-            text: "Servidor no elegido"
-            size_hint_y: None
-            height: self.texture_size[1]
+            Label:
+                id: label_servidor
+                text: "Servidor no elegido"
+                size_hint_y: None
+                height: self.texture_size[1]
 
-        Button:
-            text: "3. Jugar"
-            on_release: root.iniciar_juego()
-            disabled: not (root.rom_cargado and root.servidor_elegido)
+            Button:
+                text: "3. Jugar"
+                on_release: root.iniciar_juego()
+                disabled: not (root.rom_cargado and root.servidor_elegido)
 
-        Label:
-            id: label_estado
-            text: ""
-            size_hint_y: None
-            height: self.texture_size[1]
-        
-        Button:
-            text: "Probar lista de archivos"
-            on_release: root.probar_listdir()
+            Label:
+                id: label_estado
+                text: ""
+                size_hint_y: None
+                height: self.texture_size[1]
+            
+            Button:
+                text: "Probar lista de archivos"
+                on_release: root.probar_listdir()
+        ImageButton:
+            id: menuButton
+            source: 'resources/image/settings.png'
+            size_hint: 0.1, 0.1
+            pos_hint: {"x": 0.88, "y": 0.91}
+            on_release: root.open_menu(self)
+
