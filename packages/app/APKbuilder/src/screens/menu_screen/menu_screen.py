@@ -45,10 +45,6 @@ class MenuScreen(Screen):
         emulator_screen.rom_path = self.rom_path
         self.manager.current = 'emulator'
 
-    def open_menu(self, caller):
-        dropdown = MenuDropdown()
-        dropdown.menu_screen = self
-        dropdown.open(caller)
 
     def probar_listdir(self):
         if platform == 'android':
