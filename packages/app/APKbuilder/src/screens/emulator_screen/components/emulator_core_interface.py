@@ -78,6 +78,7 @@ class EmulatorCoreInterface:
                 self.pyboy.save_state(f, True)
 
             file_size = os.path.getsize(RAMfile)
+            self.on_text_output(f"[DEBUG] Ram guardada: {RAMfile} ({file_size} bytes)")
             print(f"[DEBUG] Ram guardada: {RAMfile} ({file_size} bytes)")
 
         except Exception as e:
