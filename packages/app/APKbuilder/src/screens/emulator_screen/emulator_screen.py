@@ -3,6 +3,7 @@ from kivy.properties import StringProperty
 from kivy.lang import Builder
 
 from screens.emulator_screen.components.controlpad import ControlPad
+from screens.emulator_screen.components.menu_dropdown import MenuDropdown
 from screens.emulator_screen.components.video_display import VideoDisplay
 from screens.emulator_screen.components.audio_manager import AudioManagerKivy
 from screens.emulator_screen.components.emulator_core_interface import EmulatorCoreInterface
@@ -38,8 +39,11 @@ class EmulatorScreen(Screen):
     def onChatPressed(self):
         print("Chat button pressed")
     
-    def onMenuPressed(self):
-        print("Menu button pressed")
+    def onMenuPressed(self, caller):
+        if not hasattr(self, "dropdown"):
+            self.dropdown = MenuDropdown()
+            self.dropdown.father_screen = self
+        self.dropdown.open(caller)
     
     # def on_request_close(self, *args):
     #     self.emulator.save_RAM()

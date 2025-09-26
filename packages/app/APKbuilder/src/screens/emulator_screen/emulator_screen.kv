@@ -6,12 +6,6 @@
             size_hint: 1, 0.55
             pos_hint: {"x": 0, "y": 0}
         
-        Button:
-            text: "Debug button"
-            size_hint: 0.4, 0.08
-            pos_hint: {"center_x": 0.5, "y": 0.40}
-            on_release: root.emulator.save_RAM()
-        
         ImageButton:
             id: chatButton
             source: 'resources/image/chat.png'
@@ -24,7 +18,7 @@
             source: 'resources/image/menu.png'
             size_hint: 0.1, 0.1
             pos_hint: {"x": 0.85, "y": 0.45}
-            on_press: root.onMenuPressed()
+            on_press: root.onMenuPressed(self)
 
         VideoDisplay:
             id: video_display
