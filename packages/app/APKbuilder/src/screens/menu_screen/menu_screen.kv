@@ -38,14 +38,11 @@
                 disabled: not (root.rom_cargado and root.servidor_elegido)
 
             Label:
-                id: label_estado
+                id: output_label
                 text: ""
                 size_hint_y: None
                 height: self.texture_size[1]
-            
-            Button:
-                text: "Probar lista de archivos"
-                on_release: root.probar_listdir()
+
         ImageButton:
             id: menuButton
             source: 'resources/image/settings.png'

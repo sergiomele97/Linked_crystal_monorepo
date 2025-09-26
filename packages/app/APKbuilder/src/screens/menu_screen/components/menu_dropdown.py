@@ -2,8 +2,13 @@ from kivy.uix.floatlayout import FloatLayout
 from kivy.uix.button import Button
 from kivy.properties import ObjectProperty
 
+from services.devTools import DevTools
+
 class MenuDropdown(FloatLayout):
-    menu_screen = ObjectProperty(None)
+    father_screen = ObjectProperty(None)
+    devTools = DevTools()
+
+    # Inicialización del dropdown
 
     def __init__(self, **kwargs):
         super().__init__(**kwargs)
@@ -20,28 +25,28 @@ class MenuDropdown(FloatLayout):
         btn2.bind(on_release=self.opcion2)
         self.add_widget(btn2)
 
-        btn3 = Button(text="Cerrar", size_hint=(1, 0.3), pos_hint={"x": 0, "y": 0.1})
-        btn3.bind(on_release=self.close)
-        self.add_widget(btn3)
-
-    def open(self, caller=None):
-        if not self.parent: 
-            self.menu_screen.add_widget(self)
-        self.menu_screen.bind(on_touch_down=self._on_touch_down_outside)
-
-    def close(self, *args):
-        if self.parent:  
-            self.menu_screen.remove_widget(self)
-        if self.menu_screen:
-            self.menu_screen.unbind(on_touch_down=self._on_touch_down_outside)
+    # Funciones
 
     def opcion1(self, *args):
-        print("Opción 1 seleccionada")
+        self.devTools.listInternalStorageContent(self.father_screen)
         self.close()
 
     def opcion2(self, *args):
         print("Opción 2 seleccionada")
         self.close()
+
+    # Funciones base
+
+    def open(self, caller=None):
+        if not self.parent: 
+            self.father_screen.add_widget(self)
+        self.father_screen.bind(on_touch_down=self._on_touch_down_outside)
+
+    def close(self, *args):
+        if self.parent:  
+            self.father_screen.remove_widget(self)
+        if self.father_screen:
+            self.father_screen.unbind(on_touch_down=self._on_touch_down_outside)
 
     def _on_touch_down_outside(self, instance, touch):
         if not self.collide_point(*touch.pos):
