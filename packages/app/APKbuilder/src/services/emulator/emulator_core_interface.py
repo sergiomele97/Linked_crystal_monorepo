@@ -5,6 +5,7 @@ import threading
 import os
 
 from services.environment.environment_manager import solicitar_permisos
+from services.emulator.emulator_loop import EmulationLoop
 
 
 class EmulatorCoreInterface:
@@ -14,6 +15,7 @@ class EmulatorCoreInterface:
         self.on_text_output = on_text_output
         self.on_audio = on_audio
         self.pyboy = None
+        self.loop = None
 
     def start(self):
         threading.Thread(target=self._initialize, daemon=True).start()
@@ -27,37 +29,23 @@ class EmulatorCoreInterface:
             return
 
         try:
-            self.pyboy = PyBoy(self.rom_path, window="null", sound_emulated=True, sound_volume=100)
+            self.pyboy = PyBoy(
+                self.rom_path,
+                window="null",
+                sound_emulated=True,
+                sound_volume=100,
+            )
             self.pyboy.set_emulation_speed(1)
         except Exception as e:
             if self.on_text_output:
                 print(f"Error al cargar ROM: {e}")
             return
 
-        Clock.schedule_interval(self._emulate, 1 / 60)
-
-    def _emulate(self, dt):
-        if not self.pyboy:
-            return False
-
-        if self.pyboy.tick():
-
-            # Enviar frame
-            if self.on_frame:
-                Clock.schedule_once(lambda dt: self.on_frame(self.pyboy), 0)
-
-            # Enviar audio
-            audio_len = self.pyboy.sound.raw_buffer_head
-            if audio_len > 0 and self.on_audio:
-                audio_buffer = self.pyboy.sound.ndarray[:audio_len]
-                sample_rate = self.pyboy.sound.sample_rate
-                self.on_audio(audio_buffer, sample_rate)
-
-        else:
-            self.pyboy.stop()
-            if self.on_text_output:
-                Clock.schedule_once(lambda dt: self.on_text_output("Emulación finalizada"), 0)
-            return False
+        # Crear y lanzar el loop de emulación
+        self.loop = EmulationLoop(
+            self.pyboy, self.on_frame, self.on_audio, self.on_text_output
+        )
+        self.loop.start(fps=60)
 
     def send_input_press(self, button_name):
         if self.pyboy:
@@ -71,7 +59,9 @@ class EmulatorCoreInterface:
         try:
             rom_dir = os.path.dirname(self.rom_path)
             RAMfile = (
-                os.path.join(rom_dir, "rom_seleccionada.gbc") if platform == "android" else self.rom_path
+                os.path.join(rom_dir, "rom_seleccionada.gbc")
+                if platform == "android"
+                else self.rom_path
             ) + ".ram"
 
             with open(RAMfile, "wb") as f:
@@ -83,5 +73,6 @@ class EmulatorCoreInterface:
 
         except Exception as e:
             if self.on_text_output:
-                Clock.schedule_once(lambda dt, err=e: self.on_text_output(f"Error guardando RAM: {err}"), 0)
-
+                Clock.schedule_once(
+                    lambda dt, err=e: self.on_text_output(f"Error guardando RAM: {err}"), 0
+                )
