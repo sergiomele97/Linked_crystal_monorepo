@@ -5,8 +5,8 @@ from kivy.lang import Builder
 from screens.emulator_screen.components.controlpad import ControlPad
 from screens.emulator_screen.components.menu_dropdown import MenuDropdown
 from screens.emulator_screen.components.video_display import VideoDisplay
-from screens.emulator_screen.components.audio_manager import AudioManagerKivy
-from screens.emulator_screen.components.emulator_core_interface import EmulatorCoreInterface
+from services.audio.audio_manager import AudioManagerKivy
+from services.emulator.emulator_core_interface import EmulatorCoreInterface
 
 Builder.load_file("screens/emulator_screen/emulator_screen.kv")
 Builder.load_file("screens/emulator_screen/components/controlpad.kv")

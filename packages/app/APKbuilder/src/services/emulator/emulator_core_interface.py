@@ -4,7 +4,7 @@ from kivy.utils import platform
 import threading
 import os
 
-from screens.emulator_screen.components.environment_manager import solicitar_permisos
+from services.environment.environment_manager import solicitar_permisos
 
 
 class EmulatorCoreInterface:
