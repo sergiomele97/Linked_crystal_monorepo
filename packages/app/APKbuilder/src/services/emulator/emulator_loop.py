@@ -40,8 +40,8 @@ class EmulationLoop:
         if self.pyboy.tick():
             # Enviar frame
             if self.on_frame:
-                frame_image = self.pyboy.screen.image
-                Clock.schedule_once(lambda dt: self.on_frame(frame_image), 0)
+                frame_arr = self.pyboy.screen.ndarray
+                Clock.schedule_once(lambda dt: self.on_frame(frame_arr), 0)
 
             # Enviar audio
             audio_len = self.pyboy.sound.raw_buffer_head
