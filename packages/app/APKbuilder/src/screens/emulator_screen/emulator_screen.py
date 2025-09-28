@@ -14,7 +14,6 @@ Builder.load_file("screens/emulator_screen/components/video_display.kv")
 
 
 class EmulatorScreen(Screen):
-    rom_path = StringProperty("")
 
     def on_enter(self):
         if hasattr(self, '_initialized'):
@@ -25,7 +24,6 @@ class EmulatorScreen(Screen):
         self.controlpad = self.ids.control_pad
         self.audio_manager = AudioManagerKivy()
         self.emulator = EmulatorCoreInterface(
-            rom_path=self.rom_path,
             on_frame=self.video_display.update_frame,
             on_text_output=self.video_display.display_message,
             on_audio=self.audio_manager.play_audio_buffer

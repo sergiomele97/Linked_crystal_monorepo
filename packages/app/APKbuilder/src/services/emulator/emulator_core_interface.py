@@ -1,4 +1,5 @@
 from pyboy import PyBoy
+from kivy.app import App
 from kivy.clock import Clock
 from kivy.utils import platform
 import threading
@@ -9,8 +10,10 @@ from services.emulator.emulator_loop import EmulationLoop
 
 
 class EmulatorCoreInterface:
-    def __init__(self, rom_path, on_frame=None, on_audio=None, on_text_output=None):
-        self.rom_path = rom_path
+    """
+    Clase que crea y gestiona la instancia de Pyboy
+    """
+    def __init__(self, on_frame=None, on_audio=None, on_text_output=None):
         self.on_frame = on_frame
         self.on_text_output = on_text_output
         self.on_audio = on_audio
@@ -23,14 +26,14 @@ class EmulatorCoreInterface:
     def _initialize(self):
         solicitar_permisos()
 
-        if not os.path.exists(self.rom_path):
+        if not os.path.exists(App.get_running_app().rom_path):
             if self.on_text_output:
                 Clock.schedule_once(lambda dt: self.on_text_output("ROM no encontrada"), 0)
             return
 
         try:
             self.pyboy = PyBoy(
-                self.rom_path,
+                App.get_running_app().rom_path,
                 window="null",
                 sound_emulated=True,
                 sound_volume=100,
@@ -57,11 +60,11 @@ class EmulatorCoreInterface:
 
     def save_RAM(self):
         try:
-            rom_dir = os.path.dirname(self.rom_path)
+            rom_dir = os.path.dirname(App.get_running_app().rom_path)
             RAMfile = (
                 os.path.join(rom_dir, "rom_seleccionada.gbc")
                 if platform == "android"
-                else self.rom_path
+                else App.get_running_app().rom_path
             ) + ".ram"
 
             with open(RAMfile, "wb") as f:

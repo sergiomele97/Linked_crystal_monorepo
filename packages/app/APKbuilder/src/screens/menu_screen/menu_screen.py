@@ -1,3 +1,4 @@
+from kivy.app import App
 from kivy.uix.screenmanager import Screen
 from kivy.properties import StringProperty, BooleanProperty
 from kivy.lang import Builder
@@ -12,7 +13,6 @@ Builder.load_file("screens/menu_screen/menu_screen.kv")
 class MenuScreen(Screen):
     rom_cargado = BooleanProperty(False)
     servidor_elegido = BooleanProperty(False)
-    rom_path = StringProperty("")
     current_path = StringProperty("/")
 
     def open_menu(self, caller):
@@ -24,7 +24,7 @@ class MenuScreen(Screen):
     def abrir_explorador(self):
         def cuando_selecciona_archivo(destino_path):
             if destino_path:
-                self.rom_path = destino_path
+                App.get_running_app().rom_path = destino_path
                 self.ids.label_rom.text = f"ROM seleccionada:\n{os.path.basename(destino_path)}"
                 self.rom_cargado = True
             else:
@@ -37,9 +37,8 @@ class MenuScreen(Screen):
         self.ids.label_servidor.text = "Servidor elegido correctamente."
 
     def iniciar_juego(self):
-        self.ids.output_label.text = f"¡Iniciando juego con {os.path.basename(self.rom_path)}!"
+        self.ids.output_label.text = f"¡Iniciando juego con {os.path.basename(App.get_running_app().rom_path)}!"
         emulator_screen = self.manager.get_screen('emulator')
-        emulator_screen.rom_path = self.rom_path
         self.manager.current = 'emulator'
 
 
