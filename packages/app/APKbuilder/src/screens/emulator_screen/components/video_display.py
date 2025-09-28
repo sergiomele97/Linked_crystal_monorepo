@@ -12,8 +12,7 @@ class VideoDisplay(FloatLayout):
     def display_message(self, message):
         self.label.text = message
 
-    def update_frame(self, pyboy):
-        image = pyboy.screen.image
+    def update_frame(self, image):
         with BytesIO() as byte_io:
             image.save(byte_io, format='PNG')
             byte_io.seek(0)
