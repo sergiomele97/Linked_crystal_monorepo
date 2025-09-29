@@ -39,11 +39,18 @@ def draw_sprite(frame, sprite_array, x, y):
 def create_black_sprite(size=16):
     """
     Crea un sprite negro RGBA de tamaño `size x size`.
+    Con algunos píxeles transparentes para probar el blending binario.
     """
     sprite = np.zeros((size, size, 4), dtype=np.uint8)
     sprite[..., :3] = 0      # negro
     sprite[..., 3] = 255     # opaco
+
+    # Hacer transparente la diagonal principal
+    for i in range(size):
+        sprite[i, i, 3] = 0  # alpha = 0 → transparente
+
     return sprite
+
 
 
 class EmulationLoop:
