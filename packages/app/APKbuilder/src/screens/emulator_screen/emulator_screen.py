@@ -43,6 +43,3 @@ class EmulatorScreen(Screen):
             self.dropdown.father_screen = self
         self.dropdown.open(caller)
     
-    # def on_request_close(self, *args):
-    #     self.emulator.save_RAM()
-    #     return False
