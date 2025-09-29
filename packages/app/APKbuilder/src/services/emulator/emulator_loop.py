@@ -3,26 +3,36 @@ import numpy as np
 
 def draw_sprite(frame, sprite_array, x, y):
     """
-    Dibuja un sprite RGBA sobre el framebuffer usando blending.
+    Dibuja un sprite RGBA sobre el framebuffer.
+    Alpha binario: 0 (transparente) o 255 (opaco).
+    Maneja correctamente cuando el sprite está fuera de pantalla.
     """
+    H, W, _ = frame.shape
     h, w, _ = sprite_array.shape
 
-    # Evitar salirse del framebuffer
-    h = min(h, frame.shape[0] - y)
-    w = min(w, frame.shape[1] - x)
-    if h <= 0 or w <= 0:
-        return
+    # Coordenadas destino en el framebuffer
+    x0 = max(x, 0)
+    y0 = max(y, 0)
+    x1 = min(x + w, W)
+    y1 = min(y + h, H)
 
-    frame_slice = frame[y:y+h, x:x+w]
+    if x0 >= x1 or y0 >= y1:
+        return  # completamente fuera de pantalla
 
-    # Normalizar alpha
-    alpha = sprite_array[:h, :w, 3:4] / 255.0
+    # Coordenadas origen en el sprite (recorte)
+    sx0 = max(0, -x)
+    sy0 = max(0, -y)
+    sx1 = sx0 + (x1 - x0)
+    sy1 = sy0 + (y1 - y0)
 
-    # Blending de los 3 canales de color
-    frame_slice[:, :, :3] = frame_slice[:, :, :3] * (1 - alpha) + sprite_array[:h, :w, :3] * alpha
+    frame_slice = frame[y0:y1, x0:x1]
+    sprite_crop = sprite_array[sy0:sy1, sx0:sx1]
 
-    # Opcional: mantener alpha del framebuffer igual
-    frame_slice[:, :, 3] = 255  # o dejar frame original si quieres
+    # Máscara de píxeles opacos
+    mask = sprite_crop[:, :, 3] == 255
+
+    # Copiar solo donde el sprite es opaco
+    frame_slice[mask] = sprite_crop[mask]
 
 
 
@@ -54,8 +64,8 @@ class EmulationLoop:
         # Sprite negro de personaje (16x16)
         self.black_sprite = create_black_sprite(16)
         # Coordenadas iniciales del sprite (puedes cambiar según overworld)
-        self.sprite_x = 64
-        self.sprite_y = 66
+        self.sprite_x = -8
+        self.sprite_y = -8
 
     def start(self, fps=60):
         """Inicia el ciclo de emulación."""
@@ -84,6 +94,8 @@ class EmulationLoop:
                 frame_arr = self.pyboy.screen.ndarray
                 # Dibujar cuadrado negro del sprite
                 draw_sprite(frame_arr, self.black_sprite, self.sprite_x, self.sprite_y)
+                draw_sprite(frame_arr, self.black_sprite, 64, 64)
+                draw_sprite(frame_arr, self.black_sprite, 155, 140)
                 Clock.schedule_once(lambda dt: self.on_frame(frame_arr), 0)
 
             # Enviar audio
