@@ -11,13 +11,21 @@ else:
 
 
 class AudioManagerKivy:
-    def __init__(self):
+    def __init__(self, pyboy):
+        self.pyboy = pyboy
         self.platform = platform
         self.audio_buffer = None
         self.audio_stream = None
         self.audio_track = None
         self.android_audio_initialized = False
         self._channels = 2 
+    
+    def update_audio(self):
+        audio_len = self.pyboy.sound.raw_buffer_head
+        if audio_len > 0:
+            audio_buffer = self.pyboy.sound.ndarray[:audio_len]
+            sample_rate = self.pyboy.sound.sample_rate
+            self.play_audio_buffer(audio_buffer, sample_rate)
 
     def init_audio_stream(self, sample_rate, channels):
         self._channels = channels

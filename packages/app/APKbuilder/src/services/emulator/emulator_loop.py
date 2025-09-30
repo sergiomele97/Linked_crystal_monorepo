@@ -26,7 +26,7 @@ class EmulationLoop:
         self.ramData = RamData()
         self.connectionData = ConnectionData()
     #Services
-        self.audioManager = AudioManagerKivy()
+        self.audioManager = AudioManagerKivy(self.pyboy)
         self.ramScrapper = RamScrapper(self.ramData)
         self.connectionManager = ConnectionManager(self.connectionData)
         self.drawingManager = DrawingManager(self.ramData, self.connectionData, self.pyboy, self.on_frame)
@@ -60,7 +60,7 @@ class EmulationLoop:
             self.connectionManager.update_online_data()
             self.ramScrapper.update_ram_data()
             self.drawingManager.update_frame()
-            self.update_audio()
+            self.audioManager.update_audio()
             
         else:
             self.stop()
@@ -70,9 +70,3 @@ class EmulationLoop:
                 )
             return False
 
-    def update_audio(self):
-        audio_len = self.pyboy.sound.raw_buffer_head
-        if audio_len > 0:
-            audio_buffer = self.pyboy.sound.ndarray[:audio_len]
-            sample_rate = self.pyboy.sound.sample_rate
-            self.audioManager.play_audio_buffer(audio_buffer, sample_rate)
