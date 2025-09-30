@@ -2,7 +2,7 @@ from kivy.uix.floatlayout import FloatLayout
 from kivy.uix.button import Button
 from kivy.properties import ObjectProperty
 
-from services.devTools import DevTools
+from services.devTools.devTools import DevTools
 
 class MenuDropdown(FloatLayout):
     father_screen = ObjectProperty(None)
