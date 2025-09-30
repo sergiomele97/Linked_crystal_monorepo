@@ -6,8 +6,7 @@ class SpriteRenderer:
     Usa alpha binario (0 = transparente, 255 = opaco).
     """
 
-    @staticmethod
-    def draw(frame, sprite_array, x, y):
+    def draw(self, frame, sprite_array, x, y):
         """
         Dibuja un sprite RGBA sobre el framebuffer en (x, y).
         Maneja recortes si el sprite está fuera de pantalla.
@@ -39,8 +38,7 @@ class SpriteRenderer:
         # Copiar solo donde el sprite es opaco
         frame_slice[mask] = sprite_crop[mask]
 
-    @staticmethod
-    def create_black_sprite(size=16):
+    def create_black_sprite(self, size=16):
         """
         Crea un sprite negro RGBA de tamaño `size x size`.
         Con algunos píxeles transparentes en la diagonal.

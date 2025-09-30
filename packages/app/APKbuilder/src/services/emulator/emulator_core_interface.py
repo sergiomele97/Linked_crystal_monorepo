@@ -13,10 +13,9 @@ class EmulatorCoreInterface:
     """
     Clase que crea y gestiona la instancia de Pyboy
     """
-    def __init__(self, on_frame=None, on_audio=None, on_text_output=None):
+    def __init__(self, on_frame=None, on_text_output=None):
         self.on_frame = on_frame
         self.on_text_output = on_text_output
-        self.on_audio = on_audio
         self.pyboy = None
         self.loop = None
 
@@ -46,7 +45,7 @@ class EmulatorCoreInterface:
 
         # Crear y lanzar el loop de emulación
         self.loop = EmulationLoop(
-            self.pyboy, self.on_frame, self.on_audio, self.on_text_output
+            self.pyboy, self.on_frame, self.on_text_output
         )
         self.loop.start(fps=60)
 

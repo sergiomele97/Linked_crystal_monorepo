@@ -5,7 +5,6 @@ from kivy.lang import Builder
 from screens.emulator_screen.components.controlpad import ControlPad
 from screens.emulator_screen.components.menu_dropdown import MenuDropdown
 from screens.emulator_screen.components.video_display import VideoDisplay
-from services.audio.audio_manager import AudioManagerKivy
 from services.emulator.emulator_core_interface import EmulatorCoreInterface
 
 Builder.load_file("screens/emulator_screen/emulator_screen.kv")
@@ -22,11 +21,9 @@ class EmulatorScreen(Screen):
 
         self.video_display = self.ids.video_display
         self.controlpad = self.ids.control_pad
-        self.audio_manager = AudioManagerKivy()
         self.emulator = EmulatorCoreInterface(
             on_frame=self.video_display.update_frame,
-            on_text_output=self.video_display.display_message,
-            on_audio=self.audio_manager.play_audio_buffer
+            on_text_output=self.video_display.display_message
         )
 
         self.controlpad.on_button_press = self.emulator.send_input_press
