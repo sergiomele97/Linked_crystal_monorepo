@@ -1,4 +1,6 @@
 import numpy as np
+from PIL import Image
+
 
 class SpriteRenderer:
     """
@@ -52,3 +54,40 @@ class SpriteRenderer:
             sprite[i, i, 3] = 0  # alpha = 0 → transparente
 
         return sprite
+
+    def load_sprite_sheet(self, path, frame_width=16, frame_height=16):
+        """
+        Carga una hoja de sprites (sprite sheet) PNG en formato RGBA.
+        Devuelve un array numpy (H, W, 4) y una lista de frames (cada uno 16x16).
+        """
+        image = Image.open(path).convert("RGBA")
+        sheet = np.array(image, dtype=np.uint8)
+
+        sheet_h, sheet_w, _ = sheet.shape
+        frames = []
+
+        num_frames = sheet_w // frame_width
+        for i in range(num_frames):
+            x0 = i * frame_width
+            x1 = x0 + frame_width
+            frame = sheet[0:frame_height, x0:x1, :]
+            frames.append(frame)
+
+        self.sprite_sheet = sheet
+        self.sprite_frames = frames
+        return frames
+
+    def get_first_frame(self):
+        """
+        Devuelve el primer frame (16x16) del sprite sheet cargado.
+        """
+        if not hasattr(self, 'sprite_frames') or len(self.sprite_frames) == 0:
+            raise ValueError("No se ha cargado ningún sprite sheet todavía.")
+        return self.sprite_frames[0]
+
+    def draw_first_frame(self, frame, x, y):
+        """
+        Dibuja el primer frame del sprite sheet en pantalla.
+        """
+        first_frame = self.get_first_frame()
+        self.draw(frame, first_frame, x, y)

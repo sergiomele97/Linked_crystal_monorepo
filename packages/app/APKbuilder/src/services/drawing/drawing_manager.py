@@ -15,9 +15,11 @@ class DrawingManager:
         self.connectionData = connectionData
         #Services
         self.spriteRenderer = SpriteRenderer()
+
+        self.spriteRenderer.load_sprite_sheet("resources/image/OW_default_sprite.png")
         # Sprite negro de personaje (16x16)
         self.black_sprite = self.spriteRenderer.create_black_sprite(16)
-            # Coordenadas iniciales del sprite (puedes cambiar según overworld)
+        # Coordenadas iniciales del sprite (puedes cambiar según overworld)
         self.sprite_x = -8
         self.sprite_y = -8
 
@@ -29,5 +31,7 @@ class DrawingManager:
             self.spriteRenderer.draw(frame_arr, self.black_sprite, self.sprite_x, self.sprite_y)
             self.spriteRenderer.draw(frame_arr, self.black_sprite, 64, 64)
             self.spriteRenderer.draw(frame_arr, self.black_sprite, 155, 140)
+
+            self.spriteRenderer.draw_first_frame(frame_arr, 0, 0)
 
             Clock.schedule_once(lambda dt: self.on_frame(frame_arr), 0)
