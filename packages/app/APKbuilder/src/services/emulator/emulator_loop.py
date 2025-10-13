@@ -27,7 +27,7 @@ class EmulationLoop:
         self.connectionData = ConnectionData()
     #Services
         self.audioManager = AudioManagerKivy(self.pyboy)
-        self.ramScrapper = RamScrapper(self.ramData)
+        self.ramScrapper = RamScrapper(self.pyboy, self.ramData)
         self.connectionManager = ConnectionManager(self.connectionData)
         self.drawingManager = DrawingManager(self.ramData, self.connectionData, self.pyboy, self.on_frame)
     #Others
