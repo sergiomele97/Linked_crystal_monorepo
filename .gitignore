@@ -1,6 +1,6 @@
 # Virtual environment
-.venv/
-venv/
+**/.venv/
+**/venv/
 
 # PyCharm/JetBrains configuration
 .idea/
@@ -10,3 +10,7 @@ venv/
 
 # Python bytecode cache
 __pycache__/
+
+# Modulo de GO
+**/go.mod
+
