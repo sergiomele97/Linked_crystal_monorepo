@@ -35,13 +35,9 @@ jobs:
         run: |
           go build -o server .
 
-      # 5️⃣ Detener servidor en ejecución
-      - name: Stop running server
+      # 5️⃣ Reiniciar el servicio systemd
+      - name: Restart WebSocket service
         run: |
-          pkill server || true
-
-      # 6️⃣ Ejecutar servidor en background
-      - name: Start server
-        run: |
-          cd packages/server
-          nohup ./server >/dev/null 2>&1 &
+          sudo systemctl daemon-reload
+          sudo systemctl restart websocket-server
+          sudo systemctl status websocket-server --no-pager
