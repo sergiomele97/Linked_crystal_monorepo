@@ -1,0 +1,33 @@
+name: Deploy WebSocket Server
+
+on:
+  push:
+    branches:
+      - main
+
+jobs:
+  build-and-deploy:
+    environment: development
+    runs-on: self-hosted
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Setup Go
+        uses: actions/setup-go@v4
+        with:
+          go-version: '1.25'
+
+      - name: Build Go server
+        run: |
+          cd packages/server
+          go build -o server main.go
+
+      - name: Stop running server
+        run: |
+          pkill server || true
+
+      - name: Start server
+        run: |
+          cd packages/server
+          nohup ./server >/dev/null 2>&1 &
