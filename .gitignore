@@ -11,7 +11,4 @@
 # Python bytecode cache
 __pycache__/
 
-# Modulo de GO
-**/go.mod
-**/go.sum
 
