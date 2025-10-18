@@ -10,23 +10,37 @@ jobs:
     environment: development
     runs-on: self-hosted
     steps:
+      # 1️⃣ Clonar el repo
       - name: Checkout repository
         uses: actions/checkout@v4
 
+      # 2️⃣ Instalar Go
       - name: Setup Go
         uses: actions/setup-go@v4
         with:
           go-version: '1.25'
 
-      - name: Build Go server
-        run: |
-          cd packages/server
-          go build -o server main.go
+      # 3️⃣ Cache de dependencias Go
+      - name: Cache Go modules
+        uses: actions/cache@v3
+        with:
+          path: |
+            ~/go/pkg/mod
+            ~/go/cache
+          key: ${{ runner.os }}-go-${{ hashFiles('packages/server/go.sum') }}
 
+      # 4️⃣ Compilar el servidor
+      - name: Build Go server
+        working-directory: packages/server
+        run: |
+          go build -o server .
+
+      # 5️⃣ Detener servidor en ejecución
       - name: Stop running server
         run: |
           pkill server || true
 
+      # 6️⃣ Ejecutar servidor en background
       - name: Start server
         run: |
           cd packages/server
