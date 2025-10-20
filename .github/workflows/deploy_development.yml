@@ -46,6 +46,5 @@ jobs:
       # 6️⃣ Reiniciar el servicio systemd
       - name: Restart WebSocket service
         run: |
-          sudo systemctl daemon-reload
           sudo systemctl restart websocket-server
           sudo systemctl status websocket-server --no-pager
