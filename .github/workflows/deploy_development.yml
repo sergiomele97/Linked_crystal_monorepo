@@ -10,6 +10,11 @@ jobs:
     environment: development
     runs-on: self-hosted
     steps:
+      # 🔧 Limpiar permisos del workspace (evita errores EACCES)
+      - name: Fix permissions
+        run: |
+          sudo chown -R $USER:$USER ${{ github.workspace }} || true
+
       # 1️⃣ Clonar el repo
       - name: Checkout repository
         uses: actions/checkout@v4
