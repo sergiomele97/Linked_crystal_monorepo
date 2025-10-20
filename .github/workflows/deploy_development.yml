@@ -13,7 +13,8 @@ jobs:
       # Limpiar permisos del workspace
       - name: Fix permissions
         run: |
-          sudo chown -R $USER:$USER ${{ github.workspace }} || true
+          sudo chown -R $USER:$USER /home/sergio/actions-runner/_work || true
+          sudo chmod -R u+rw /home/sergio/actions-runner/_work || true
 
       # 1️⃣ Clonar el repo
       - name: Checkout repository
