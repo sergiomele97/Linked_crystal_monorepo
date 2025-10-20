@@ -10,7 +10,7 @@ jobs:
     environment: development
     runs-on: self-hosted
     steps:
-      # 🔧 Limpiar permisos del workspace
+      # Limpiar permisos del workspace
       - name: Fix permissions
         run: |
           sudo chown -R $USER:$USER ${{ github.workspace }} || true
