@@ -20,35 +20,33 @@ jobs:
       - name: Checkout repository
         uses: actions/checkout@v4
 
-      # 2️⃣ Instalar Go
+      # 📦 2️⃣ Clonar el repositorio
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      # 🏗️ 3️⃣ Instalar Go y habilitar caché
       - name: Setup Go
         uses: actions/setup-go@v4
         with:
           go-version: '1.25'
+          cache: true  # activa la caché automática de módulos y compilaciones
 
-      # 3️⃣ Configurar cache de dependencias Go
-      - name: Cache Go modules
+      # ⚡ 4️⃣ Cache adicional persistente (opcional, mejora tiempos)
+      - name: Cache Go build
         uses: actions/cache@v3
         with:
           path: |
-            .go/pkg/mod
-          key: ${{ runner.os }}-go-${{ hashFiles('packages/server/go.sum') }}
+            ~/.cache/go-build
+            ~/.local/share/go
+          key: ${{ runner.os }}-go-${{ hashFiles('**/go.sum') }}
 
-      # 4️⃣ Configurar GOPATH local (evita conflictos)
-      - name: Setup Go environment
-        run: |
-          mkdir -p .go
-          export GOPATH=$(pwd)/.go
-          go env -w GOPATH=$GOPATH
-          go env -w GOCACHE=$GOPATH/cache
-
-      # 5️⃣ Compilar el servidor
+      # 🧱 5️⃣ Compilar el servidor (limitando CPU y RAM)
       - name: Build Go server
         working-directory: packages/server
         run: |
-          go build -o server .
+          GOMAXPROCS=1 go build -ldflags="-s -w" -o server .
 
-      # 6️⃣ Reiniciar el servicio systemd
+      # 🔁 6️⃣ Reiniciar el servicio systemd
       - name: Restart WebSocket service
         run: |
           sudo systemctl restart websocket-server
