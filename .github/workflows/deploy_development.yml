@@ -45,7 +45,6 @@ jobs:
       - name: Build Go server
         working-directory: packages/server
         run: |
-          go mod tidy
           go build -o server .
 
       # 6️⃣ Reiniciar el servicio systemd
