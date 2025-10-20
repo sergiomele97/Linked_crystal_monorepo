@@ -40,7 +40,7 @@ jobs:
       - name: Build Go server
         working-directory: packages/server
         run: |
-          GOMAXPROCS=1 go build -ldflags="-s -w" -o server .
+          GOMAXPROCS=1 go build -v -x -ldflags="-s -w" -o server .
 
       # 🔁 6️⃣ Reiniciar el servicio systemd
       - name: Restart WebSocket service
