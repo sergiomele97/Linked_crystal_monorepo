@@ -10,15 +10,11 @@ jobs:
     environment: development
     runs-on: self-hosted
     steps:
-      # Limpiar permisos del workspace
+      # 1️⃣ Limpiar permisos del workspace
       - name: Fix permissions
         run: |
           sudo chown -R $USER:$USER /home/sergio/actions-runner/_work || true
           sudo chmod -R u+rw /home/sergio/actions-runner/_work || true
-
-      # 1️⃣ Clonar el repo
-      - name: Checkout repository
-        uses: actions/checkout@v4
 
       # 📦 2️⃣ Clonar el repositorio
       - name: Checkout repository
@@ -29,7 +25,7 @@ jobs:
         uses: actions/setup-go@v4
         with:
           go-version: '1.25'
-          cache: true  # activa la caché automática de módulos y compilaciones
+          cache-dependency-path: packages/server/go.sum 
 
       # ⚡ 4️⃣ Cache adicional persistente (opcional, mejora tiempos)
       - name: Cache Go build
