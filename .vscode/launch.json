@@ -1,0 +1,28 @@
+{
+    "version": "0.2.0",
+    "configurations": [
+        {
+            "name": "Python: cliente",
+            "type": "debugpy",
+            "request": "launch",
+            "program": "${workspaceFolder}/packages/app/APKbuilder/src/main.py",
+            "cwd": "${workspaceFolder}/packages/app/APKbuilder/src",
+            "console": "integratedTerminal"
+        },
+        {
+            "name": "Go: server",
+            "type": "go",
+            "request": "launch",
+            "mode": "debug",
+            "program": "${workspaceFolder}/packages/server/main.go",
+            "cwd": "${workspaceFolder}/packages/server",
+            "console": "integratedTerminal"
+        }
+    ],
+    "compounds": [
+        {
+            "name": "Development: Python + Go",
+            "configurations": ["Python: cliente", "Go: server"]
+        }
+    ]
+}
