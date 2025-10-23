@@ -9,28 +9,31 @@
 
 <hr>
 
-<div style="display:flex; align-items:flex-start; gap:20px;">
+<table>
+  <tr>
+    <td style="width:70%; vertical-align:top;">
 
-  <!-- Progreso del Proyecto -->
-  <div style="flex:7; border:1px solid #ddd; border-radius:10px; padding:15px;">
-    <h3>📈 Progreso del Proyecto</h3>
-    <div style="border-left:2px solid #4CAF50; padding-left:15px; margin-left:10px;">
-      <p>✅ <b>Etapa 1:</b> Diseño completado</p>
-      <p>🟡 <b>Etapa 2:</b> Backend en desarrollo</p>
-      <p>⚪ <b>Etapa 3:</b> Frontend pendiente</p>
-      <p>⚪ <b>Etapa 4:</b> Documentación</p>
-    </div>
-  </div>
+      <h3>📈 Progreso del Proyecto</h3>
+      <div style="border-left:2px solid #4CAF50; padding-left:15px; margin-left:10px;">
+        <p>✅ <b>Etapa 1:</b> Diseño completado</p>
+        <p>🟡 <b>Etapa 2:</b> Backend en desarrollo</p>
+        <p>⚪ <b>Etapa 3:</b> Frontend pendiente</p>
+        <p>⚪ <b>Etapa 4:</b> Documentación</p>
+      </div>
 
-  <!-- Entornos -->
-  <div style="flex:3; border:1px solid #ddd; border-radius:10px; padding:15px;">
-    <h3>🌍 Entornos</h3>
-    <p>💻 <b>Local:</b> 🟢 Activo</p>
-    <p>🔧 <b>Staging:</b> 🟠 Mantenimiento</p>
-    <p>🚀 <b>Producción:</b> 🟢 Online</p>
-  </div>
+    </td>
+    <td style="width:30%; vertical-align:top;">
 
-</div>
+      <h3>🌍 Entornos</h3>
+      <div style="border:1px solid #ddd; border-radius:10px; padding:10px;">
+        <p>💻 <b>Local:</b> 🟢 Activo</p>
+        <p>🔧 <b>Staging:</b> 🟠 Mantenimiento</p>
+        <p>🚀 <b>Producción:</b> 🟢 Online</p>
+      </div>
+
+    </td>
+  </tr>
+</table>
 
 <hr>
 
