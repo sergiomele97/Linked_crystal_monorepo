@@ -1,4 +1,17 @@
-<h1 align="center">🚀 Proyecto Nombre</h1>
+<table>
+  <tr>
+    <td width="70%" valign="top">
+      <b>📈 Progreso del Proyecto</b>
+      <p>✅ Etapa 1: Diseño completado</p>
+      <p>🟡 Etapa 2: Backend en desarrollo</p>
+      <p>⚪ Etapa 3: Frontend pendiente</p>
+      <p>⚪ Etapa 4: Documentación</p>
+    </td>
+    <td width="30%" valign="top">
+      <b>🌍 Entornos</b>
+      <p>💻 Local: 🟢 Activo</p>
+      <p>🔧 Staging: 🟠 Mantenimiento</p>
+      <h1 align="center">🚀 Nombre del Proyecto</h1>
 <p align="center">Descripción breve y atractiva del proyecto.</p>
 
 <p align="center">
@@ -7,40 +20,29 @@
   <img src="https://img.shields.io/badge/Licencia-MIT-green">
 </p>
 
-<hr>
+---
 
-<table>
-  <tr>
-    <td style="width:70%; vertical-align:top;">
+| 📈 **Progreso del Proyecto** | 🌍 **Entornos** |
+|------------------------------|----------------|
+| ✅ **Diseño:** completado<br>🟡 **Backend:** en desarrollo<br>⚪ **Frontend:** pendiente<br>⚪ **Documentación:** pendiente | 💻 **Local:** 🟢 Activo<br>🔧 **Staging:** 🟠 Mantenimiento<br>🚀 **Producción:** 🟢 Online |
 
-      <h3>📈 Progreso del Proyecto</h3>
-      <div style="border-left:2px solid #4CAF50; padding-left:15px; margin-left:10px;">
-        <p>✅ <b>Etapa 1:</b> Diseño completado</p>
-        <p>🟡 <b>Etapa 2:</b> Backend en desarrollo</p>
-        <p>⚪ <b>Etapa 3:</b> Frontend pendiente</p>
-        <p>⚪ <b>Etapa 4:</b> Documentación</p>
-      </div>
+---
 
-    </td>
-    <td style="width:30%; vertical-align:top;">
+### 🧰 Desplegar entorno local
 
-      <h3>🌍 Entornos</h3>
-      <div style="border:1px solid #ddd; border-radius:10px; padding:10px;">
-        <p>💻 <b>Local:</b> 🟢 Activo</p>
-        <p>🔧 <b>Staging:</b> 🟠 Mantenimiento</p>
-        <p>🚀 <b>Producción:</b> 🟢 Online</p>
-      </div>
+```bash
+# Clonar el repositorio
+git clone https://github.com/usuario/proyecto.git
 
+# Entrar al directorio
+cd proyecto
+
+# Instalar dependencias
+npm install
+
+# Iniciar entorno local
+npm run dev
+🚀 Producción: 🟢 Online</p>
     </td>
   </tr>
 </table>
-
-<hr>
-
-<h3>🧰 Desplegar entorno local</h3>
-
-```bash
-git clone https://github.com/usuario/proyecto.git
-cd proyecto
-npm install
-npm run dev
