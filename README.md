@@ -46,3 +46,5 @@ npm run dev
     </td>
   </tr>
 </table>
+
+![Caja con scroll](./scroll-box.svg)
