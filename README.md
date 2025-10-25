@@ -1,6 +1,5 @@
 <table>
   <tr>
-    <!-- Columna Roadmap -->
     <td>
       <details>
         <summary>✅ Paso 1: Planificación</summary>
@@ -28,8 +27,6 @@
         Despliegue a producción y documentación final.
       </details>
     </td>
-
-    <!-- Columna adicional -->
     <td>
       Información adicional, notas o recursos del proyecto.  
       Puedes poner enlaces, listas o cualquier otro contenido en Markdown.
