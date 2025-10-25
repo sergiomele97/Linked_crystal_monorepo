@@ -1,11 +1,11 @@
-<table style="border-collapse: collapse; width: 100%;">
+<table>
   <tr>
     <!-- Columna Roadmap -->
-    <td style="width: 50%; vertical-align: top; border: none;">
+    <td>
       <details>
         <summary>✅ Paso 1: Planificación</summary>
-        Definir objetivos y alcance del proyecto. <br>
-        Reunir recursos necesarios y establecer cronograma.
+        Definir objetivos y alcance del proyecto.  
+        Reunir recursos y establecer cronograma.
       </details>
       <br>
       <details>
@@ -30,8 +30,9 @@
     </td>
 
     <!-- Columna adicional -->
-    <td style="width: 50%; vertical-align: top; border: none;">
-      <p>Información adicional, notas o recursos del proyecto.</p>
+    <td>
+      Información adicional, notas o recursos del proyecto.  
+      Puedes poner enlaces, listas o cualquier otro contenido en Markdown.
     </td>
   </tr>
 </table>
