@@ -1,6 +1,8 @@
 <table>
   <tr>
     <td>
+      <h2>🚀 ROADMAP</h2>
+      <img src="https://via.placeholder.com/400x1/FFFFFF/FFFFFF" alt="" width="400" height="1">
       <details>
         <summary>✅ Paso 1: Planificación</summary>
         Definir objetivos y alcance del proyecto.  
@@ -27,9 +29,7 @@
         Despliegue a producción y documentación final.
       </details>
       <br>
-      <!-- Línea blanca fija al final -->
-      <img src="https://via.placeholder.com/400x1/FFFFFF/FFFFFF" alt="" width="400" height="1">
-    </td>
+      </td>
     <td>
       Información adicional, notas o recursos del proyecto. 
     </td>
