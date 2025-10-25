@@ -1,3 +1,6 @@
+<h1 align="center">💎 Linked Crystal</h1>
+<p align="center"><em>Turning Pokémon Crystal into an MMO experience</em></p>
+
 <table>
   <tr>
     <td valign="top">
@@ -29,16 +32,12 @@
         <summary>⚪ Paso 5: Lanzamiento</summary>
         Despliegue a producción y documentación final.
       </details>
-        </td>
+    </td>
     <td valign="top">
       <h3 align="center">🌍 ENVIRONMENTS</h3>    
       <img src="https://via.placeholder.com/400x1/FFFFFF/FFFFFF" alt="" width="400" height="1">
       <br>
-  
-
-
-
-      Información adicional, notas o recursos del proyecto
     </td>
+    
   </tr>
 </table>
