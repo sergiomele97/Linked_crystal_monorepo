@@ -3,6 +3,7 @@
     <td valign="top">
       <h3 align="center">🚀 ROADMAP</h3>
       <img src="https://via.placeholder.com/400x1/FFFFFF/FFFFFF" alt="" width="140" height="1">
+      <br>
       <details>
         <summary>✅ Paso 1: Planificación</summary>
         Definir objetivos y alcance del proyecto.  
@@ -32,7 +33,8 @@
     <td valign="top">
       <h3 align="center">🌍 ENVIRONMENTS</h3>    
       <img src="https://via.placeholder.com/400x1/FFFFFF/FFFFFF" alt="" width="400" height="1">
-       Información adicional, notas o recursos del proyecto
+      <br>
+      Información adicional, notas o recursos del proyecto
     </td>
   </tr>
 </table>
