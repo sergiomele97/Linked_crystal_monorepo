@@ -28,8 +28,7 @@
       </details>
     </td>
     <td>
-      Información adicional, notas o recursos del proyecto.  
-      Puedes poner enlaces, listas o cualquier otro contenido en Markdown.
+      Información adicional, notas o recursos del proyecto. 
     </td>
   </tr>
 </table>
