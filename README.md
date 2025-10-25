@@ -1,7 +1,8 @@
 <table>
   <tr>
     <td valign="top">
-      <h2 align="center">🚀 ROADMAP</h2>
+      <b align="center">🚀 ROADMAP</b>
+      <img src="https://via.placeholder.com/400x1/FFFFFF/FFFFFF" alt="" width="180" height="1">
       <details>
         <summary>✅ Paso 1: Planificación</summary>
         Definir objetivos y alcance del proyecto.  
@@ -27,12 +28,11 @@
         <summary>⚪ Paso 5: Lanzamiento</summary>
         Despliegue a producción y documentación final.
       </details>
-      <img src="https://via.placeholder.com/400x1/FFFFFF/FFFFFF" alt="" width="180" height="1">
-    </td>
+        </td>
     <td valign="top">
-      <h2 align="center">🌍 ENVIRONMENTS</h2>    
-      Información adicional, notas o recursos del proyecto.
+      <b align="center">🌍 ENVIRONMENTS</b>    
       <img src="https://via.placeholder.com/400x1/FFFFFF/FFFFFF" alt="" width="400" height="1">
+       Información adicional, notas o recursos del proyecto
     </td>
   </tr>
 </table>
