@@ -1,13 +1,37 @@
-<table>
+<table style="border-collapse: collapse; width: 100%;">
   <tr>
-    <td>
+    <!-- Columna Roadmap -->
+    <td style="width: 50%; vertical-align: top; border: none;">
       <details>
-        <summary>Ver más</summary>
-        Línea 1<br>
-        Línea 2
+        <summary>✅ Paso 1: Planificación</summary>
+        Definir objetivos y alcance del proyecto. <br>
+        Reunir recursos necesarios y establecer cronograma.
+      </details>
+      <br>
+      <details>
+        <summary>✅ Paso 2: Diseño</summary>
+        Crear diagramas, wireframes y especificaciones técnicas.
+      </details>
+      <br>
+      <details>
+        <summary>⚪ Paso 3: Desarrollo</summary>
+        Implementar funcionalidades principales y pruebas iniciales.
+      </details>
+      <br>
+      <details>
+        <summary>⚪ Paso 4: Pruebas y QA</summary>
+        Realizar pruebas exhaustivas y corrección de errores.
+      </details>
+      <br>
+      <details>
+        <summary>⚪ Paso 5: Lanzamiento</summary>
+        Despliegue a producción y documentación final.
       </details>
     </td>
-    <td>Texto<br>extra</td>
-    <td>Hola<br>👋</td>
+
+    <!-- Columna adicional -->
+    <td style="width: 50%; vertical-align: top; border: none;">
+      <p>Información adicional, notas o recursos del proyecto.</p>
+    </td>
   </tr>
 </table>
