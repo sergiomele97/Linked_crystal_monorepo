@@ -1,7 +1,7 @@
 <table>
   <tr>
     <td valign="top">
-      <b align="center">🚀 ROADMAP</b>
+      <h3 align="center">🚀 ROADMAP</h3>
       <img src="https://via.placeholder.com/400x1/FFFFFF/FFFFFF" alt="" width="140" height="1">
       <details>
         <summary>✅ Paso 1: Planificación</summary>
@@ -30,7 +30,7 @@
       </details>
         </td>
     <td valign="top">
-      <b align="center">🌍 ENVIRONMENTS</b>    
+      <h3 align="center">🌍 ENVIRONMENTS</h3>    
       <img src="https://via.placeholder.com/400x1/FFFFFF/FFFFFF" alt="" width="400" height="1">
        Información adicional, notas o recursos del proyecto
     </td>
