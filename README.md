@@ -35,32 +35,31 @@
       <img src="https://via.placeholder.com/400x1/FFFFFF/FFFFFF" alt="" width="400" height="1">
       <br>
   
-<table>
-  <tr>
-    <th>Entorno</th>
-    <th>Back (Go + WebSockets)</th>
-    <th>Front (Python + Kivy)</th>
-    <th>Estado</th>
-  </tr>
-  <tr>
-    <td>Local</td>
-    <td>💻 Servidor local</td>
-    <td>🖥️ App Desktop</td>
-    <td>⚪ Cada dev lo despliega</td>
-  </tr>
-  <tr>
-    <td>Development</td>
-    <td>🌐 Servidor publicado</td>
-    <td>📱 App Android compilada</td>
-    <td>✅ Healthy (revisar)</td>
-  </tr>
-  <tr>
-    <td>Producción</td>
-    <td>❌ No implementado</td>
-    <td>❌ No implementado</td>
-    <td>⚪ Pendiente</td>
-  </tr>
-</table>
+flowchart TD
+    subgraph Local
+        LBack[💻 Back: Servidor Go + WebSockets]
+        LFront[🖥️ Front: App Desktop Python + Kivy]
+        LBack --> LFront
+        LFront -.-> LStatusLocal[⚪ Desplegado por cada dev]
+    end
+
+    subgraph Development
+        DBack[🌐 Back: Servidor publicado]
+        DFront[📱 Front: App Android compilada]
+        DBack --> DFront
+        DFront -.-> DStatusDev[✅ Healthy]
+    end
+
+    subgraph Producción
+        PBack[❌ Back: No implementado]
+        PFront[❌ Front: No implementado]
+        PBack --> PFront
+        PFront -.-> PStatusProd[⚪ Pendiente]
+    end
+
+    LFront --> DBack
+    DFront --> PBack
+
 
       Información adicional, notas o recursos del proyecto
     </td>
