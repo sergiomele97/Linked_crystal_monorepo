@@ -34,6 +34,34 @@
       <h3 align="center">🌍 ENVIRONMENTS</h3>    
       <img src="https://via.placeholder.com/400x1/FFFFFF/FFFFFF" alt="" width="400" height="1">
       <br>
+  
+<table>
+  <tr>
+    <th>Entorno</th>
+    <th>Back (Go + WebSockets)</th>
+    <th>Front (Python + Kivy)</th>
+    <th>Estado</th>
+  </tr>
+  <tr>
+    <td>Local</td>
+    <td>💻 Servidor local</td>
+    <td>🖥️ App Desktop</td>
+    <td>⚪ Cada dev lo despliega</td>
+  </tr>
+  <tr>
+    <td>Development</td>
+    <td>🌐 Servidor publicado</td>
+    <td>📱 App Android compilada</td>
+    <td>✅ Healthy (revisar)</td>
+  </tr>
+  <tr>
+    <td>Producción</td>
+    <td>❌ No implementado</td>
+    <td>❌ No implementado</td>
+    <td>⚪ Pendiente</td>
+  </tr>
+</table>
+
       Información adicional, notas o recursos del proyecto
     </td>
   </tr>
