@@ -27,7 +27,7 @@
         <summary>⚪ Paso 5: Lanzamiento</summary>
         Despliegue a producción y documentación final.
       </details>
-      <img src="https://via.placeholder.com/400x1/FFFFFF/FFFFFF" alt="" width="400" height="1">
+      <img src="https://via.placeholder.com/400x1/FFFFFF/FFFFFF" alt="" width="180" height="1">
     </td>
     <td valign="top">
       <h2 align="center">🌍 ENVIRONMENTS</h2>    
