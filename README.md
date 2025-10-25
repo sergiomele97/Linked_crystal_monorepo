@@ -2,7 +2,6 @@
   <tr>
     <td>
       <h2 align="center">🚀 ROADMAP</h2>
-      <img src="https://via.placeholder.com/400x1/FFFFFF/FFFFFF" alt="" width="400" height="1">
       <details>
         <summary>✅ Paso 1: Planificación</summary>
         Definir objetivos y alcance del proyecto.  
