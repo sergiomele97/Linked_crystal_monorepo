@@ -1,6 +1,6 @@
 <table>
   <tr>
-    <td>
+    <td valign="top">
       <h2 align="center">🚀 ROADMAP</h2>
       <details>
         <summary>✅ Paso 1: Planificación</summary>
@@ -27,10 +27,9 @@
         <summary>⚪ Paso 5: Lanzamiento</summary>
         Despliegue a producción y documentación final.
       </details>
-      <br>
-      </td>
-    <td>
-      <h2 align="center" width="400" >🚀 ROADMAP</h2>    
+    </td>
+    <td valign="top">
+      <h2 align="center">🌍 ENVIRONMENTS</h2>    
       Información adicional, notas o recursos del proyecto. 
     </td>
   </tr>
