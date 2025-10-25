@@ -30,7 +30,7 @@
       <br>
       </td>
     <td>
-      <img src="https://via.placeholder.com/400x1/FFFFFF/FFFFFF" alt="" width="700" height="1">
+      <h2 align="center" width="400" >🚀 ROADMAP</h2>    
       Información adicional, notas o recursos del proyecto. 
     </td>
   </tr>
