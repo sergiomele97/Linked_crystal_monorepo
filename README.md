@@ -35,30 +35,7 @@
       <img src="https://via.placeholder.com/400x1/FFFFFF/FFFFFF" alt="" width="400" height="1">
       <br>
   
-flowchart TD
-    subgraph Local
-        LBack[💻 Back: Servidor Go + WebSockets]
-        LFront[🖥️ Front: App Desktop Python + Kivy]
-        LBack --> LFront
-        LFront -.-> LStatusLocal[⚪ Desplegado por cada dev]
-    end
 
-    subgraph Development
-        DBack[🌐 Back: Servidor publicado]
-        DFront[📱 Front: App Android compilada]
-        DBack --> DFront
-        DFront -.-> DStatusDev[✅ Healthy]
-    end
-
-    subgraph Producción
-        PBack[❌ Back: No implementado]
-        PFront[❌ Front: No implementado]
-        PBack --> PFront
-        PFront -.-> PStatusProd[⚪ Pendiente]
-    end
-
-    LFront --> DBack
-    DFront --> PBack
 
 
       Información adicional, notas o recursos del proyecto
