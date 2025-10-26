@@ -41,7 +41,7 @@
         <table>
             <tr>
                 <td>
-                  [![](https://img.shields.io/badge/python?style=for-the-badge&logo=python&logoColor=F7DF1E)]
+                  <code><img height="30" src="https://img.shields.io/badge/Python-FFD43B?style=for-the-badge&logo=python&logoColor=blue"></code>
                 </td>
             </tr>
         </table>-----------------------------sadad------------
