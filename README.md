@@ -37,7 +37,6 @@
       <h3 align="center">🌍 PRODUCTS AND ENVIRONMENTS</h3>    
       <img src="https://via.placeholder.com/400x1/FFFFFF/FFFFFF" alt="" width="600" height="1"><br>
       <b>Production</b><br>
-      ----------------------
         <table>
             <tr>
               <td><b>Client</b></td>
@@ -50,7 +49,7 @@
                 
             </tr>
             
-        </table>-----------------------------sadad------------
+        </table>
       <img src="https://via.placeholder.com/400x1/FFFFFF/FFFFFF" alt="" width="600" height="1"><br>
       <b>Development</b>
       <img src="https://via.placeholder.com/400x1/FFFFFF/FFFFFF" alt="" width="600" height="1"><br>
