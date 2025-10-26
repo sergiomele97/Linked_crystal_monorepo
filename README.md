@@ -41,8 +41,12 @@
             <tr>
               <td><b>Client</b></td>
               <td rowspan="2">Columna derecha (fusionada)</td>
+              <td><b>Server</b></td>
             </tr>
             <tr>
+                <td>
+                  <code><img height="30" src="https://img.shields.io/badge/Python-FFD43B?style=for-the-badge&logo=python&logoColor=blue"></code>
+                </td>
                 <td>
                   <code><img height="30" src="https://img.shields.io/badge/Python-FFD43B?style=for-the-badge&logo=python&logoColor=blue"></code>
                 </td>
