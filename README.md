@@ -35,7 +35,7 @@
     </td>
     <td valign="top">
       <h3 align="center">🌍 ENVIRONMENTS</h3>    
-      <img src="https://via.placeholder.com/400x1/FFFFFF/FFFFFF" alt="" width="400" height="1">
+      <img src="https://via.placeholder.com/400x1/FFFFFF/FFFFFF" alt="" width="600" height="1">
       <br>
     </td>
     
