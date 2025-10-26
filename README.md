@@ -40,10 +40,16 @@
       ----------------------
         <table>
             <tr>
+              <td><b>Client</b></td>
+              <td rowspan="2">Columna derecha (fusionada)</td>
+            </tr>
+            <tr>
                 <td>
                   <code><img height="30" src="https://img.shields.io/badge/Python-FFD43B?style=for-the-badge&logo=python&logoColor=blue"></code>
                 </td>
+                
             </tr>
+            
         </table>-----------------------------sadad------------
       <img src="https://via.placeholder.com/400x1/FFFFFF/FFFFFF" alt="" width="600" height="1"><br>
       <b>Development</b>
