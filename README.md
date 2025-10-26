@@ -35,14 +35,21 @@
     </td>
     <td valign="top">
       <h3 align="center">🌍 PRODUCTS AND ENVIRONMENTS</h3>    
-      <img src="https://via.placeholder.com/400x1/FFFFFF/FFFFFF" alt="" width="600" height="1">
+      <img src="https://via.placeholder.com/400x1/FFFFFF/FFFFFF" alt="" width="600" height="1"><br>
       <b>Production</b><br>
-      ----------------------adads-----------------------------sadad------------
-      <img src="https://via.placeholder.com/400x1/FFFFFF/FFFFFF" alt="" width="600" height="1">
+      ----------------------
+        <table>
+            <tr>
+                <td>
+                  [![](https://img.shields.io/badge/python?style=for-the-badge&logo=python&logoColor=F7DF1E)]
+                </td>
+            </tr>
+        </table>-----------------------------sadad------------
+      <img src="https://via.placeholder.com/400x1/FFFFFF/FFFFFF" alt="" width="600" height="1"><br>
       <b>Development</b>
-      <img src="https://via.placeholder.com/400x1/FFFFFF/FFFFFF" alt="" width="600" height="1">
+      <img src="https://via.placeholder.com/400x1/FFFFFF/FFFFFF" alt="" width="600" height="1"><br>
       <b>Local</b>
-      <img src="https://via.placeholder.com/400x1/FFFFFF/FFFFFF" alt="" width="600" height="1">
+      <img src="https://via.placeholder.com/400x1/FFFFFF/FFFFFF" alt="" width="600" height="1"><br>
       <br>
     </td>
     
