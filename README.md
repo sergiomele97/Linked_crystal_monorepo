@@ -41,12 +41,9 @@
             <tr>
               <td><b>Client</b></td>
               <td rowspan="2">
-                <svg width="200" height="50" xmlns="http://www.w3.org/2000/svg">
-                  <line x1="0" y1="25" x2="200" y2="25" stroke="black" stroke-width="4" stroke-dasharray="20 10">
-                    <animate attributeName="stroke-dashoffset" from="0" to="-60" dur="1s" repeatCount="indefinite" />
-                  </line>
-                  <polygon points="190,20 200,25 190,30" fill="black" />
-                </svg>
+                <td rowspan="2" align="center">
+                  <img src="https://raw.githubusercontent.com/sergiomele97/Linked_crystal_monorepo/main/flow.svg" width="200" alt="data flow animation">
+                </td>
               </td>
               <td><b>Server</b></td>
             </tr>
