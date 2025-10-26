@@ -34,7 +34,14 @@
       </details>
     </td>
     <td valign="top">
-      <h3 align="center">🌍 ENVIRONMENTS</h3>    
+      <h3 align="center">🌍 PRODUCTS AND ENVIRONMENTS</h3>    
+      <img src="https://via.placeholder.com/400x1/FFFFFF/FFFFFF" alt="" width="600" height="1">
+      <b>Production</b><br>
+      ----------------------adads-----------------------------sadad------------
+      <img src="https://via.placeholder.com/400x1/FFFFFF/FFFFFF" alt="" width="600" height="1">
+      <b>Development</b>
+      <img src="https://via.placeholder.com/400x1/FFFFFF/FFFFFF" alt="" width="600" height="1">
+      <b>Local</b>
       <img src="https://via.placeholder.com/400x1/FFFFFF/FFFFFF" alt="" width="600" height="1">
       <br>
     </td>
