@@ -122,6 +122,6 @@
 
 Some info...
 
-[Set up environment](#client)
+[Set up environment](#set-up-client)
 
 ## Set up client
