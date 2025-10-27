@@ -44,7 +44,7 @@
                 <td>
                   <details>
                     <summary><b>Client</b></summary>
-                     [Set up environment](#client)
+                     [Set up environment](#set-up-client)
                   </details>
                 </td>
                 <td rowspan="3" align="center">
@@ -118,4 +118,4 @@
 </table>
 
 
-##CLient
+## Set up client
