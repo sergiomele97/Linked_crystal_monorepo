@@ -118,4 +118,10 @@
 </table>
 
 
+## Client
+
+Some info...
+
+[Set up environment](#client)
+
 ## Set up client
