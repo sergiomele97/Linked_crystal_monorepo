@@ -55,7 +55,7 @@
                   </td>
               </tr>
           </table>
-      </details>
+      </details><br>
       <img src="https://via.placeholder.com/400x1/FFFFFF/FFFFFF" alt="" width="600" height="1"><br>
       <b>Development</b>
       <img src="https://via.placeholder.com/400x1/FFFFFF/FFFFFF" alt="" width="600" height="1"><br>
