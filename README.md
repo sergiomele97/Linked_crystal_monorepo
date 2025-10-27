@@ -38,6 +38,7 @@
       <img src="https://via.placeholder.com/400x1/FFFFFF/FFFFFF" alt="" width="600" height="1"><br>
       <details>
         <summary><b>Production</b><br></summary>
+          <br>
           <table>
               <tr>
                 <td><b>Client</b></td>
@@ -59,6 +60,7 @@
       <img src="https://via.placeholder.com/400x1/FFFFFF/FFFFFF" alt="" width="600" height="1"><br>
       <details open>
         <summary><b>Development</b><br></summary>
+          <br>
           <table>
               <tr>
                 <td><b>Client</b></td>
