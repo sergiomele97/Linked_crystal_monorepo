@@ -49,8 +49,7 @@
               </tr>
               <tr>
                   <td>
-                    <code><img height="30" width="100" src="https://img.shields.io/badge/platform-Desktop-brightgreen"></code><br>         
-                    <code><img height="30" width="100" src="https://img.shields.io/badge/Kivy-blue?logo=python"></code><br>
+                    <code><img height="30" width="100" src="https://img.shields.io/badge/Kivy-Desktop-brightgreen"></code><br>
                     <code><img height="30" width="100" src="https://img.shields.io/badge/Python-FFD43B?style=for-the-badge&logo=python&logoColor=blue"></code>
                   </td>
                   <td>
