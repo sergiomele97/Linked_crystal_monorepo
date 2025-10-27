@@ -57,8 +57,8 @@
                   </td>
               </tr>
               <tr>
-                <td>Set up</td>
-                <td>Set up</td>
+                <td>👉 <a>Set up</a></td>
+                <td>👉 <a>Set up</a></td>
               </tr>
           </table>
       </details>
