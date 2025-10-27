@@ -69,11 +69,12 @@
               </tr>
               <tr>
                   <td>
-                    <code><img height="30" src="https://img.shields.io/badge/Android-3DDC84?logo=android&logoColor=white"></code><br>         
-                    <code><img height="30" src="https://img.shields.io/badge/Kivy-Buildozer-blue?logo=python"></code><br>
-                    <code><img height="30" src="https://img.shields.io/badge/Python-FFD43B?style=for-the-badge&logo=python&logoColor=blue"></code>
+                    <code><img height="30" width="100" src="https://img.shields.io/badge/Android-3DDC84?logo=android&logoColor=white"></code><br>         
+                    <code><img height="30" width="100" src="https://img.shields.io/badge/Kivy-Buildozer-blue?logo=python"></code><br>
+                    <code><img height="30" width="100" src="https://img.shields.io/badge/Python-FFD43B?style=for-the-badge&logo=python&logoColor=blue"></code>
                   </td>
                   <td>
+                    <code><img height="30" src="https://img.shields.io/badge/Cloudflare-F38020?style=for-the-badge&logo=Cloudflare&logoColor=white"></code>
                     <code><img height="30" src="https://img.shields.io/badge/Go-00ADD8?logo=Go&logoColor=white&style=for-the-badge"></code>
                   </td>
               </tr>
