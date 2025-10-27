@@ -57,7 +57,7 @@
           </table>
       </details>
       <img src="https://via.placeholder.com/400x1/FFFFFF/FFFFFF" alt="" width="600" height="1"><br>
-      <details>
+      <details open>
         <summary><b>Development</b><br></summary>
           <table>
               <tr>
