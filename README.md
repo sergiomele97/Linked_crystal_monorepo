@@ -44,13 +44,18 @@
                 <td>
                   <details>
                     <summary><b>Client</b></summary>
-                     <a href="#set-up-client">Set up environment</a>
+                     <a href="#set-up-local-client">Set up locally</a>
                   </details>
                 </td>
                 <td rowspan="3" align="center">
                   <img src="https://raw.githubusercontent.com/sergiomele97/Linked_crystal_monorepo/main/.github/assets/flow.svg" width="300" alt="data flow animation">
                 </td>
-                <td><b>Server</b></td>
+                <td>
+                  <details>
+                    <summary><b>Server</b></summary>
+                     <a href="#set-up-local-server">Set up locally</a>
+                  </details>
+                </td>
               </tr>
               <tr>
                   <td>
@@ -118,10 +123,6 @@
 </table>
 
 
-## Client
+## Set up local client
 
-Some info...
-
-[Set up environment](#set-up-client)
-
-## Set up client
+## Set up local server
