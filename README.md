@@ -44,7 +44,7 @@
                 <td>
                   <details>
                     <summary><b>Client</b></summary>
-                     [👉 Set up environment](#client)
+                     [Set up environment](#client)
                   </details>
                 </td>
                 <td rowspan="3" align="center">
