@@ -44,7 +44,7 @@
                 <td>
                   <details>
                     <summary><b>Client</b></summary>
-                     [Set up environment](#set-up-client)
+                     <a href="#set-up-client">Set up environment</a>
                   </details>
                 </td>
                 <td rowspan="3" align="center">
