@@ -36,24 +36,26 @@
     <td valign="top">
       <h3 align="center">🌍 PRODUCTS AND ENVIRONMENTS</h3>    
       <img src="https://via.placeholder.com/400x1/FFFFFF/FFFFFF" alt="" width="600" height="1"><br>
-      <b>Production</b><br>
-        <table>
-            <tr>
-              <td><b>Client</b></td>
-              <td rowspan="2" align="center">
-                <img src="https://raw.githubusercontent.com/sergiomele97/Linked_crystal_monorepo/main/flow.svg" width="330" alt="data flow animation">
-              </td>
-              <td><b>Server</b></td>
-            </tr>
-            <tr>
-                <td>
-                  <code><img height="30" src="https://img.shields.io/badge/Python-FFD43B?style=for-the-badge&logo=python&logoColor=blue"></code>
+      <details>
+        <summary><b>Production</b><br></summary>
+          <table>
+              <tr>
+                <td><b>Client</b></td>
+                <td rowspan="2" align="center">
+                  <img src="https://raw.githubusercontent.com/sergiomele97/Linked_crystal_monorepo/main/flow.svg" width="300" alt="data flow animation">
                 </td>
-                <td>
-                  <code><img height="30" src="https://img.shields.io/badge/Go-00ADD8?logo=Go&logoColor=white&style=for-the-badge"></code>
-                </td>
-            </tr>
-        </table>
+                <td><b>Server</b></td>
+              </tr>
+              <tr>
+                  <td>
+                    <code><img height="30" src="https://img.shields.io/badge/Python-FFD43B?style=for-the-badge&logo=python&logoColor=blue"></code>
+                  </td>
+                  <td>
+                    <code><img height="30" src="https://img.shields.io/badge/Go-00ADD8?logo=Go&logoColor=white&style=for-the-badge"></code>
+                  </td>
+              </tr>
+          </table>
+      </details>
       <img src="https://via.placeholder.com/400x1/FFFFFF/FFFFFF" alt="" width="600" height="1"><br>
       <b>Development</b>
       <img src="https://via.placeholder.com/400x1/FFFFFF/FFFFFF" alt="" width="600" height="1"><br>
