@@ -1,6 +1,6 @@
 <svg width="300" height="80" xmlns="http://www.w3.org/2000/svg">
   <!-- Línea 1: flujo izquierda → derecha -->
-  <line x1="0" y1="45" x2="200" y2="45"
+  <line x1="0" y1="45" x2="300" y2="45"
         stroke="black" stroke-width="4"
         stroke-dasharray="20 10">
     <animate attributeName="stroke-dashoffset"
@@ -9,7 +9,7 @@
   </line>
 
   <!-- Línea 2: flujo derecha → izquierda -->
-  <line x1="0" y1="30" x2="200" y2="30"
+  <line x1="0" y1="30" x2="300" y2="30"
         stroke="black" stroke-width="4"
         stroke-dasharray="20 10" stroke-opacity="0.7">
     <animate attributeName="stroke-dashoffset"
@@ -18,7 +18,7 @@
   </line>
 
   <!-- Texto centrado -->
-  <text x="100" y="20"
+  <text x="150" y="20"
         font-family="Arial, sans-serif"
         font-size="12"
         text-anchor="middle"
