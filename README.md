@@ -42,7 +42,7 @@
               <tr>
                 <td><b>Client</b></td>
                 <td rowspan="2" align="center">
-                  <img src="https://raw.githubusercontent.com/sergiomele97/Linked_crystal_monorepo/main/flow.svg" width="300" alt="data flow animation">
+                  <img src="https://raw.githubusercontent.com/sergiomele97/Linked_crystal_monorepo/main/.github/assets/not_flow.svg" width="300" alt="data flow animation">
                 </td>
                 <td><b>Server</b></td>
               </tr>
@@ -63,7 +63,7 @@
               <tr>
                 <td><b>Client</b></td>
                 <td rowspan="2" align="center">
-                  <img src="https://raw.githubusercontent.com/sergiomele97/Linked_crystal_monorepo/main/flow.svg" width="300" alt="data flow animation">
+                  <img src="https://raw.githubusercontent.com/sergiomele97/Linked_crystal_monorepo/main/.github/assets/flow.svg" width="300" alt="data flow animation">
                 </td>
                 <td><b>Server</b></td>
               </tr>
