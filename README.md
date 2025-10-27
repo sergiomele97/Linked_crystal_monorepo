@@ -56,6 +56,7 @@
                   </td>
               </tr>
           </table>
+          <div> ⬆️ on release                           ⬆️ on release</div>
       </details>
       <img src="https://via.placeholder.com/400x1/FFFFFF/FFFFFF" alt="" width="600" height="1"><br>
       <details open>
