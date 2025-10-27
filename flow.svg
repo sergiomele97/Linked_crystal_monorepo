@@ -1,4 +1,4 @@
-<svg width="200" height="80" xmlns="http://www.w3.org/2000/svg">
+<svg width="300" height="80" xmlns="http://www.w3.org/2000/svg">
   <!-- Línea 1: flujo izquierda → derecha -->
   <line x1="0" y1="45" x2="200" y2="45"
         stroke="black" stroke-width="4"
