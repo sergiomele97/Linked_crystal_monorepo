@@ -41,7 +41,12 @@
           <br>
           <table>
               <tr>
-                <td><b>Client</b></td>
+                <td>
+                  <details>
+                    <summary><b>Client</b></summary>
+                     [👉 Set up environment](#client)
+                  </details>
+                </td>
                 <td rowspan="3" align="center">
                   <img src="https://raw.githubusercontent.com/sergiomele97/Linked_crystal_monorepo/main/.github/assets/flow.svg" width="300" alt="data flow animation">
                 </td>
@@ -55,10 +60,6 @@
                   <td>
                     <code><img height="60" width="100" src="https://img.shields.io/badge/Go-00ADD8?logo=Go&logoColor=white&style=for-the-badge"></code>
                   </td>
-              </tr>
-              <tr>
-                <td>👉 <a>Set up</a></td>
-                <td>👉 <a>Set up</a></td>
               </tr>
           </table>
       </details>
@@ -115,3 +116,6 @@
     
   </tr>
 </table>
+
+
+##CLient
