@@ -40,9 +40,8 @@
         <table>
             <tr>
               <td><b>Client</b></td>
-              <td rowspan="2"></td>
               <td rowspan="2" align="center">
-                <img src="https://raw.githubusercontent.com/sergiomele97/Linked_crystal_monorepo/main/flow.svg" width="250" alt="data flow animation">
+                <img src="https://raw.githubusercontent.com/sergiomele97/Linked_crystal_monorepo/main/flow.svg" width="330" alt="data flow animation">
               </td>
               <td><b>Server</b></td>
             </tr>
