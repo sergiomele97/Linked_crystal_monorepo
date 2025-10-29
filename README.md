@@ -116,7 +116,26 @@
   </tr>
 </table>
 
+# 1 Developing this project on your machine:
 
-## Set up local client
+## Introduction: If you have 0 patience and are just a little bit familiar with docker I recommend you the one click ready environment: Containerized development environment on your web browser using webtops => (pending implementation)
 
-## Set up local server
+Alternativaly, you can follow the classic method:
+- We recommend Visual Studio Code as IDE.
+- You will need a linux environment (or wsl in windows) in order to compile the client to an android APK using buildozer.
+
+## 1.1 Set up local client
+(pending)
+
+## 1.2 Set up local server
+(pending)
+
+# 2 Development environment:
+
+## 2.1 Compiling client to an Android APK
+(pending steps)
+
+## 2.2 Server deploy
+The go server is currently self hosted with a cloudflare tunnel and automatically deployed on push via a yaml github actions pipeline.
+
+# 3 Production (not yet implemented)
