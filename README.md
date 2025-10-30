@@ -8,8 +8,8 @@
       <img src="https://via.placeholder.com/400x1/FFFFFF/FFFFFF" alt="" width="140" height="1">
       <br>
       <details>
-        <summary>...</summary>
-        Alert: too much text in here. Talks about the begining of the project.
+        <summary>Project origins</summary>
+        Alert!!!: too much useless text in here. Avoid.
       <details>
         <summary>✅ 2020: The idea is born</summary>
         Probably around 2020 I discovered this bad boy called Pyboy. I was so hyped about that famouse video where one guy used genetic algorithms to teach a neuronal network to play Super Mario. That was way before LLMs and looked just amazing! I didnt even use git at the moment and had learnt Python just for bioinformatics. Somehow i reallized I could teoretically mimic an online experience for Pokemon Silver (my first and most favorite videogame) with the functions the pyboy API offered. Pyboy didnt even have sound nor color support at that moment. 
@@ -25,6 +25,7 @@
         By far the hardest and most uncertain thing I've done in this world. I was stuck here for a couple of years. Somehow it ended up working.
       </details>
       </details>
+      <div>...</div>
       <br>
       <details>
         <summary>⚪ Paso 4: Pruebas y QA</summary>
