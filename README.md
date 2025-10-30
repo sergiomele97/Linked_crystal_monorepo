@@ -8,8 +8,7 @@
       <img src="https://via.placeholder.com/400x1/FFFFFF/FFFFFF" alt="" width="140" height="1">
       <br>
       <details>
-        <summary>Project origins</summary>
-        Alert!!!: too much useless text in here. Avoid.
+        <summary>About project origins</summary>
       <details>
         <summary>✅ 2020: The idea is born</summary>
         Probably around 2020 I discovered this bad boy called Pyboy. I was so hyped about that famouse video where one guy used genetic algorithms to teach a neuronal network to play Super Mario. That was way before LLMs and looked just amazing! I didnt even use git at the moment and had learnt Python just for bioinformatics. Somehow i reallized I could teoretically mimic an online experience for Pokemon Silver (my first and most favorite videogame) with the functions the pyboy API offered. Pyboy didnt even have sound nor color support at that moment. 
@@ -35,7 +34,6 @@
           <li>✅ Defining development environments</li>
         </ul>
       </details>
-      <br>
       <details>
         <summary>⚪ Developing backend MVP</summary>
         <ul>
@@ -52,7 +50,7 @@
           <li>⚪ Flawless drawing of the diferent players on screen</li>
         </ul>
       </details>
-      <div>Will continue</div>
+      <div>Will continue...</div>
     </td>
     <td valign="top">
       <h3 align="center">🌍 PRODUCTS AND ENVIRONMENTS</h3>    
