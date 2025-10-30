@@ -61,13 +61,13 @@
           <table>
               <tr>
                 <td>
-                  <a href="#set-up-local-client">Client</a>
+                  <a href="#1.1-set-up-local-client">Client</a>
                 </td>
                 <td rowspan="3" align="center">
                   <img src="https://raw.githubusercontent.com/sergiomele97/Linked_crystal_monorepo/main/.github/assets/flow.svg" width="300" alt="data flow animation">
                 </td>
                 <td>
-                  <a href="#set-up-local-server">Server</a>
+                  <a href="#1.2-set-up-local-server">Server</a>
                 </td>
               </tr>
               <tr>
