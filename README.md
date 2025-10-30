@@ -37,9 +37,22 @@
       </details>
       <br>
       <details>
-        <summary>⚪ Paso 5: Lanzamiento</summary>
-        Despliegue a producción y documentación final.
+        <summary>⚪ Developing backend MVP</summary>
+        <ul>
+          <li>⚪ Websockets and really eficient approach</li>
+          <li>⚪ Centrilized server</li>
+          <li>⚪ Sends info from all players to every player every 0.1 secs</li>
+          <li>⚪ Easy to update data transfer model</li>
+        </ul>
       </details>
+      <details>
+        <summary>⚪ Developing ram-drawing coordination</summary>
+        <ul>
+          <li>⚪ Defining the data transfer model</li>
+          <li>⚪ Flawless drawing of the diferent players on screen</li>
+        </ul>
+      </details>
+      <div>Will continue</div>
     </td>
     <td valign="top">
       <h3 align="center">🌍 PRODUCTS AND ENVIRONMENTS</h3>    
