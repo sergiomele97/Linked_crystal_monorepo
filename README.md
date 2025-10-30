@@ -21,7 +21,7 @@
       </details>
       <br>
       <details>
-        <summary>✅ Foundations</summary>
+        <summary>✅ Adapting pyboy to android</summary>
         By far the hardest and most uncertain thing I've done in this world. I was stuck here for a couple of years. Somehow it ended up working.
       </details>
       </details>
