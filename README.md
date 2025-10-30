@@ -28,8 +28,12 @@
       <div>...</div>
       <br>
       <details>
-        <summary>⚪ Paso 4: Pruebas y QA</summary>
-        Realizar pruebas exhaustivas y corrección de errores.
+        <summary>✅ Foundations</summary>
+        <ul>
+          <li><input type="checkbox" checked> Defining architecture</li>
+          <li><input type="checkbox" checked> Integrating pyboy into an APK</li>
+          <li><input type="checkbox" checked> Defining development environments</li>
+        </ul>
       </details>
       <br>
       <details>
