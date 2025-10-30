@@ -34,6 +34,9 @@
           <li><input type="checkbox" checked> Integrating pyboy into an APK</li>
           <li><input type="checkbox" checked> Defining development environments</li>
         </ul>
+        - [ ] Comprar pan  
+        - [x] Lavar el auto  
+        - [ ] Estudiar HTML
       </details>
       <br>
       <details>
