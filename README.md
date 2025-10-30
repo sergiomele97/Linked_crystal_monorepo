@@ -30,13 +30,10 @@
       <details>
         <summary>✅ Foundations</summary>
         <ul>
-          <li><input type="checkbox" checked> Defining architecture</li>
-          <li><input type="checkbox" checked> Integrating pyboy into an APK</li>
-          <li><input type="checkbox" checked> Defining development environments</li>
+          <li>✅ Defining architecture</li>
+          <li>✅ Integrating pyboy into an APK</li>
+          <li>✅ Defining development environments</li>
         </ul>
-        - [ ] Comprar pan  
-        - [x] Lavar el auto  
-        - [ ] Estudiar HTML
       </details>
       <br>
       <details>
