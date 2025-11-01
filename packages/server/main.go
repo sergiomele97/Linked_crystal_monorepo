@@ -30,7 +30,7 @@ var upgrader = websocket.Upgrader{
 
 var (
 	dataChan = make(chan DataCliente, 2000)
-	clients  sync.Map // reemplaza el struct con RWMutex
+	clients  sync.Map // almacenar *Client como clave
 )
 
 // ------------------ SERVERS LIST ------------------
@@ -72,6 +72,7 @@ func recordMetrics(recv, send int, lat time.Duration) {
 		latCount:  btoi(lat > 0),
 	})
 
+	// podar antiguas muestras > windowDur
 	cutoff := now.Add(-windowDur)
 	i := 0
 	for ; i < len(metrics); i++ {
@@ -125,6 +126,70 @@ var bufferPool = sync.Pool{
 	},
 }
 
+// ------------------ CLIENT TYPE (writer loop y cierre seguro) ------------------
+
+type Client struct {
+	conn      *websocket.Conn
+	send      chan []byte
+	closeOnce sync.Once
+	closed    chan struct{}
+}
+
+func newClient(conn *websocket.Conn, sendBuf int) *Client {
+	return &Client{
+		conn:   conn,
+		send:   make(chan []byte, sendBuf),
+		closed: make(chan struct{}),
+	}
+}
+
+func (c *Client) close() {
+	c.closeOnce.Do(func() {
+		// cerrar recursos de forma segura
+		close(c.closed)
+		// cerrar canal send evita writer goroutine
+		close(c.send)
+		// eliminar de clients map
+		clients.Delete(c)
+		// cerrar conexión TCP
+		_ = c.conn.Close()
+	})
+}
+
+// writer loop: consume mensajes desde c.send y los escribe en la conexión
+func (c *Client) writerLoop(writeTimeout time.Duration) {
+	for msg := range c.send {
+		// cada escritura con deadline para no bloquear indefinidamente
+		_ = c.conn.SetWriteDeadline(time.Now().Add(writeTimeout))
+		if err := c.conn.WriteMessage(websocket.BinaryMessage, msg); err != nil {
+			// fallo en escritura -> limpiar y salir
+			c.close()
+			return
+		}
+	}
+	// canal cerrado -> limpiar
+	c.close()
+}
+
+// ping loop: intenta pings periódicos; si falla, cierra cliente
+func (c *Client) pingLoop(interval, timeout time.Duration) {
+	ticker := time.NewTicker(interval)
+	defer ticker.Stop()
+	for {
+		select {
+		case <-ticker.C:
+			// usar WriteControl para ping con deadline
+			_ = c.conn.SetWriteDeadline(time.Now().Add(timeout))
+			if err := c.conn.WriteControl(websocket.PingMessage, []byte{}, time.Now().Add(timeout)); err != nil {
+				c.close()
+				return
+			}
+		case <-c.closed:
+			return
+		}
+	}
+}
+
 // ------------------ MAIN ------------------
 
 func main() {
@@ -147,30 +212,29 @@ func handleConnection(w http.ResponseWriter, r *http.Request) {
 	}
 
 	conn.SetReadLimit(1024)
+	// read deadline renovada por pong handler
 	conn.SetReadDeadline(time.Now().Add(30 * time.Second))
 	conn.SetPongHandler(func(string) error {
-		conn.SetReadDeadline(time.Now().Add(30 * time.Second))
+		_ = conn.SetReadDeadline(time.Now().Add(30 * time.Second))
 		return nil
 	})
 
-	// Añadir cliente (thread-safe)
-	clients.Store(conn, true)
+	// crear client con buffer de envío (ajustable)
+	const sendBufSize = 32
+	client := newClient(conn, sendBufSize)
 
-	// Ping cada 10 s
-	go func(c *websocket.Conn) {
-		ticker := time.NewTicker(10 * time.Second)
-		defer ticker.Stop()
-		for range ticker.C {
-			if err := c.WriteControl(websocket.PingMessage, []byte{}, time.Now().Add(5*time.Second)); err != nil {
-				c.Close()
-				break
-			}
-		}
-	}(conn)
+	// almacenar client
+	clients.Store(client, true)
 
+	// iniciar writer y ping loops
+	go client.writerLoop(5 * time.Second)
+	go client.pingLoop(10*time.Second, 5*time.Second)
+
+	// lectura (reader) en este goroutine
 	for {
 		_, msg, err := conn.ReadMessage()
 		if err != nil {
+			// lectura fallida (cliente desconectado o timeout) -> cleanup
 			break
 		}
 		if len(msg) < 16 {
@@ -184,16 +248,18 @@ func handleConnection(w http.ResponseWriter, r *http.Request) {
 			Y:  int32(binary.LittleEndian.Uint32(msg[8:12])),
 			Z:  int32(binary.LittleEndian.Uint32(msg[12:16])),
 		}
+
 		select {
 		case dataChan <- data:
 			recordMetrics(1, 0, time.Since(start))
 		default:
+			// canal lleno: registrar métrica mínima (no spam de logs)
+			recordMetrics(0, 0, 0)
 		}
 	}
 
-	// Eliminar cliente
-	clients.Delete(conn)
-	conn.Close()
+	// reader sale -> cerrar client (esto también despierta writer/ping)
+	client.close()
 }
 
 // ------------------ HEALTH ------------------
@@ -201,6 +267,7 @@ func handleConnection(w http.ResponseWriter, r *http.Request) {
 func handleHealth(w http.ResponseWriter, _ *http.Request) {
 	count := 0
 	clients.Range(func(key, value any) bool {
+		// key es *Client
 		count++
 		return true
 	})
@@ -238,12 +305,11 @@ func broadcastLoop() {
 		select {
 		case d := <-dataChan:
 			accum = append(accum, d)
-			// Si se alcanza el tamaño máximo, se envía inmediatamente
+			// flush por tamaño
 			if len(accum) >= 5000 {
 				processAndBroadcast(accum)
 				accum = accum[:0]
 			}
-
 		case <-ticker.C:
 			if len(accum) > 0 {
 				processAndBroadcast(accum)
@@ -253,19 +319,22 @@ func broadcastLoop() {
 	}
 }
 
-// Helper que serializa y envía a todos los clientes activos
+// processAndBroadcast envía el mensaje serializado a cada cliente,
+// usando el canal per-client para evitar bloqueos de escritura.
 func processAndBroadcast(accum []DataCliente) {
 	start := time.Now()
 	message := serializeSlice(accum)
 
 	sent := 0
+	// iterar sobre clients; si el canal de un cliente está lleno, se elimina el cliente
 	clients.Range(func(key, value any) bool {
-		c := key.(*websocket.Conn)
-		if err := c.WriteMessage(websocket.BinaryMessage, message); err != nil {
-			c.Close()
-			clients.Delete(c)
-		} else {
+		c := key.(*Client)
+		select {
+		case c.send <- message:
 			sent++
+		default:
+			// buffer lleno -> cliente lento, cerramos para mantener throughput
+			c.close()
 		}
 		return true
 	})
@@ -275,6 +344,7 @@ func processAndBroadcast(accum []DataCliente) {
 
 // ------------------ SERIALIZACIÓN ------------------
 
+// serializeSlice usa PutUint32 y bufferPool para minimizar allocations.
 func serializeSlice(data []DataCliente) []byte {
 	buf := bufferPool.Get().(*bytes.Buffer)
 	buf.Reset()
@@ -288,6 +358,7 @@ func serializeSlice(data []DataCliente) []byte {
 		buf.Write(tmp[:])
 	}
 
+	// devolvemos una copia porque buf puede ser reutilizado por el pool
 	b := append([]byte(nil), buf.Bytes()...)
 	bufferPool.Put(buf)
 	return b
