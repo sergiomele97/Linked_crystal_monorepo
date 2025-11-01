@@ -4,12 +4,11 @@ import websockets
 
 SERVER_URL = "ws://localhost:8080/ws"
 
-# Empaqueta (ID, X, Y, Z) en formato binario little-endian (igual que Go)
-def make_message(client_id, x, y, z):
-    return struct.pack("<4i", client_id, x, y, z)
+# Empaqueta (X, Y, Z) en formato binario little-endian (igual que Go)
+def make_message(x, y, z):
+    return struct.pack("<3i", x, y, z)
 
 async def run_client():
-    client_id = 1
     x = y = z = 0
     backoff = 1
     max_backoff = 30
@@ -22,11 +21,11 @@ async def run_client():
                 ping_timeout=5,     # espera pong máximo 5s
                 close_timeout=3,    # tiempo máximo para cierre limpio
             ) as ws:
-                print(f"Conectado al servidor WebSocket (client_id={client_id})")
+                print("Conectado al servidor WebSocket")
                 backoff = 1  # reinicia backoff tras conexión exitosa
 
                 while True:
-                    msg = make_message(client_id, x, y, z)
+                    msg = make_message(x, y, z)
                     await ws.send(msg)
 
                     try:
