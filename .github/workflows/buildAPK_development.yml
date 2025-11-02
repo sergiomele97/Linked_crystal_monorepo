@@ -33,8 +33,10 @@ jobs:
       uses: actions/cache@v4
       with:
         path: |
-          ~/.buildozer
-          /home/runner/.buildozer
+          ~/.buildozer/android/platform/android-sdk
+          ~/.buildozer/android/platform/android-ndk-r25b
+          ~/.buildozer/android/platform/python-for-android
+          ~/.buildozer/android/platform/build-arm64-v8a/build/other_builds
           ~/.gradle
         key: ${{ runner.os }}-buildozer-${{ hashFiles('packages/app/APKbuilder/buildozer.spec') }}
         restore-keys: |
@@ -71,8 +73,11 @@ jobs:
 
     - name: Use python-for-android 2024.01.21 (same as local)
       run: |
-        rm -rf ~/.buildozer/android/platform/python-for-android
-        git clone --depth=1 --branch release-2024.01.21 https://github.com/kivy/python-for-android ~/.buildozer/android/platform/python-for-android
+        if [ ! -d "~/.buildozer/android/platform/python-for-android" ]; then
+          git clone --depth=1 --branch release-2024.01.21 https://github.com/kivy/python-for-android ~/.buildozer/android/platform/python-for-android
+        else
+          echo "python-for-android already cached."
+        fi
 
     - name: Build debug APK
       working-directory: packages/app/APKbuilder
