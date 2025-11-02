@@ -77,6 +77,12 @@ jobs:
         sed -i 's|https://github.com/libffi/libffi|https://github.com/libffi/libffi/releases/download/v3.4.4/libffi-3.4.4.tar.gz|' \
           .buildozer/android/platform/python-for-android/pythonforandroid/recipes/libffi/__init__.py || true
 
+    - name: Clean previous libffi build cache (force re-download)
+      working-directory: packages/app/APKbuilder
+      run: |
+        rm -rf .buildozer/android/platform/build-*/build/other_builds/libffi || true
+        rm -rf .buildozer/android/platform/python-for-android || true
+
     - name: Build APK
       working-directory: packages/app/APKbuilder
       run: |
@@ -91,4 +97,4 @@ jobs:
       with:
         name: app-debug-apk
         path: packages/app/APKbuilder/bin/*.apk
-        retention-days: 3  # se borra automáticamente después de 3 días para ahorrar espacio
+        retention-days: 3
