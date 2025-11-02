@@ -1,8 +1,6 @@
 name: buildAPK_development
 
 on:
-  push:
-    branches: [ "main" ]
   workflow_dispatch:
 
 jobs:
