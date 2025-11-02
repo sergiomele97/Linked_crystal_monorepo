@@ -27,7 +27,7 @@ jobs:
           python3-pip python3-setuptools git zip openjdk-17-jdk \
           libffi-dev libssl-dev libsqlite3-dev zlib1g-dev \
           libjpeg-dev libfreetype6-dev wget unzip \
-          autoconf automake libtool
+          autoconf automake libtool m4 pkg-config
 
     - name: Install buildozer
       run: |
