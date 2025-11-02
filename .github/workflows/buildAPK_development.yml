@@ -68,13 +68,13 @@ jobs:
 
     - name: Fix sdkmanager path for Buildozer
       run: |
-        mkdir -p /home/runner/.buildozer/android/platform/android-sdk/tools/bin
-        ln -sf /home/runner/.buildozer/android/platform/android-sdk/cmdline-tools/latest/bin/sdkmanager /home/runner/.buildozer/android/platform/android-sdk/tools/bin/sdkmanager
+        mkdir -p ~/.buildozer/android/platform/android-sdk/tools/bin
+        ln -sf ~/.buildozer/android/platform/android-sdk/cmdline-tools/latest/bin/sdkmanager ~/.buildozer/android/platform/android-sdk/tools/bin/sdkmanager
 
     - name: Use python-for-android 2024.01.21 (same as local)
       run: |
-        if [ ! -d "~/.buildozer/android/platform/python-for-android" ]; then
-          git clone --depth=1 --branch release-2024.01.21 https://github.com/kivy/python-for-android ~/.buildozer/android/platform/python-for-android
+        if [ ! -d "$HOME/.buildozer/android/platform/python-for-android" ]; then
+          git clone --depth=1 --branch release-2024.01.21 https://github.com/kivy/python-for-android $HOME/.buildozer/android/platform/python-for-android
         else
           echo "python-for-android already cached."
         fi
@@ -84,8 +84,8 @@ jobs:
       run: |
         buildozer android debug
       env:
-        ANDROIDSDK: /home/runner/.buildozer/android/platform/android-sdk
-        ANDROIDNDK: /home/runner/.buildozer/android/platform/android-ndk-r25b
+        ANDROIDSDK: $HOME/.buildozer/android/platform/android-sdk
+        ANDROIDNDK: $HOME/.buildozer/android/platform/android-ndk-r25b
         JAVA_HOME: /usr/lib/jvm/java-17-openjdk-amd64
 
     - name: Upload generated APK (debug)
@@ -94,3 +94,4 @@ jobs:
         name: app-debug-apk
         path: packages/app/APKbuilder/bin/*.apk
         retention-days: 5
+        overwrite: true

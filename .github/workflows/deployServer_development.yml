@@ -1,4 +1,4 @@
-name: deploy WebSocket Server
+name: deployServer_development
 
 on:
   push:
