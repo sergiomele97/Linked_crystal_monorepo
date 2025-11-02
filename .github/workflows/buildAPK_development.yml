@@ -9,7 +9,7 @@ jobs:
   build:
     environment: development
     runs-on: ubuntu-latest
-    timeout-minutes: 360  # Límite máximo para runners gratuitos (6 horas)
+    timeout-minutes: 360
 
     steps:
     - name: Checkout repository
@@ -29,6 +29,17 @@ jobs:
           libjpeg-dev libfreetype6-dev wget unzip \
           autoconf automake libltdl-dev libtool m4 pkg-config
 
+    - name: Restore Buildozer & Gradle cache
+      uses: actions/cache@v4
+      with:
+        path: |
+          ~/.buildozer
+          /home/runner/.buildozer
+          ~/.gradle
+        key: ${{ runner.os }}-buildozer-${{ hashFiles('packages/app/APKbuilder/buildozer.spec') }}
+        restore-keys: |
+          ${{ runner.os }}-buildozer-
+
     - name: Install buildozer and dependencies
       run: |
         pip install --upgrade pip
@@ -38,16 +49,20 @@ jobs:
       run: |
         mkdir -p ~/.buildozer/android/platform
         cd ~/.buildozer/android/platform
-        echo "Installing Android SDK..."
-        mkdir android-sdk
-        cd android-sdk
-        wget https://dl.google.com/android/repository/commandlinetools-linux-9477386_latest.zip -O cmdtools.zip
-        unzip -q cmdtools.zip -d cmdline-tools
-        rm cmdtools.zip
-        mkdir -p cmdline-tools/latest
-        mv cmdline-tools/cmdline-tools/* cmdline-tools/latest/ || true
-        yes | cmdline-tools/latest/bin/sdkmanager --licenses
-        yes | cmdline-tools/latest/bin/sdkmanager "platform-tools" "build-tools;34.0.0" "platforms;android-34"
+        if [ ! -d "android-sdk" ]; then
+          echo "Installing Android SDK..."
+          mkdir android-sdk
+          cd android-sdk
+          wget https://dl.google.com/android/repository/commandlinetools-linux-9477386_latest.zip -O cmdtools.zip
+          unzip -q cmdtools.zip -d cmdline-tools
+          rm cmdtools.zip
+          mkdir -p cmdline-tools/latest
+          mv cmdline-tools/cmdline-tools/* cmdline-tools/latest/ || true
+          yes | cmdline-tools/latest/bin/sdkmanager --licenses
+          yes | cmdline-tools/latest/bin/sdkmanager "platform-tools" "build-tools;34.0.0" "platforms;android-34"
+        else
+          echo "Android SDK already cached."
+        fi
 
     - name: Fix sdkmanager path for Buildozer
       run: |
@@ -59,31 +74,18 @@ jobs:
         rm -rf ~/.buildozer/android/platform/python-for-android
         git clone --depth=1 --branch release-2024.01.21 https://github.com/kivy/python-for-android ~/.buildozer/android/platform/python-for-android
 
-    - name: Generate release keystore
-      run: |
-        keytool -genkey -v \
-          -keystore my-release-key.keystore \
-          -alias my-key-alias \
-          -keyalg RSA -keysize 2048 -validity 10000 \
-          -storepass password -keypass password \
-          -dname "CN=GitHub Actions, OU=CI, O=GitHub, L=Internet, S=World, C=US"
-
-    - name: Build release APK
+    - name: Build debug APK
       working-directory: packages/app/APKbuilder
       run: |
-        buildozer android release
+        buildozer android debug
       env:
         ANDROIDSDK: /home/runner/.buildozer/android/platform/android-sdk
         ANDROIDNDK: /home/runner/.buildozer/android/platform/android-ndk-r25b
         JAVA_HOME: /usr/lib/jvm/java-17-openjdk-amd64
-        BUILDOZER_KEYSTORE: /home/runner/work/Linked_crystal_monorepo/my-release-key.keystore
-        BUILDOZER_KEYALIAS: my-key-alias
-        BUILDOZER_KEYSTORE_PASS: password
-        BUILDOZER_KEYALIAS_PASS: password
 
-    - name: Upload generated APK (release)
+    - name: Upload generated APK (debug)
       uses: actions/upload-artifact@v4
       with:
-        name: app-release-apk
+        name: app-debug-apk
         path: packages/app/APKbuilder/bin/*.apk
         retention-days: 5
