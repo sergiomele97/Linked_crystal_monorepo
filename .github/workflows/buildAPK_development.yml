@@ -1,33 +1,20 @@
 name: buildAPK_development
 
 on:
-  workflow_dispatch:
+  workflow_dispatch:  # Solo se puede lanzar manualmente
 
 jobs:
   build:
     environment: development
     runs-on: ubuntu-latest
-    timeout-minutes: 360
+    container:
+      image: kivy/buildozer:latest  # Imagen con todo preinstalado
 
     steps:
     - name: Checkout repository
       uses: actions/checkout@v4
 
-    - name: Set up Python
-      uses: actions/setup-python@v5
-      with:
-        python-version: "3.10"
-
-    - name: Install system dependencies
-      run: |
-        sudo apt-get update -y
-        sudo apt-get install -y \
-          python3-pip python3-setuptools git zip openjdk-17-jdk \
-          libffi-dev libssl-dev libsqlite3-dev zlib1g-dev \
-          libjpeg-dev libfreetype6-dev wget unzip \
-          autoconf automake libltdl-dev libtool m4 pkg-config
-
-    - name: Restore Buildozer & Gradle cache
+    - name: Restore Buildozer cache
       uses: actions/cache@v4
       with:
         path: |
@@ -35,55 +22,17 @@ jobs:
           ~/.buildozer/android/platform/android-ndk-r25b
           ~/.buildozer/android/platform/python-for-android
           ~/.buildozer/android/platform/build-arm64-v8a/build/other_builds
-          ~/.gradle
         key: ${{ runner.os }}-buildozer-${{ hashFiles('packages/app/APKbuilder/buildozer.spec') }}
         restore-keys: |
           ${{ runner.os }}-buildozer-
-
-    - name: Install buildozer and dependencies
-      run: |
-        pip install --upgrade pip
-        pip install buildozer cython
-
-    - name: Preinstall Android SDK build-tools
-      run: |
-        mkdir -p ~/.buildozer/android/platform
-        cd ~/.buildozer/android/platform
-        if [ ! -d "android-sdk" ]; then
-          echo "Installing Android SDK..."
-          mkdir android-sdk
-          cd android-sdk
-          wget https://dl.google.com/android/repository/commandlinetools-linux-9477386_latest.zip -O cmdtools.zip
-          unzip -q cmdtools.zip -d cmdline-tools
-          rm cmdtools.zip
-          mkdir -p cmdline-tools/latest
-          mv cmdline-tools/cmdline-tools/* cmdline-tools/latest/ || true
-          yes | cmdline-tools/latest/bin/sdkmanager --licenses
-          yes | cmdline-tools/latest/bin/sdkmanager "platform-tools" "build-tools;34.0.0" "platforms;android-34"
-        else
-          echo "Android SDK already cached."
-        fi
-
-    - name: Fix sdkmanager path for Buildozer
-      run: |
-        mkdir -p ~/.buildozer/android/platform/android-sdk/tools/bin
-        ln -sf ~/.buildozer/android/platform/android-sdk/cmdline-tools/latest/bin/sdkmanager ~/.buildozer/android/platform/android-sdk/tools/bin/sdkmanager
-
-    - name: Use python-for-android 2024.01.21 (same as local)
-      run: |
-        if [ ! -d "$HOME/.buildozer/android/platform/python-for-android" ]; then
-          git clone --depth=1 --branch release-2024.01.21 https://github.com/kivy/python-for-android $HOME/.buildozer/android/platform/python-for-android
-        else
-          echo "python-for-android already cached."
-        fi
 
     - name: Build debug APK
       working-directory: packages/app/APKbuilder
       run: |
         buildozer android debug
       env:
-        ANDROIDSDK: $HOME/.buildozer/android/platform/android-sdk
-        ANDROIDNDK: $HOME/.buildozer/android/platform/android-ndk-r25b
+        ANDROIDSDK: /home/user/.buildozer/android/platform/android-sdk
+        ANDROIDNDK: /home/user/.buildozer/android/platform/android-ndk-r25b
         JAVA_HOME: /usr/lib/jvm/java-17-openjdk-amd64
 
     - name: Upload generated APK (debug)
