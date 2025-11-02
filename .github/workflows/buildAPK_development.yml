@@ -9,7 +9,7 @@ jobs:
   build:
     environment: development
     runs-on: ubuntu-latest
-    timeout-minutes: 360  # Máximo permitido en runners gratis (6 horas)
+    timeout-minutes: 360  # Límite máximo para runners gratuitos (6 horas)
 
     steps:
     - name: Checkout repository
@@ -29,59 +29,37 @@ jobs:
           libjpeg-dev libfreetype6-dev wget unzip \
           autoconf automake libtool m4 pkg-config
 
-    - name: Install buildozer
+    - name: Install buildozer and dependencies
       run: |
         pip install --upgrade pip
         pip install buildozer cython
-
-    - name: Restore buildozer cache
-      uses: actions/cache@v4
-      with:
-        path: |
-          ~/.buildozer
-          /home/runner/.buildozer
-          ~/.gradle
-        key: ${{ runner.os }}-buildozer-${{ hashFiles('packages/app/APKbuilder/buildozer.spec') }}
-        restore-keys: |
-          ${{ runner.os }}-buildozer-
 
     - name: Preinstall Android SDK build-tools
       run: |
         mkdir -p ~/.buildozer/android/platform
         cd ~/.buildozer/android/platform
-        if [ ! -d "android-sdk" ]; then
-          echo "Installing Android SDK..."
-          mkdir android-sdk
-          cd android-sdk
-          wget https://dl.google.com/android/repository/commandlinetools-linux-9477386_latest.zip -O cmdtools.zip
-          unzip -q cmdtools.zip -d cmdline-tools
-          rm cmdtools.zip
-          mkdir -p cmdline-tools/latest
-          mv cmdline-tools/cmdline-tools/* cmdline-tools/latest/ || true
-          yes | cmdline-tools/latest/bin/sdkmanager --licenses
-          yes | cmdline-tools/latest/bin/sdkmanager "platform-tools" "build-tools;34.0.0" "platforms;android-34"
-        else
-          echo "Android SDK already cached."
-        fi
+        echo "Installing Android SDK..."
+        mkdir android-sdk
+        cd android-sdk
+        wget https://dl.google.com/android/repository/commandlinetools-linux-9477386_latest.zip -O cmdtools.zip
+        unzip -q cmdtools.zip -d cmdline-tools
+        rm cmdtools.zip
+        mkdir -p cmdline-tools/latest
+        mv cmdline-tools/cmdline-tools/* cmdline-tools/latest/ || true
+        yes | cmdline-tools/latest/bin/sdkmanager --licenses
+        yes | cmdline-tools/latest/bin/sdkmanager "platform-tools" "build-tools;34.0.0" "platforms;android-34"
 
     - name: Fix sdkmanager path for Buildozer
       run: |
         mkdir -p /home/runner/.buildozer/android/platform/android-sdk/tools/bin
         ln -sf /home/runner/.buildozer/android/platform/android-sdk/cmdline-tools/latest/bin/sdkmanager /home/runner/.buildozer/android/platform/android-sdk/tools/bin/sdkmanager
 
-    - name: Patch libffi recipe to use prebuilt release (avoid autogen.sh errors)
-      working-directory: packages/app/APKbuilder
+    - name: Use latest stable python-for-android (fixes libffi issues)
       run: |
-        mkdir -p .buildozer/android/platform/python-for-android/pythonforandroid/recipes/libffi/
-        echo "Patching libffi recipe to use tarball instead of git source..."
-        sed -i 's|https://github.com/libffi/libffi|https://github.com/libffi/libffi/releases/download/v3.4.4/libffi-3.4.4.tar.gz|' \
-          .buildozer/android/platform/python-for-android/pythonforandroid/recipes/libffi/__init__.py || true
-
-    - name: Clean previous libffi build cache (force re-download)
-      working-directory: packages/app/APKbuilder
-      run: |
-        rm -rf .buildozer/android/platform/build-*/build/other_builds/libffi || true
-        rm -rf .buildozer/android/platform/python-for-android || true
+        rm -rf ~/.buildozer/android/platform/python-for-android
+        git clone --depth=1 https://github.com/kivy/python-for-android ~/.buildozer/android/platform/python-for-android
+        cd ~/.buildozer/android/platform/python-for-android
+        git checkout 2024.04.01
 
     - name: Build APK
       working-directory: packages/app/APKbuilder
