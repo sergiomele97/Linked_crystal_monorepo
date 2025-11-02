@@ -26,7 +26,8 @@ jobs:
         sudo apt-get install -y \
           python3-pip python3-setuptools git zip openjdk-17-jdk \
           libffi-dev libssl-dev libsqlite3-dev zlib1g-dev \
-          libjpeg-dev libfreetype6-dev wget unzip
+          libjpeg-dev libfreetype6-dev wget unzip \
+          autoconf automake libtool
 
     - name: Install buildozer
       run: |
