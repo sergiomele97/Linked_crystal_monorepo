@@ -1,7 +1,7 @@
 name: buildAPK_development
 
 on:
-  workflow_dispatch:  # Solo ejecución manual
+  workflow_dispatch:  # Solo se puede lanzar manualmente
 
 jobs:
   build:
@@ -9,7 +9,7 @@ jobs:
     runs-on: ubuntu-latest
     container:
       image: kivy/buildozer:latest
-      options: --user 1000:1000  # Ejecutar como usuario no-root
+      options: --user user  # Evita ejecutar como root
 
     steps:
     - name: Checkout repository
