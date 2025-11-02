@@ -6,6 +6,7 @@ import (
 	"encoding/json"
 	"log"
 	"net/http"
+	"os"
 	"sync"
 	"sync/atomic"
 	"time"
@@ -23,17 +24,17 @@ type DataCliente struct {
 // ------------------ CONFIG ------------------
 
 const (
-	MaxClients       = 1024             // configurable: máximo de clientes simultáneos
-	BroadcastMs      = 100              // cada cuánto hacer broadcast (ms)
-	SendBufPerClient = 32               // tamaño del buffer de envío por cliente
-	ReadLimit        = 1024             // límite de lectura por conexión
-	IdleReadDeadline = 30 * time.Second // read deadline renovado por PONG
+	MaxClients       = 1024
+	BroadcastMs      = 100
+	SendBufPerClient = 32
+	ReadLimit        = 1024
+	IdleReadDeadline = 30 * time.Second
 )
 
 // ------------------ WEBSOCKET CORE ------------------
 
 var upgrader = websocket.Upgrader{
-	CheckOrigin:       func(r *http.Request) bool { return true }, // override más abajo si quieres restringir
+	CheckOrigin:       func(r *http.Request) bool { return true },
 	ReadBufferSize:    256,
 	WriteBufferSize:   256,
 	EnableCompression: false,
@@ -41,14 +42,9 @@ var upgrader = websocket.Upgrader{
 
 // ------------------ IDs y slots ------------------
 
-// Pool de IDs libres: si vacío -> no aceptamos más conexiones.
 var freeIDs = make(chan int, MaxClients)
-
-// latestData: slice indexado por ID; cada entry guarda *DataCliente (o nil) usando atomic.Value
-var latestData []atomic.Value // length = MaxClients
-
-// clients: map de clientes a su ID (valor int)
-var clients sync.Map // key: *Client, value: int (id)
+var latestData []atomic.Value
+var clients sync.Map
 
 // ------------------ SERVERS LIST ------------------
 
@@ -89,7 +85,6 @@ func recordMetrics(recv, send int, lat time.Duration) {
 		latCount:  btoi(lat > 0),
 	})
 
-	// podar antiguas muestras > windowDur
 	cutoff := now.Add(-windowDur)
 	i := 0
 	for ; i < len(metrics); i++ {
@@ -135,7 +130,7 @@ func btoi(b bool) int {
 	return 0
 }
 
-// ------------------ MEMORIA (reutilización) ------------------
+// ------------------ MEMORIA ------------------
 
 var bufferPool = sync.Pool{
 	New: func() any {
@@ -143,14 +138,14 @@ var bufferPool = sync.Pool{
 	},
 }
 
-// ------------------ CLIENT TYPE (writer loop y cierre seguro) ------------------
+// ------------------ CLIENT ------------------
 
 type Client struct {
 	conn      *websocket.Conn
 	send      chan []byte
 	closeOnce sync.Once
 	closed    chan struct{}
-	id        int // id asignado por servidor, -1 si ninguno
+	id        int
 	addr      string
 }
 
@@ -166,31 +161,22 @@ func newClient(conn *websocket.Conn, sendBuf int, id int) *Client {
 
 func (c *Client) close() {
 	c.closeOnce.Do(func() {
-		// cerrar recursos de forma segura
 		close(c.closed)
-		// cerrar canal send evita writer goroutine
 		close(c.send)
-		// eliminar de clients map
 		clients.Delete(c)
-		// liberar ID y limpiar su slot
 		if c.id >= 0 {
-			// limpiar slot
 			latestData[c.id].Store((*DataCliente)(nil))
-			// devolver ID al pool (non-blocking: pero canal tiene capacidad MaxClients así que no bloqueará)
 			select {
 			case freeIDs <- c.id:
 			default:
-				// si no cabe (no debería), lo descartamos
 			}
 			log.Printf("Cliente desconectado: id=%d addr=%s", c.id, c.addr)
 			c.id = -1
 		}
-		// cerrar conexión TCP
 		_ = c.conn.Close()
 	})
 }
 
-// writer loop: consume mensajes desde c.send y los escribe en la conexión
 func (c *Client) writerLoop(writeTimeout time.Duration) {
 	for msg := range c.send {
 		_ = c.conn.SetWriteDeadline(time.Now().Add(writeTimeout))
@@ -202,7 +188,6 @@ func (c *Client) writerLoop(writeTimeout time.Duration) {
 	c.close()
 }
 
-// ping loop: intenta pings periódicos; si falla, cierra cliente
 func (c *Client) pingLoop(interval, timeout time.Duration) {
 	ticker := time.NewTicker(interval)
 	defer ticker.Stop()
@@ -223,7 +208,6 @@ func (c *Client) pingLoop(interval, timeout time.Duration) {
 // ------------------ MAIN ------------------
 
 func init() {
-	// inicializar pool de IDs y latestData
 	latestData = make([]atomic.Value, MaxClients)
 	for i := 0; i < MaxClients; i++ {
 		freeIDs <- i
@@ -232,13 +216,24 @@ func init() {
 }
 
 func main() {
-	// ejemplo: restringir orígenes aquí si quieres (descomenta/edita)
-	// upgrader.CheckOrigin = func(r *http.Request) bool {
-	//	  origin := r.Header.Get("Origin")
-	//	  return origin == "https://mi-frontend.com" || origin == "http://localhost:5173"
-	// }
+	// cargar token del entorno
+	staticToken := os.Getenv("STATIC_TOKEN")
+	if staticToken == "" {
+        // fallback para entorno local
+        staticToken = "demo_token"
+        log.Println("⚠️ STATIC_TOKEN no definido, usando token de desarrollo")
+    }
 
-	http.HandleFunc("/ws", handleConnection)
+	http.HandleFunc("/ws", func(w http.ResponseWriter, r *http.Request) {
+		// validar token antes de aceptar
+		token := r.URL.Query().Get("token")
+		if token != staticToken {
+			http.Error(w, "unauthorized", http.StatusUnauthorized)
+			return
+		}
+		handleConnection(w, r)
+	})
+
 	http.HandleFunc("/health", handleHealth)
 	http.HandleFunc("/servers", handleServers)
 
@@ -251,20 +246,16 @@ func main() {
 // ------------------ HANDLERS ------------------
 
 func handleConnection(w http.ResponseWriter, r *http.Request) {
-	// intentar asignar ID
 	var id int
 	select {
 	case id = <-freeIDs:
-		// got an ID
 	default:
-		// sin IDs libres: rechazar conexión
 		http.Error(w, "server full", http.StatusServiceUnavailable)
 		return
 	}
 
 	conn, err := upgrader.Upgrade(w, r, nil)
 	if err != nil {
-		// devolver ID al pool porque no se terminó la conexión
 		select {
 		case freeIDs <- id:
 		default:
@@ -279,54 +270,39 @@ func handleConnection(w http.ResponseWriter, r *http.Request) {
 		return nil
 	})
 
-	// crear client con ID asignada
 	client := newClient(conn, SendBufPerClient, id)
 	clients.Store(client, id)
-
-	// log de conexión
 	log.Printf("Cliente conectado: id=%d addr=%s", client.id, client.addr)
 
-	// iniciar writer y ping loops
 	go client.writerLoop(5 * time.Second)
 	go client.pingLoop(10*time.Second, 5*time.Second)
 
-	// reader en este goroutine
 	for {
 		_, msg, err := conn.ReadMessage()
 		if err != nil {
-			// cliente desconectado o timeout
 			break
 		}
-		// esperamos al menos 12 bytes (X Y Z) o 16 si tu cliente sigue mandando ID (lo ignoramos)
 		if len(msg) < 12 {
 			continue
 		}
 
 		start := time.Now()
-		// leer campos (si el cliente sigue mandando ID en los primeros 4 bytes, lo ignoramos y usamos nuestro id)
 		var d DataCliente
-		// si el cliente envía 16 bytes: [id(4) X(4) Y(4) Z(4)] -> leer desde 4
 		if len(msg) >= 16 {
 			d.X = int32(binary.LittleEndian.Uint32(msg[4:8]))
 			d.Y = int32(binary.LittleEndian.Uint32(msg[8:12]))
 			d.Z = int32(binary.LittleEndian.Uint32(msg[12:16]))
 		} else {
-			// si envía sólo X Y Z (12 bytes)
 			d.X = int32(binary.LittleEndian.Uint32(msg[0:4]))
 			d.Y = int32(binary.LittleEndian.Uint32(msg[4:8]))
 			d.Z = int32(binary.LittleEndian.Uint32(msg[8:12]))
 		}
 
-		// asignar ID del servidor
 		d.ID = int32(client.id)
-
-		// almacenar en el slot del cliente (sobrescribe cualquier valor anterior)
 		latestData[client.id].Store(&d)
-
 		recordMetrics(1, 0, time.Since(start))
 	}
 
-	// reader sale -> cerrar client (esto también libera ID y limpia slot)
 	client.close()
 }
 
@@ -340,7 +316,6 @@ func handleHealth(w http.ResponseWriter, _ *http.Request) {
 	})
 
 	recvRate, sendRate, latencyMs := getAverages()
-
 	resp := map[string]any{
 		"status":     "ok",
 		"clients":    count,
@@ -360,7 +335,7 @@ func handleServers(w http.ResponseWriter, _ *http.Request) {
 	json.NewEncoder(w).Encode(servers)
 }
 
-// ------------------ BROADCAST LOOP ------------------
+// ------------------ BROADCAST ------------------
 
 func broadcastLoop() {
 	ticker := time.NewTicker(time.Millisecond * time.Duration(BroadcastMs))
@@ -368,18 +343,14 @@ func broadcastLoop() {
 
 	for {
 		<-ticker.C
-
-		// recolectar todos los latestData no nil
 		accum := make([]DataCliente, 0, 256)
 		for id := 0; id < MaxClients; id++ {
 			v := latestData[id].Load()
 			if v == nil {
 				continue
 			}
-			// extraer valor y limpiar slot (atomically store nil)
 			if p, ok := v.(*DataCliente); ok && p != nil {
 				accum = append(accum, *p)
-				// limpiar slot para no reenviar mismo dato en siguiente tick
 				latestData[id].Store((*DataCliente)(nil))
 			}
 		}
@@ -392,8 +363,6 @@ func broadcastLoop() {
 	}
 }
 
-// processAndBroadcast envía el mensaje serializado a cada cliente,
-// usando el canal per-client para evitar bloqueos de escritura.
 func processAndBroadcast(accum []DataCliente) {
 	start := time.Now()
 	message := serializeSlice(accum)
@@ -405,7 +374,6 @@ func processAndBroadcast(accum []DataCliente) {
 		case c.send <- message:
 			sent++
 		default:
-			// cliente lento -> cerramos para mantener throughput
 			c.close()
 		}
 		return true
@@ -414,9 +382,6 @@ func processAndBroadcast(accum []DataCliente) {
 	recordMetrics(0, sent, time.Since(start))
 }
 
-// ------------------ SERIALIZACIÓN ------------------
-
-// serializeSlice usa PutUint32 y bufferPool para minimizar allocations.
 func serializeSlice(data []DataCliente) []byte {
 	buf := bufferPool.Get().(*bytes.Buffer)
 	buf.Reset()
@@ -430,7 +395,6 @@ func serializeSlice(data []DataCliente) []byte {
 		buf.Write(tmp[:])
 	}
 
-	// devolvemos una copia porque buf puede ser reutilizado por el pool
 	b := append([]byte(nil), buf.Bytes()...)
 	bufferPool.Put(buf)
 	return b

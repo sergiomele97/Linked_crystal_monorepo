@@ -1,8 +1,12 @@
 import asyncio
 import struct
 import websockets
+import os
 
-SERVER_URL = "ws://localhost:8080/ws"
+# Token estático (puede sacarse de variable de entorno local)
+STATIC_TOKEN = os.getenv("STATIC_TOKEN", "demo_token")  # reemplaza demo_token si quieres
+
+SERVER_URL = f"ws://localhost:8080/ws?token={STATIC_TOKEN}"
 
 # Empaqueta (X, Y, Z) en formato binario little-endian (igual que Go)
 def make_message(x, y, z):
@@ -17,9 +21,9 @@ async def run_client():
         try:
             async with websockets.connect(
                 SERVER_URL,
-                ping_interval=10,   # manda ping cada 10s
-                ping_timeout=5,     # espera pong máximo 5s
-                close_timeout=3,    # tiempo máximo para cierre limpio
+                ping_interval=10,
+                ping_timeout=5,
+                close_timeout=3,
             ) as ws:
                 print("Conectado al servidor WebSocket")
                 backoff = 1  # reinicia backoff tras conexión exitosa
