@@ -63,6 +63,11 @@ jobs:
           echo "Android SDK already cached."
         fi
 
+    - name: Fix sdkmanager path for Buildozer
+      run: |
+        mkdir -p /home/runner/.buildozer/android/platform/android-sdk/tools/bin
+        ln -sf /home/runner/.buildozer/android/platform/android-sdk/cmdline-tools/latest/bin/sdkmanager /home/runner/.buildozer/android/platform/android-sdk/tools/bin/sdkmanager
+
     - name: Build APK
       working-directory: packages/app/APKbuilder
       run: |
