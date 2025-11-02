@@ -54,25 +54,36 @@ jobs:
         mkdir -p /home/runner/.buildozer/android/platform/android-sdk/tools/bin
         ln -sf /home/runner/.buildozer/android/platform/android-sdk/cmdline-tools/latest/bin/sdkmanager /home/runner/.buildozer/android/platform/android-sdk/tools/bin/sdkmanager
 
-    - name: Use latest stable python-for-android (fixes libffi issues)
+    - name: Use python-for-android 2024.01.21 (same as local)
       run: |
         rm -rf ~/.buildozer/android/platform/python-for-android
-        git clone --depth=1 https://github.com/kivy/python-for-android ~/.buildozer/android/platform/python-for-android
-        cd ~/.buildozer/android/platform/python-for-android
-        git checkout 2024.04.01
+        git clone --depth=1 --branch release-2024.01.21 https://github.com/kivy/python-for-android ~/.buildozer/android/platform/python-for-android
 
-    - name: Build APK
+    - name: Generate release keystore
+      run: |
+        keytool -genkey -v \
+          -keystore my-release-key.keystore \
+          -alias my-key-alias \
+          -keyalg RSA -keysize 2048 -validity 10000 \
+          -storepass password -keypass password \
+          -dname "CN=GitHub Actions, OU=CI, O=GitHub, L=Internet, S=World, C=US"
+
+    - name: Build release APK
       working-directory: packages/app/APKbuilder
       run: |
-        buildozer android debug
+        buildozer android release
       env:
         ANDROIDSDK: /home/runner/.buildozer/android/platform/android-sdk
         ANDROIDNDK: /home/runner/.buildozer/android/platform/android-ndk-r25b
         JAVA_HOME: /usr/lib/jvm/java-17-openjdk-amd64
+        BUILDOZER_KEYSTORE: /home/runner/work/Linked_crystal_monorepo/my-release-key.keystore
+        BUILDOZER_KEYALIAS: my-key-alias
+        BUILDOZER_KEYSTORE_PASS: password
+        BUILDOZER_KEYALIAS_PASS: password
 
-    - name: Upload generated APK
+    - name: Upload generated APK (release)
       uses: actions/upload-artifact@v4
       with:
-        name: app-debug-apk
+        name: app-release-apk
         path: packages/app/APKbuilder/bin/*.apk
-        retention-days: 3
+        retention-days: 5
