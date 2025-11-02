@@ -8,7 +8,7 @@ jobs:
     environment: development
     runs-on: ubuntu-latest
     container:
-      image: kivy/buildozer:latest  # Imagen con todo preinstalado
+      image: kivy/buildozer:latest
 
     steps:
     - name: Checkout repository
@@ -18,10 +18,10 @@ jobs:
       uses: actions/cache@v4
       with:
         path: |
-          ~/.buildozer/android/platform/android-sdk
-          ~/.buildozer/android/platform/android-ndk-r25b
-          ~/.buildozer/android/platform/python-for-android
-          ~/.buildozer/android/platform/build-arm64-v8a/build/other_builds
+          $HOME/.buildozer/android/platform/android-sdk
+          $HOME/.buildozer/android/platform/android-ndk-r25b
+          $HOME/.buildozer/android/platform/python-for-android
+          $HOME/.buildozer/android/platform/build-arm64-v8a/build/other_builds
         key: ${{ runner.os }}-buildozer-${{ hashFiles('packages/app/APKbuilder/buildozer.spec') }}
         restore-keys: |
           ${{ runner.os }}-buildozer-
@@ -31,8 +31,8 @@ jobs:
       run: |
         buildozer android debug
       env:
-        ANDROIDSDK: /home/user/.buildozer/android/platform/android-sdk
-        ANDROIDNDK: /home/user/.buildozer/android/platform/android-ndk-r25b
+        ANDROIDSDK: $HOME/.buildozer/android/platform/android-sdk
+        ANDROIDNDK: $HOME/.buildozer/android/platform/android-ndk-r25b
         JAVA_HOME: /usr/lib/jvm/java-17-openjdk-amd64
 
     - name: Upload generated APK (debug)
