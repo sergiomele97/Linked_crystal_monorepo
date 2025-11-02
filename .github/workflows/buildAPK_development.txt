@@ -1,0 +1,62 @@
+ 
+name: Build Kivy APK
+
+on:
+  push:
+    branches: [ "main" ]
+  workflow_dispatch:
+
+jobs:
+  build:
+    environment: development
+    runs-on: ubuntu-latest
+    timeout-minutes: 360  # Máximo permitido en runners gratis (6 horas)
+
+    steps:
+    - name: Checkout repository
+      uses: actions/checkout@v4
+
+    - name: Set up Python
+      uses: actions/setup-python@v5
+      with:
+        python-version: "3.10"
+
+    - name: Install system dependencies
+      run: |
+        sudo apt-get update -y
+        sudo apt-get install -y \
+          python3-pip python3-setuptools git zip openjdk-17-jdk \
+          libffi-dev libssl-dev libsqlite3-dev zlib1g-dev \
+          libjpeg-dev libfreetype6-dev
+
+    - name: Install buildozer
+      run: |
+        pip install --upgrade pip
+        pip install buildozer cython
+
+    - name: Restore buildozer cache
+      uses: actions/cache@v4
+      with:
+        path: |
+          ~/.buildozer
+          /home/runner/.buildozer
+          ~/.gradle
+        key: ${{ runner.os }}-buildozer-${{ hashFiles('packages/app/APKbuilder/buildozer.spec') }}
+        restore-keys: |
+          ${{ runner.os }}-buildozer-
+
+    - name: Build APK
+      working-directory: packages/app/APKbuilder
+      run: |
+        buildozer android debug
+      env:
+        ANDROIDSDK: /home/runner/.buildozer/android/platform/android-sdk
+        ANDROIDNDK: /home/runner/.buildozer/android/platform/android-ndk-r25b
+        JAVA_HOME: /usr/lib/jvm/java-17-openjdk-amd64
+
+    - name: Upload generated APK
+      uses: actions/upload-artifact@v4
+      with:
+        name: app-debug-apk
+        path: packages/app/APKbuilder/bin/*.apk
+        retention-days: 3  # se borra automáticamente después de 3 días para ahorrar espacio
