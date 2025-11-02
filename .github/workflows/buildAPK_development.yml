@@ -1,5 +1,4 @@
- 
-name: Build Kivy APK
+name: buildAPK_development
 
 on:
   push:
@@ -27,7 +26,7 @@ jobs:
         sudo apt-get install -y \
           python3-pip python3-setuptools git zip openjdk-17-jdk \
           libffi-dev libssl-dev libsqlite3-dev zlib1g-dev \
-          libjpeg-dev libfreetype6-dev
+          libjpeg-dev libfreetype6-dev wget unzip
 
     - name: Install buildozer
       run: |
@@ -44,6 +43,25 @@ jobs:
         key: ${{ runner.os }}-buildozer-${{ hashFiles('packages/app/APKbuilder/buildozer.spec') }}
         restore-keys: |
           ${{ runner.os }}-buildozer-
+
+    - name: Preinstall Android SDK build-tools
+      run: |
+        mkdir -p ~/.buildozer/android/platform
+        cd ~/.buildozer/android/platform
+        if [ ! -d "android-sdk" ]; then
+          echo "Installing Android SDK..."
+          mkdir android-sdk
+          cd android-sdk
+          wget https://dl.google.com/android/repository/commandlinetools-linux-9477386_latest.zip -O cmdtools.zip
+          unzip -q cmdtools.zip -d cmdline-tools
+          rm cmdtools.zip
+          mkdir -p cmdline-tools/latest
+          mv cmdline-tools/cmdline-tools/* cmdline-tools/latest/ || true
+          yes | cmdline-tools/latest/bin/sdkmanager --licenses
+          yes | cmdline-tools/latest/bin/sdkmanager "platform-tools" "build-tools;34.0.0" "platforms;android-34"
+        else
+          echo "Android SDK already cached."
+        fi
 
     - name: Build APK
       working-directory: packages/app/APKbuilder
