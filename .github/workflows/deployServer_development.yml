@@ -27,7 +27,7 @@ jobs:
           go-version: '1.25'
           cache-dependency-path: packages/server/go.sum 
 
-      # ⚡ 4️⃣ Cache adicional persistente (opcional, mejora tiempos)
+      # ⚡ 4️⃣ Cache adicional persistente (opcional)
       - name: Cache Go build
         uses: actions/cache@v3
         with:
@@ -36,14 +36,18 @@ jobs:
             ~/.local/share/go
           key: ${{ runner.os }}-go-${{ hashFiles('**/go.sum') }}
 
-      # 🧱 5️⃣ Compilar el servidor (limitando CPU y RAM)
+      # 🧱 5️⃣ Compilar el servidor
       - name: Build Go server
         working-directory: packages/server
         run: |
           GOMAXPROCS=1 go build -v -x -ldflags="-s -w" -o server .
 
-      # 🔁 6️⃣ Reiniciar el servicio systemd
+      # 🔁 6️⃣ Reiniciar el servicio systemd con STATIC_TOKEN
       - name: Restart WebSocket service
+        env:
+          STATIC_TOKEN: ${{ secrets.STATIC_TOKEN }}
         run: |
+          echo "STATIC_TOKEN=${STATIC_TOKEN}" | sudo tee /etc/default/websocket-server > /dev/null
+          sudo systemctl daemon-reload
           sudo systemctl restart websocket-server
           sudo systemctl status websocket-server --no-pager
