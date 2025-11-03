@@ -3,15 +3,24 @@ import struct
 import websockets
 import os
 import ssl
+from dotenv import load_dotenv 
 
 
-ssl_context = ssl.create_default_context()
+# 🔹 Cargar variables desde .env
+load_dotenv()
 
-# Token estático (puede sacarse de variable de entorno local)
-STATIC_TOKEN = os.getenv("STATIC_TOKEN", "demo_token")  # reemplaza demo_token si quieres
+# Apuntar a local
+STATIC_TOKEN="demo_token"
+SERVER_URL = f"ws://localhost:8080/ws?token={STATIC_TOKEN}"
+ssl_context = None
+server_hostname = None
 
-#SERVER_URL = f"ws://localhost:8080/ws?token={STATIC_TOKEN}"
-SERVER_URL = f"wss://server_publicado.linkedcrystal.com/ws?token={STATIC_TOKEN}"
+# Apuntar a desarrollo
+# STATIC_TOKEN = os.getenv("STATIC_TOKEN", "demo_token")
+# SERVER_URL = f"wss://server_publicado.linkedcrystal.com/ws?token={STATIC_TOKEN}"
+# ssl_context = ssl.create_default_context()
+# server_hostname="linkedcrystal.com"
+
 
 # Empaqueta (X, Y, Z) en formato binario little-endian (igual que Go)
 def make_message(x, y, z):
@@ -27,7 +36,7 @@ async def run_client():
             async with websockets.connect(
                 SERVER_URL,
                 ssl=ssl_context,
-                server_hostname="linkedcrystal.com",
+                server_hostname=server_hostname,
                 ping_interval=10,
                 ping_timeout=5,
                 close_timeout=3,

@@ -8,4 +8,6 @@
 # Python bytecode cache
 __pycache__/
  
+# Environment variables
+**/.env
 
