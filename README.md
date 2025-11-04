@@ -55,53 +55,46 @@
     <td valign="top">
       <h3 align="center">🌍 PRODUCTS AND ENVIRONMENTS</h3>    
       <img src="https://via.placeholder.com/400x1/FFFFFF/FFFFFF" alt="" width="600" height="1"><br>
-      <b>Local</b><br>
-        <br>
-        <table>
-            <tr>
-              <td>
-                <a href="#1.1-set-up-local-client">Client</a>
-              </td>
-              <td rowspan="3" align="center">
-                <img src="https://raw.githubusercontent.com/sergiomele97/Linked_crystal_monorepo/main/.github/assets/flow.svg" width="300" alt="data flow animation">
-              </td>
-              <td>
-                <a href="#1.2-set-up-local-server">Server</a>
-              </td>
-            </tr>
-            <tr>
-                <td>
-                  <code><img height="30" width="100" src="https://img.shields.io/badge/Kivy-Desktop-brightgreen"></code><br>
-                  <code><img height="30" width="100" src="https://img.shields.io/badge/Python-FFD43B?style=for-the-badge&logo=python&logoColor=blue"></code>
-                </td>
-                <td>
-                  <code><img height="60" width="100" src="https://img.shields.io/badge/Go-00ADD8?logo=Go&logoColor=white&style=for-the-badge"></code>
-                </td>
-            </tr>
-        </table>
-      <img src="https://via.placeholder.com/400x1/FFFFFF/FFFFFF" alt="" width="600" height="1"><br>
-      <b>Development</b><br>
-        <br>
-        <table>
-            <tr>
-              <td><b>Client</b></td>
-              <td rowspan="2" align="center">
-                <img src="https://raw.githubusercontent.com/sergiomele97/Linked_crystal_monorepo/main/.github/assets/flow.svg" width="300" alt="data flow animation">
-              </td>
-              <td><b>Server</b></td>
-            </tr>
-            <tr>
-                <td>
-                  <code><img height="30" width="100" src="https://img.shields.io/badge/Android-3DDC84?logo=android&logoColor=white"></code><br>         
-                  <code><img height="30" width="100" src="https://img.shields.io/badge/Kivy-Buildozer-blue?logo=python"></code><br>
-                  <code><img height="30" width="100" src="https://img.shields.io/badge/Python-FFD43B?style=for-the-badge&logo=python&logoColor=blue"></code>
-                </td>
-                <td>
-                  <code><img height="30" width="100" src="https://img.shields.io/badge/Cloudflare-F38020?style=for-the-badge&logo=Cloudflare&logoColor=white"></code><br>
-                  <code><img height="60" width="100" src="https://img.shields.io/badge/Go-00ADD8?logo=Go&logoColor=white&style=for-the-badge"></code>
-                </td>
-            </tr>
-        </table>
+      <table>
+        <tr>
+          <td>
+            <a href="#1.1-set-up-local-client">Local client</a>
+          </td>
+          <td rowspan="3" align="center">
+            <img src="https://raw.githubusercontent.com/sergiomele97/Linked_crystal_monorepo/main/.github/assets/flow.svg" width="300" alt="data flow animation">
+          </td>
+          <td>
+            <a href="#1.2-set-up-local-server">Localerver</a>
+          </td>
+        </tr>
+        <tr>
+            <td>
+              <code><img height="30" width="100" src="https://img.shields.io/badge/Kivy-Desktop-brightgreen"></code><br>
+              <code><img height="30" width="100" src="https://img.shields.io/badge/Python-FFD43B?style=for-the-badge&logo=python&logoColor=blue"></code>
+            </td>
+            <td>
+              <code><img height="60" width="100" src="https://img.shields.io/badge/Go-00ADD8?logo=Go&logoColor=white&style=for-the-badge"></code>
+            </td>
+        </tr>
+        <tr>
+          <td><b>Development client</b></td>
+          <td rowspan="2" align="center">
+            <img src="https://raw.githubusercontent.com/sergiomele97/Linked_crystal_monorepo/main/.github/assets/flow.svg" width="300" alt="data flow animation">
+          </td>
+          <td><b>Development server</b></td>
+        </tr>
+        <tr>
+          <td>
+            <code><img height="30" width="100" src="https://img.shields.io/badge/Android-3DDC84?logo=android&logoColor=white"></code><br>         
+            <code><img height="30" width="100" src="https://img.shields.io/badge/Kivy-Buildozer-blue?logo=python"></code><br>
+            <code><img height="30" width="100" src="https://img.shields.io/badge/Python-FFD43B?style=for-the-badge&logo=python&logoColor=blue"></code>
+          </td>
+          <td>
+            <code><img height="30" width="100" src="https://img.shields.io/badge/Cloudflare-F38020?style=for-the-badge&logo=Cloudflare&logoColor=white"></code><br>
+            <code><img height="60" width="100" src="https://img.shields.io/badge/Go-00ADD8?logo=Go&logoColor=white&style=for-the-badge"></code>
+          </td>
+        </tr>
+      </table>
       <img src="https://via.placeholder.com/400x1/FFFFFF/FFFFFF" alt="" width="600" height="1"><br>
       <details>
         <summary><b>Production</b><br></summary>
