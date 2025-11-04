@@ -60,7 +60,7 @@
           <td>
             <a href="#1.1-set-up-local-client">Local client</a>
           </td>
-          <td rowspan="3" align="center">
+          <td rowspan="5" align="center">
             <img src="https://raw.githubusercontent.com/sergiomele97/Linked_crystal_monorepo/main/.github/assets/flow.svg" width="300" alt="data flow animation">
           </td>
           <td>
@@ -78,9 +78,6 @@
         </tr>
         <tr>
           <td><b>Development client</b></td>
-          <td rowspan="2" align="center">
-            <img src="https://raw.githubusercontent.com/sergiomele97/Linked_crystal_monorepo/main/.github/assets/flow.svg" width="300" alt="data flow animation">
-          </td>
           <td><b>Development server</b></td>
         </tr>
         <tr>
