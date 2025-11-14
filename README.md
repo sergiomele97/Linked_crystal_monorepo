@@ -27,7 +27,7 @@
       <div>...</div>
       <br>
       <details>
-        <summary>✅ Foundations</summary>
+        <summary>&#x2611; Foundations</summary>
         <ul>
           <li>✅ Defining architecture</li>
           <li>✅ Integrating pyboy into an APK</li>
