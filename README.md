@@ -78,10 +78,20 @@
         </tr>
         <tr>
           <td>
-            &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;|<br>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;| Build APK<br>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;|<br>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;V
+            <pre>
+                 |
+                 | Build APK
+                 |
+                 V
+            </pre>
           </td>
           <td>
-            &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;|<br>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;| Deploy server<br>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;|<br>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;V
+            <pre>
+                 |
+                 | Deploy
+                 |
+                 V
+            </pre>
           </td>
         </tr>
         <tr>
