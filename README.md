@@ -93,8 +93,8 @@
           </td>
         </tr>
         <tr>
-          <td><b>Development client</b></td>
-          <td><b>Development server</b></td>
+          <td><b>Dev client</b></td>
+          <td><b>Dev server</b></td>
         </tr>
         <tr>
           <td>
