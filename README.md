@@ -137,6 +137,8 @@
   </tr>
 </table>
 
+# New plan: quickstart with docker and wiki index
+
 # 1 Developing this project on your machine:
 
 ## Introduction: If you have 0 patience and are just a little bit familiar with docker I recommend you the one click ready environment: Containerized development environment on your web browser using webtops => (pending implementation)
