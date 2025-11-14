@@ -78,7 +78,7 @@
         </tr>
         <tr>
           <td>
-            |<br>| Build APK<br>|<br>V
+            |<br>    | Build APK<br>|<br>V
           </td>
           <td>
             |<br>| Deploy server<br>|<br>V
@@ -88,7 +88,7 @@
           <td><b>Development client</b></td>
           <td><b>Development server</b></td>
         </tr>
-        <tr>
+        <tr>F
           <td>
             <code><img height="30" width="100" src="https://img.shields.io/badge/Android-3DDC84?logo=android&logoColor=white"></code><br>         
             <code><img height="30" width="100" src="https://img.shields.io/badge/Kivy-Buildozer-blue?logo=python"></code><br>
