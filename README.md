@@ -79,18 +79,18 @@
         <tr>
           <td>
             <pre>
-                 |
-                 | Build APK
-                 |
-                 V
+              |
+              | Build APK
+              |
+              V
             </pre>
           </td>
           <td>
             <pre>
-                 |
-                 | Deploy
-                 |
-                 V
+              |
+              | Deploy
+              |
+              V
             </pre>
           </td>
         </tr>
