@@ -81,7 +81,7 @@
             ⬇️<a href="#1.1-set-up-local-client">Build APK</a>
           </td>
           <td>
-            ⬇️<a href="#1.1-set-up-local-client">deploy<br>Deploy</a>
+            |<br>| Deploy server<br>|<br>V
           </td>
         </tr>
         <tr>
