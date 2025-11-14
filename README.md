@@ -85,12 +85,11 @@
    V  </pre>
           </td>
           <td>
-            <pre>
-              |
-              | Deploy
-              |
-              V
-            </pre>
+       <pre>
+   |
+   | Deploy
+   |
+   V  </pre>
           </td>
         </tr>
         <tr>
