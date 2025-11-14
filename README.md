@@ -35,7 +35,7 @@
         </ul>
       </details>
       <details>
-        <summary>⚪ Developing backend MVP</summary>
+        <summary>&#x2610; Developing backend MVP</summary>
         <ul>
           <li>⚪ Websockets and really eficient approach</li>
           <li>⚪ Centrilized server</li>
