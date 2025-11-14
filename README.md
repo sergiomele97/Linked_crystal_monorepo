@@ -78,10 +78,10 @@
         </tr>
         <tr>
           <td>
-            ⬇️<a href="#1.1-set-up-local-client">APK building pipeline</a>
+            ⬇️<a href="#1.1-set-up-local-client">Build APK</a>
           </td>
           <td>
-            ⬇️<a href="#1.1-set-up-local-client">Server deploy pipeline</a>
+            ⬇️<a href="#1.1-set-up-local-client">deploy<br>Deploy</a>
           </td>
         </tr>
         <tr>
