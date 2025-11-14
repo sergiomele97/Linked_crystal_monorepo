@@ -78,12 +78,11 @@
         </tr>
         <tr>
           <td>
-            <pre>
-              |
-              | Build APK
-              |
-              V
-            </pre>
+       <pre>
+   |
+   | Build APK
+   |
+   V  </pre>
           </td>
           <td>
             <pre>
