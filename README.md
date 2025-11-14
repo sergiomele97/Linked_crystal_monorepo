@@ -80,7 +80,7 @@
           <td>
        <pre>
    |
-   | Build APK
+   | Build
    |
    V  </pre>
           </td>
