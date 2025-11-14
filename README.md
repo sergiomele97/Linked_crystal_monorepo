@@ -78,17 +78,17 @@
         </tr>
         <tr>
           <td>
-            |<br>    | Build APK<br>|<br>V
+            <&nbsp><&nbsp><&nbsp><&nbsp>|<br><&nbsp><&nbsp><&nbsp><&nbsp>| Build APK<br><&nbsp><&nbsp><&nbsp><&nbsp>|<br><&nbsp><&nbsp><&nbsp><&nbsp>V
           </td>
           <td>
-            |<br>| Deploy server<br>|<br>V
+            <&nbsp><&nbsp><&nbsp><&nbsp>|<br><&nbsp><&nbsp><&nbsp><&nbsp>| Deploy server<br><&nbsp><&nbsp><&nbsp><&nbsp>|<br><&nbsp><&nbsp><&nbsp><&nbsp>V
           </td>
         </tr>
         <tr>
           <td><b>Development client</b></td>
           <td><b>Development server</b></td>
         </tr>
-        <tr>F
+        <tr>
           <td>
             <code><img height="30" width="100" src="https://img.shields.io/badge/Android-3DDC84?logo=android&logoColor=white"></code><br>         
             <code><img height="30" width="100" src="https://img.shields.io/badge/Kivy-Buildozer-blue?logo=python"></code><br>
