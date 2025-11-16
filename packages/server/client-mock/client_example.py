@@ -6,20 +6,23 @@ import ssl
 from dotenv import load_dotenv 
 
 
-# 🔹 Cargar variables desde .env
+# Cargar variables desde .env
 load_dotenv()
 
-# Apuntar a local
-STATIC_TOKEN="demo_token"
-SERVER_URL = f"ws://localhost:8080/ws?token={STATIC_TOKEN}"
+# Variables de entorno
+ENV = os.getenv("ENV", "local")
+STATIC_TOKEN = os.getenv("STATIC_TOKEN", "demo_token")
+URL = os.getenv("URL")
+SERVER_URL = os.getenv("SERVER_URL", "ws://localhost:8080/ws")
+FULL_URL = f"{SERVER_URL}?token={STATIC_TOKEN}"
+
 ssl_context = None
 server_hostname = None
 
-# Apuntar a desarrollo
-# STATIC_TOKEN = os.getenv("STATIC_TOKEN", "demo_token")
-# SERVER_URL = f"wss://linkedcrystal.com/ws?token={STATIC_TOKEN}"
-# ssl_context = ssl.create_default_context()
-# server_hostname="linkedcrystal.com"
+if (ENV != "local"):
+    ssl_context = ssl.create_default_context()
+    server_hostname=URL
+
 
 
 # Empaqueta (X, Y, Z) en formato binario little-endian (igual que Go)
@@ -34,7 +37,7 @@ async def run_client():
     while True:
         try:
             async with websockets.connect(
-                SERVER_URL,
+                FULL_URL,
                 ssl=ssl_context,
                 server_hostname=server_hostname,
                 ping_interval=10,

@@ -214,6 +214,7 @@ func init() {
 
 	envServers := os.Getenv("SERVERS")
 	if envServers == "" {
+		log.Println("Variable de entorno SERVERS vacia, usando default value")
 		servers = []string{"wss://linkedcrystal.com/ws"}
 	} else {
 		list := strings.Split(envServers, ",")
