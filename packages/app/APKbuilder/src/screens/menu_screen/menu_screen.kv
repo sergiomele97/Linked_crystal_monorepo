@@ -43,10 +43,22 @@
                 size_hint_y: None
                 height: self.texture_size[1]
 
+        # Spinner usando ZIP de imágenes (spinner.zip)
+        Image:
+            id: loading_spinner
+            source: 'resources/image/spinner.zip'
+            size_hint: 0.15, 0.15
+            size: 50, 50
+            pos_hint: {"center_x": 0.5, "center_y": 0.5}
+            opacity: 1 if root.loading else 0
+            allow_stretch: True
+            keep_ratio: True
+            anim_delay: -1    
+            anim_loop: 0      
+
         ImageButton:
             id: menuButton
             source: 'resources/image/settings.png'
             size_hint: 0.1, 0.1
             pos_hint: {"x": 0.88, "y": 0.91}
             on_release: root.open_menu(self)
-
