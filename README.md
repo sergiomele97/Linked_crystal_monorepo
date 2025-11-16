@@ -27,7 +27,7 @@
       <div>...</div>
       <br>
       <details>
-        <summary>✅ Foundations</summary>
+        <summary>&#x2611; Foundations</summary>
         <ul>
           <li>✅ Defining architecture</li>
           <li>✅ Integrating pyboy into an APK</li>
@@ -35,7 +35,7 @@
         </ul>
       </details>
       <details>
-        <summary>⚪ Developing backend MVP</summary>
+        <summary>&#x2610; Developing backend MVP</summary>
         <ul>
           <li>⚪ Websockets and really eficient approach</li>
           <li>⚪ Centrilized server</li>
@@ -55,57 +55,59 @@
     <td valign="top">
       <h3 align="center">🌍 PRODUCTS AND ENVIRONMENTS</h3>    
       <img src="https://via.placeholder.com/400x1/FFFFFF/FFFFFF" alt="" width="600" height="1"><br>
-      <details open>
-        <summary><b>Local</b><br></summary>
-          <br>
-          <table>
-              <tr>
-                <td>
-                  <a href="#1.1-set-up-local-client">Client</a>
-                </td>
-                <td rowspan="3" align="center">
-                  <img src="https://raw.githubusercontent.com/sergiomele97/Linked_crystal_monorepo/main/.github/assets/flow.svg" width="300" alt="data flow animation">
-                </td>
-                <td>
-                  <a href="#1.2-set-up-local-server">Server</a>
-                </td>
-              </tr>
-              <tr>
-                  <td>
-                    <code><img height="30" width="100" src="https://img.shields.io/badge/Kivy-Desktop-brightgreen"></code><br>
-                    <code><img height="30" width="100" src="https://img.shields.io/badge/Python-FFD43B?style=for-the-badge&logo=python&logoColor=blue"></code>
-                  </td>
-                  <td>
-                    <code><img height="60" width="100" src="https://img.shields.io/badge/Go-00ADD8?logo=Go&logoColor=white&style=for-the-badge"></code>
-                  </td>
-              </tr>
-          </table>
-      </details>
-      <img src="https://via.placeholder.com/400x1/FFFFFF/FFFFFF" alt="" width="600" height="1"><br>
-      <details open>
-        <summary><b>Development</b><br></summary>
-          <br>
-          <table>
-              <tr>
-                <td><b>Client</b></td>
-                <td rowspan="2" align="center">
-                  <img src="https://raw.githubusercontent.com/sergiomele97/Linked_crystal_monorepo/main/.github/assets/flow.svg" width="300" alt="data flow animation">
-                </td>
-                <td><b>Server</b></td>
-              </tr>
-              <tr>
-                  <td>
-                    <code><img height="30" width="100" src="https://img.shields.io/badge/Android-3DDC84?logo=android&logoColor=white"></code><br>         
-                    <code><img height="30" width="100" src="https://img.shields.io/badge/Kivy-Buildozer-blue?logo=python"></code><br>
-                    <code><img height="30" width="100" src="https://img.shields.io/badge/Python-FFD43B?style=for-the-badge&logo=python&logoColor=blue"></code>
-                  </td>
-                  <td>
-                    <code><img height="30" width="100" src="https://img.shields.io/badge/Cloudflare-F38020?style=for-the-badge&logo=Cloudflare&logoColor=white"></code><br>
-                    <code><img height="60" width="100" src="https://img.shields.io/badge/Go-00ADD8?logo=Go&logoColor=white&style=for-the-badge"></code>
-                  </td>
-              </tr>
-          </table>
-      </details>
+      <table>
+        <tr>
+          <td>
+            &nbsp;&nbsp;&nbsp;<b>Local client</b>
+          </td>
+          <td rowspan="6" align="center">
+            <img src="https://raw.githubusercontent.com/sergiomele97/Linked_crystal_monorepo/main/.github/assets/flow.svg" width="300" alt="data flow animation">
+          </td>
+          <td>
+            &nbsp;&nbsp;&nbsp;<b>Local server</b>
+          </td>
+        </tr>
+        <tr>
+            <td>
+              <code><img height="30" width="100" src="https://img.shields.io/badge/Kivy-Desktop-brightgreen"></code><br>
+              <code><img height="30" width="100" src="https://img.shields.io/badge/Python-FFD43B?style=for-the-badge&logo=python&logoColor=blue"></code>
+            </td>
+            <td>
+              <code><img height="60" width="100" src="https://img.shields.io/badge/Go-00ADD8?logo=Go&logoColor=white&style=for-the-badge"></code>
+            </td>
+        </tr>
+        <tr>
+          <td>
+       <pre>
+   |
+   | Build
+   |
+   V  </pre>
+          </td>
+          <td>
+       <pre>
+   |
+   | Deploy
+   |
+   V  </pre>
+          </td>
+        </tr>
+        <tr>
+          <td>&nbsp;&nbsp;&nbsp;<b>Dev client</b></td>
+          <td>&nbsp;&nbsp;&nbsp;<b>Dev server</b></td>
+        </tr>
+        <tr>
+          <td>
+            <code><img height="30" width="100" src="https://img.shields.io/badge/Android-3DDC84?logo=android&logoColor=white"></code><br>         
+            <code><img height="30" width="100" src="https://img.shields.io/badge/Kivy-Buildozer-blue?logo=python"></code><br>
+            <code><img height="30" width="100" src="https://img.shields.io/badge/Python-FFD43B?style=for-the-badge&logo=python&logoColor=blue"></code>
+          </td>
+          <td>
+            <code><img height="30" width="100" src="https://img.shields.io/badge/Cloudflare-F38020?style=for-the-badge&logo=Cloudflare&logoColor=white"></code><br>
+            <code><img height="60" width="100" src="https://img.shields.io/badge/Go-00ADD8?logo=Go&logoColor=white&style=for-the-badge"></code>
+          </td>
+        </tr>
+      </table>
       <img src="https://via.placeholder.com/400x1/FFFFFF/FFFFFF" alt="" width="600" height="1"><br>
       <details>
         <summary><b>Production</b><br></summary>
@@ -134,6 +136,8 @@
     
   </tr>
 </table>
+
+# New plan: quickstart with docker and wiki index
 
 # 1 Developing this project on your machine:
 
