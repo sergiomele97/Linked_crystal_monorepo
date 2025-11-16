@@ -63,7 +63,7 @@ class ConnectionManager:
     def _select_server(self, servidor, parent_screen, popup):
         self.selected_server = servidor
         parent_screen.servidor_elegido = True
-        parent_screen.ids.label_servidor.text = f"Servidor elegido: {servidor}"
+        parent_screen.ids.label_servidor.text = f"Servidor elegido:\n {servidor}"
         parent_screen.connectionManager.selected_server = servidor
         popup.dismiss()
 
