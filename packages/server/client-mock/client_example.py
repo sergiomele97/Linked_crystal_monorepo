@@ -12,7 +12,7 @@ load_dotenv()
 # Variables de entorno
 ENV = os.getenv("ENV", "local")
 STATIC_TOKEN = os.getenv("STATIC_TOKEN", "demo_token")
-URL = os.getenv("URL")
+URL = os.getenv("URL") # Not needed in local
 SERVER_URL = os.getenv("SERVER_URL", "ws://localhost:8080/ws")
 FULL_URL = f"{SERVER_URL}?token={STATIC_TOKEN}"
 

@@ -215,7 +215,7 @@ func init() {
 	envServers := os.Getenv("SERVERS")
 	if envServers == "" {
 		log.Println("Variable de entorno SERVERS vacia, usando default value")
-		servers = []string{"wss://linkedcrystal.com/ws"}
+		servers = []string{"ws://localhost:8080/ws"}
 	} else {
 		list := strings.Split(envServers, ",")
 		servers = make([]string, 0, len(list))
@@ -238,9 +238,8 @@ func main() {
 	// cargar token del entorno
 	staticToken := os.Getenv("STATIC_TOKEN")
 	if staticToken == "" {
-        // fallback para entorno local
         staticToken = "demo_token"
-        log.Println("⚠️ STATIC_TOKEN no definido, usando token de desarrollo")
+        log.Println("⚠️ STATIC_TOKEN no definido, usando default")
     }
 
 	http.HandleFunc("/ws", func(w http.ResponseWriter, r *http.Request) {
@@ -260,7 +259,8 @@ func main() {
 
 	port := os.Getenv("PORT")
 	if port == "" {
-		port = "8080" // default
+		port = "8080" 
+		log.Println("⚠️ STATIC_TOKEN no definido, usando default")
 	}
 	log.Println("Servidor WebSocket corriendo en :" + port)
 	log.Fatal(http.ListenAndServe(":" + port, nil))
