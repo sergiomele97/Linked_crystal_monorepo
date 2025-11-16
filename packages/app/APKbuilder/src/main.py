@@ -3,6 +3,7 @@ from kivy.uix.screenmanager import ScreenManager
 
 from screens.menu_screen.menu_screen import MenuScreen
 from screens.emulator_screen.emulator_screen import EmulatorScreen
+from services.connection.connection_manager import ConnectionManager
 
 class MyScreenManager(ScreenManager):
     pass
@@ -13,6 +14,7 @@ class LinkedCrystalApp(App):
         super().__init__(**kwargs)
         self.rom_path: str = ""
         self.connection: str = ""
+        self.connection_manager = ConnectionManager()
 
     def build(self):
         sm = MyScreenManager()

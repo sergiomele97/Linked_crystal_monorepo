@@ -1,6 +1,8 @@
 class ConnectionManager:
-    def __init__(self, connectionData):
-        self.connectionData = connectionData
+    def __init__(self):
+        pass
 
-    def update_online_data(self):
+    
+
+    def get_online_data(self):
         pass
