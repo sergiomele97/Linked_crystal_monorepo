@@ -1,6 +1,6 @@
 from kivy.app import App
 from kivy.uix.screenmanager import Screen
-from kivy.properties import StringProperty, BooleanProperty
+from kivy.properties import StringProperty, BooleanProperty, ListProperty
 from kivy.lang import Builder
 from kivy.utils import platform
 import os
@@ -13,7 +13,11 @@ Builder.load_file("screens/menu_screen/menu_screen.kv")
 class MenuScreen(Screen):
     rom_cargado = BooleanProperty(False)
     servidor_elegido = BooleanProperty(False)
+    listaServidores = ListProperty([])
     current_path = StringProperty("/")
+
+    def on_pre_enter(self):
+        self.connectionManager = App.get_running_app().connection_manager
 
     def open_menu(self, caller):
         if not hasattr(self, "dropdown"):
@@ -33,6 +37,7 @@ class MenuScreen(Screen):
         select_rom(self, cuando_selecciona_archivo)
 
     def elegir_servidor(self):
+        self.listaServidores = self.connectionManager.getServerList()
         self.servidor_elegido = True
         self.ids.label_servidor.text = "Servidor elegido correctamente."
 

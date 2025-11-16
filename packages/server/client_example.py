@@ -17,7 +17,7 @@ server_hostname = None
 
 # Apuntar a desarrollo
 # STATIC_TOKEN = os.getenv("STATIC_TOKEN", "demo_token")
-# SERVER_URL = f"wss://server_publicado.linkedcrystal.com/ws?token={STATIC_TOKEN}"
+# SERVER_URL = f"wss://linkedcrystal.com/ws?token={STATIC_TOKEN}"
 # ssl_context = ssl.create_default_context()
 # server_hostname="linkedcrystal.com"
 
