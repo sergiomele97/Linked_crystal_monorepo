@@ -14,6 +14,7 @@
             Button:
                 text: "1. Cargar ROM (.gbc)"
                 on_release: root.abrir_explorador()
+                disabled: root.loading
 
             Label:
                 id: label_rom
@@ -24,7 +25,7 @@
             Button:
                 text: "2. Elegir servidor"
                 on_release: root.elegir_servidor()
-                disabled: not root.rom_cargado
+                disabled: not root.rom_cargado or root.loading
 
             Label:
                 id: label_servidor
@@ -35,7 +36,7 @@
             Button:
                 text: "3. Jugar"
                 on_release: root.iniciar_juego()
-                disabled: not (root.rom_cargado and root.servidor_elegido)
+                disabled: not (root.rom_cargado and root.servidor_elegido) or root.loading
 
             Label:
                 id: output_label
@@ -48,7 +49,7 @@
             id: loading_spinner
             source: 'resources/image/spinner.zip'
             size_hint: 0.15, 0.15
-            size: 50, 50
+            size: 70, 70
             pos_hint: {"center_x": 0.5, "center_y": 0.5}
             opacity: 1 if root.loading else 0
             allow_stretch: True
