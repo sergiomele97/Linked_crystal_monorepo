@@ -4,8 +4,10 @@ from kivy.uix.popup import Popup
 from kivy.uix.button import Button
 from kivy.uix.boxlayout import BoxLayout
 
+from env import URL
+
 class ConnectionManager:
-    def __init__(self, base_url="https://linkedcrystal.com"):
+    def __init__(self, base_url=URL):
         self.base_url = base_url
         self.server_list = []
         self.selected_server = None

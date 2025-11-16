@@ -7,11 +7,13 @@ import (
 	"log"
 	"net/http"
 	"os"
+	"strings"
 	"sync"
 	"sync/atomic"
 	"time"
 
 	"github.com/gorilla/websocket"
+	"github.com/joho/godotenv"
 )
 
 type DataCliente struct {
@@ -50,9 +52,7 @@ var clients sync.Map
 
 var (
 	serversMu sync.RWMutex
-	servers   = []string{
-		"wss://linkedcrystal.com/ws",
-	}
+	servers []string
 )
 
 // ------------------ MÉTRICAS ------------------
@@ -207,6 +207,25 @@ func (c *Client) pingLoop(interval, timeout time.Duration) {
 // ------------------ MAIN ------------------
 
 func init() {
+	// Cargar .env si existe
+    if err := godotenv.Load(); err != nil {
+        log.Println("⚠️ No se encontró .env, usando variables de entorno del sistema")
+    }
+
+	envServers := os.Getenv("SERVERS")
+	if envServers == "" {
+		servers = []string{"wss://linkedcrystal.com/ws"}
+	} else {
+		list := strings.Split(envServers, ",")
+		servers = make([]string, 0, len(list))
+		for _, s := range list {
+			s = strings.TrimSpace(s)
+			if s != "" {
+				servers = append(servers, s)
+			}
+		}
+	}
+	
 	latestData = make([]atomic.Value, MaxClients)
 	for i := 0; i < MaxClients; i++ {
 		freeIDs <- i
@@ -238,8 +257,12 @@ func main() {
 
 	go broadcastLoop()
 
-	log.Println("Servidor WebSocket corriendo en :8080")
-	log.Fatal(http.ListenAndServe(":8080", nil))
+	port := os.Getenv("PORT")
+	if port == "" {
+		port = "8080" // default
+	}
+	log.Println("Servidor WebSocket corriendo en :" + port)
+	log.Fatal(http.ListenAndServe(":" + port, nil))
 }
 
 // ------------------ HANDLERS ------------------
