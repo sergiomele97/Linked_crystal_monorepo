@@ -51,8 +51,7 @@ var clients sync.Map
 var (
 	serversMu sync.RWMutex
 	servers   = []string{
-		"wss://server1.example.com/ws",
-		"wss://server2.example.com/ws",
+		"wss://linkedcrystal.com/ws",
 	}
 )
 
