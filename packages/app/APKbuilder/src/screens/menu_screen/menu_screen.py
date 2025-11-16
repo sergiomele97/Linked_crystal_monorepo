@@ -9,10 +9,11 @@ from screens.menu_screen.components.menu_dropdown import MenuDropdown
 
 Builder.load_file("screens/menu_screen/menu_screen.kv")
 
+
 class MenuScreen(Screen):
     rom_cargado = BooleanProperty(False)
     servidor_elegido = BooleanProperty(False)
-    loading = BooleanProperty(False)  # controla visibilidad del spinner.zip
+    loading = BooleanProperty(False)
     listaServidores = ListProperty([])
     current_path = StringProperty("/")
 
@@ -37,23 +38,8 @@ class MenuScreen(Screen):
         select_rom(self, cuando_selecciona_archivo)
 
     def elegir_servidor(self):
-        self.loading = True
-        self.ids.label_servidor.text = "Cargando servidores..."
-        self.ids.loading_spinner.anim_delay = 0.05  # activa animación
-
-        def success(result):
-            self.listaServidores = result
-            self.servidor_elegido = True
-            self.loading = False
-            self.ids.label_servidor.text = "Servidor elegido correctamente."
-            self.ids.loading_spinner.anim_delay = -1  # pausa animación
-
-        def error(err):
-            self.loading = False
-            self.ids.label_servidor.text = f"Error al cargar: {err}"
-            self.ids.loading_spinner.anim_delay = -1  # pausa animación
-
-        self.connectionManager.getServerList(on_success=success, on_error=error)
+        # Solo delega la lógica completa al manager
+        self.connectionManager.getServerListAndSelect(self)
 
     def iniciar_juego(self):
         self.ids.output_label.text = f"¡Iniciando juego con {os.path.basename(App.get_running_app().rom_path)}!"
