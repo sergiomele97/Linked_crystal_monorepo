@@ -1,7 +1,9 @@
 import os
-from dotenv import load_dotenv
+from kivy.utils import platform
 
-load_dotenv()  
+if platform != "android":
+    from dotenv import load_dotenv
+    load_dotenv() 
 
 ENV = os.getenv("ENV", "local")
 URL = os.getenv("URL", "http://localhost:8080")
