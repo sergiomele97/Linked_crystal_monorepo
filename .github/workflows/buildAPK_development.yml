@@ -85,6 +85,11 @@ jobs:
         ANDROIDSDK: $HOME/.buildozer/android/platform/android-sdk
         ANDROIDNDK: $HOME/.buildozer/android/platform/android-ndk-r25b
         JAVA_HOME: /usr/lib/jvm/java-17-openjdk-amd64
+        STATIC_TOKEN: ${{ secrets.STATIC_TOKEN }}
+        ENV: ${{ vars.ENV }}
+        PORT: ${{ vars.PORT }}
+        SERVERS: ${{ vars.SERVERS }}
+        URL: ${{ vars.URL }}
 
     - name: Upload generated APK (debug)
       uses: actions/upload-artifact@v4
