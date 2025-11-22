@@ -13,7 +13,7 @@ package.domain = com.linkedcrystal
 source.dir = ./src
 
 # (list) Source files to include (let empty to include all the files)
-source.include_exts = py,png,jpg,kv,atlas,GBC,pxd,pyx,ttf,bin,ogg
+source.include_exts = py,png,jpg,kv,atlas,GBC,gbc,pxd,pyx,ttf,bin,ogg,zip
 
 
 # (list) List of inclusions using pattern matching
