@@ -4,6 +4,8 @@ from kivy.uix.popup import Popup
 from kivy.uix.button import Button
 from kivy.uix.scrollview import ScrollView
 from kivy.uix.gridlayout import GridLayout
+from kivy.metrics import dp
+from kivy.core.window import Window
 
 from env import URL
 
@@ -39,7 +41,6 @@ class ConnectionManager:
 
         def _error(req, error):
             parent_screen.loading = False
-            #parent_screen.ids.label_servidor.text = f"Error al cargar: {error}"
             parent_screen.ids.loading_spinner.anim_delay = -1
 
         UrlRequest(
@@ -47,20 +48,27 @@ class ConnectionManager:
             on_success=_success,
             on_error=_error,
             req_headers={'Accept': 'application/json'},
-            decode=True  # importante para que result no sea bytes
+            decode=True 
         )
 
     def _show_server_modal(self, parent_screen):
         scroll = ScrollView(size_hint=(1, 1))
-        contenido = GridLayout(cols=1, spacing=10, padding=10, size_hint_y=None)
+        contenido = GridLayout(cols=1, spacing=dp(10), padding=dp(10), size_hint_y=None)
         contenido.bind(minimum_height=contenido.setter('height'))
 
         popup = Popup(title="Selecciona un servidor",
                     content=scroll,
                     size_hint=(0.8, 0.6))
 
+        window_height = Window.height
+        button_height = max(dp(50), window_height * 0.08) 
+
         for servidor in self.server_list:
-            btn = Button(text=str(servidor), size_hint_y=None, height=50)
+            btn = Button(
+                text=str(servidor),
+                size_hint_y=None,
+                height=button_height
+            )
             btn.bind(on_release=lambda inst, s=servidor: self._select_server(s, parent_screen, popup))
             contenido.add_widget(btn)
 
