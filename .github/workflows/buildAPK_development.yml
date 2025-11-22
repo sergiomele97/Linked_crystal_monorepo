@@ -78,8 +78,8 @@ jobs:
         fi
     
     - name: Generate config.py
-      working-directory: packages/app/APKbuilder
-      run: python generate_config.py
+      working-directory: packages/app/APKbuilder/src
+      run: python ../generate_config.py
       env:
         STATIC_TOKEN: ${{ secrets.STATIC_TOKEN }}
         ENV: ${{ vars.ENV }}
