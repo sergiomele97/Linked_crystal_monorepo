@@ -2,7 +2,8 @@ import json
 from kivy.network.urlrequest import UrlRequest
 from kivy.uix.popup import Popup
 from kivy.uix.button import Button
-from kivy.uix.boxlayout import BoxLayout
+from kivy.uix.scrollview import ScrollView
+from kivy.uix.gridlayout import GridLayout
 
 from env import URL
 
@@ -50,16 +51,20 @@ class ConnectionManager:
         )
 
     def _show_server_modal(self, parent_screen):
-        contenido = BoxLayout(orientation='vertical', spacing=10, padding=10)
+        scroll = ScrollView(size_hint=(1, 1))
+        contenido = GridLayout(cols=1, spacing=10, padding=10, size_hint_y=None)
+        contenido.bind(minimum_height=contenido.setter('height'))
+
         popup = Popup(title="Selecciona un servidor",
-                      content=contenido,
-                      size_hint=(0.8, 0.6))
+                    content=scroll,
+                    size_hint=(0.8, 0.6))
 
         for servidor in self.server_list:
-            btn = Button(text=str(servidor), size_hint_y=None, height=40)
+            btn = Button(text=str(servidor), size_hint_y=None, height=50)
             btn.bind(on_release=lambda inst, s=servidor: self._select_server(s, parent_screen, popup))
             contenido.add_widget(btn)
 
+        scroll.add_widget(contenido)
         popup.open()
         self._popup = popup
 
