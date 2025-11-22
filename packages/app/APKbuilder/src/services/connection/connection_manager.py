@@ -19,6 +19,7 @@ class ConnectionManager:
         parent_screen.loading = True
         parent_screen.ids.label_servidor.text = "Cargando servidores..."
         parent_screen.ids.loading_spinner.anim_delay = 0.05
+        parent_screen.ids.label_servidor.text = f"Base url: {self.base_url}"
 
         def _success(req, result):
             try:
@@ -26,7 +27,7 @@ class ConnectionManager:
                     result = json.loads(result)
                 self.server_list = result
             except Exception as e:
-                parent_screen.ids.label_servidor.text = f"Error parseando JSON: {e}"
+                #parent_screen.ids.label_servidor.text = f"Error parseando JSON: {e}"
                 parent_screen.loading = False
                 parent_screen.ids.loading_spinner.anim_delay = -1
                 return
@@ -37,7 +38,7 @@ class ConnectionManager:
 
         def _error(req, error):
             parent_screen.loading = False
-            parent_screen.ids.label_servidor.text = f"Error al cargar: {error}"
+            #parent_screen.ids.label_servidor.text = f"Error al cargar: {error}"
             parent_screen.ids.loading_spinner.anim_delay = -1
 
         UrlRequest(
