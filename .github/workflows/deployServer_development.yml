@@ -46,8 +46,8 @@ jobs:
       - name: Deploy WebSocket service
         env:
           STATIC_TOKEN: ${{ secrets.STATIC_TOKEN }}
-          SERVERS: ${{ secrets.SERVERS }}        # opcional
-          PORT: ${{ secrets.PORT }}              # opcional
+          SERVERS: ${{ vars.SERVERS }}        # opcional
+          PORT: ${{ vars.PORT }}              # opcional
         run: |
           # Crear/actualizar archivo de entorno para systemd
           sudo tee /etc/default/websocket-server > /dev/null <<EOF
