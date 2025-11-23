@@ -3,6 +3,7 @@ import struct
 import threading
 import ssl
 import websockets
+from kivy.app import App
 from kivy.clock import Clock
 
 # ✅ Import certifi y fuerza SSL_CERT_FILE
@@ -30,9 +31,13 @@ class ConnectionLoop:
         self.thread = None
         self.loop = None
 
-        # Callbacks que seteará MenuScreen
-        self.on_connected = None
-        self.on_disconnected = None
+        # Callbacks internos al componente global
+        self.on_connected = lambda: Clock.schedule_once(
+            lambda dt: App.get_running_app().root.connection_status.show_ok()
+        )
+        self.on_disconnected = lambda err: Clock.schedule_once(
+            lambda dt: App.get_running_app().root.connection_status.show_nok()
+        )
 
         print("\n=== ANDROID_DEBUG: ConnectionLoop init ===")
         print("ENV:", self.env)

@@ -21,17 +21,3 @@ class GlobalLayout(FloatLayout):
         self.connection_status = ConnectionStatus()
         self.add_widget(self.connection_status)
 
-        # Demo automática (opcional)
-        Clock.schedule_once(lambda dt: self.run_demo(), 1)
-
-    def run_demo(self):
-        """Demostración de iconos de conexión"""
-        self.connection_status.show_ok(duration=5)
-        Clock.schedule_once(lambda dt: self.connection_status.show_nok(duration=5), 6)
-
-    # Métodos para controlar el indicador desde cualquier parte
-    def show_connection_ok(self, duration=5):
-        self.connection_status.show_ok(duration)
-
-    def show_connection_nok(self, duration=5):
-        self.connection_status.show_nok(duration)

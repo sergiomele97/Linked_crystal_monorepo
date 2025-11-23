@@ -44,7 +44,6 @@
                 size_hint_y: None
                 height: self.texture_size[1]
 
-        # Spinner usando ZIP de imágenes (spinner.zip)
         Image:
             id: loading_spinner
             source: 'resources/image/spinner.zip'
@@ -63,19 +62,3 @@
             size_hint: 0.1, 0.1
             pos_hint: {"x": 0.88, "y": 0.91}
             on_release: root.open_menu(self)
-        
-        ImageButton:
-            id: conexionOK
-            source: 'resources/image/wifi.png'
-            size_hint: 0.1, 0.1
-            pos_hint: {"x": 0.02, "y": 0.91}
-            opacity: 0.75 if root.mostrarConexionOK else 0
-            disabled: not root.mostrarConexionOK
-
-        ImageButton:
-            id: conexionNOK
-            source: 'resources/image/wifi-slash.png'
-            size_hint: 0.1, 0.1
-            pos_hint: {"x": 0.02, "y": 0.91}
-            opacity: 0.75 if root.mostrarConexionNOK else 0
-            disabled: not root.mostrarConexionNOK
