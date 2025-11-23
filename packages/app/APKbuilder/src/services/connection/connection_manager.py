@@ -17,20 +17,17 @@ class ConnectionManager:
         self.server_list = []
         self.selected_server = None
 
+        # Pasamos callback pero se rellenarán luego desde el menú
         self.connectionLoop = ConnectionLoop(
             get_url_callback=self._get_selected_server
         )
 
     def _get_selected_server(self):
-        """
-        Required by ConnectionLoop para obtener la URL elegida.
-        """
         return self.selected_server
 
     def getServerListAndSelect(self, parent_screen):
         url = f"{self.base_url}/servers"
 
-        # Mostrar spinner
         parent_screen.loading = True
         parent_screen.ids.label_servidor.text = "Cargando servidores..."
         parent_screen.ids.loading_spinner.anim_delay = 0.05
@@ -53,13 +50,14 @@ class ConnectionManager:
         def _error(req, error):
             parent_screen.loading = False
             parent_screen.ids.loading_spinner.anim_delay = -1
+            parent_screen.ids.label_servidor.text = "Error cargando servidores"
 
         UrlRequest(
             url,
             on_success=_success,
             on_error=_error,
             req_headers={'Accept': 'application/json'},
-            decode=True 
+            decode=True
         )
 
     def _show_server_modal(self, parent_screen):
@@ -68,11 +66,11 @@ class ConnectionManager:
         contenido.bind(minimum_height=contenido.setter('height'))
 
         popup = Popup(title="Selecciona un servidor",
-                    content=scroll,
-                    size_hint=(0.8, 0.6))
+                      content=scroll,
+                      size_hint=(0.8, 0.6))
 
         window_height = Window.height
-        button_height = max(dp(50), window_height * 0.08) 
+        button_height = max(dp(50), window_height * 0.08)
 
         for servidor in self.server_list:
             btn = Button(
@@ -80,21 +78,20 @@ class ConnectionManager:
                 size_hint_y=None,
                 height=button_height
             )
-            btn.bind(on_release=lambda inst, s=servidor: self._select_server(s, parent_screen, popup))
+            btn.bind(on_release=lambda inst, s=servidor:
+                     self._select_server(s, parent_screen, popup))
             contenido.add_widget(btn)
 
         scroll.add_widget(contenido)
         popup.open()
-        self._popup = popup
 
     def _select_server(self, servidor, parent_screen, popup):
         self.selected_server = servidor
         parent_screen.servidor_elegido = True
         parent_screen.ids.label_servidor.text = f"Servidor elegido:\n {servidor}"
-        parent_screen.connectionManager.selected_server = servidor
         popup.dismiss()
 
-        # Iniciar conexión WebSocket
+        # Iniciar conexión automática
         self.connectionLoop.start()
 
     def get_online_data(self):

@@ -2,6 +2,7 @@ from kivy.app import App
 from kivy.uix.screenmanager import Screen
 from kivy.properties import StringProperty, BooleanProperty, ListProperty
 from kivy.lang import Builder
+from kivy.clock import Clock
 import os
 
 from screens.menu_screen.components.rom_selector import select_rom
@@ -14,13 +15,29 @@ class MenuScreen(Screen):
     rom_cargado = BooleanProperty(False)
     servidor_elegido = BooleanProperty(False)
     loading = BooleanProperty(False)
+    mostrarConexionOK = BooleanProperty(False)
+    mostrarConexionNOK = BooleanProperty(False)
+
     listaServidores = ListProperty([])
     current_path = StringProperty("/")
-    mostrarConexionOK = BooleanProperty(True)
-    mostrarConexionNOK = BooleanProperty(False)
 
     def on_pre_enter(self):
         self.connectionManager = App.get_running_app().connection_manager
+        loop = self.connectionManager.connectionLoop
+        loop.on_connected = self._show_connected
+        loop.on_disconnected = self._show_disconnected
+
+    def _show_connected(self):
+        self.ids.output_label.text = "Conexión establecida"
+        self.mostrarConexionNOK = False
+        self.mostrarConexionOK = True
+        Clock.schedule_once(lambda dt: setattr(self, "mostrarConexionOK", False), 5)
+
+    def _show_disconnected(self, error_text):
+        self.ids.output_label.text = f"Conexión perdida: {error_text}"
+        self.mostrarConexionOK = False
+        self.mostrarConexionNOK = True
+        Clock.schedule_once(lambda dt: setattr(self, "mostrarConexionNOK", False), 5)
 
     def open_menu(self, caller):
         if not hasattr(self, "dropdown"):
@@ -36,14 +53,12 @@ class MenuScreen(Screen):
                 self.rom_cargado = True
             else:
                 self.ids.label_rom.text = "Archivo no válido."
-
         select_rom(self, cuando_selecciona_archivo)
 
     def elegir_servidor(self):
-        # Solo delega la lógica completa al manager
         self.connectionManager.getServerListAndSelect(self)
 
     def iniciar_juego(self):
-        self.ids.output_label.text = f"¡Iniciando juego con {os.path.basename(App.get_running_app().rom_path)}!"
+        self.ids.output_label.text = f"¡Iniciando juego!"
         emulator_screen = self.manager.get_screen('emulator')
         self.manager.current = 'emulator'
