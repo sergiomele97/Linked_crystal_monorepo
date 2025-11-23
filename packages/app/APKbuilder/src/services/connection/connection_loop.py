@@ -5,6 +5,11 @@ import ssl
 import websockets
 from kivy.clock import Clock
 
+# ✅ Import certifi y fuerza SSL_CERT_FILE
+import os
+import certifi
+os.environ['SSL_CERT_FILE'] = certifi.where()
+
 from env import STATIC_TOKEN, ENV, SSL_URL
 
 class ConnectionLoop:
@@ -16,8 +21,9 @@ class ConnectionLoop:
         self.ssl_context = None
         self.hostname = SSL_URL
 
+        # ⚡ Usar certificados de certifi en Android
         if self.env != "local":
-            self.ssl_context = ssl.create_default_context()
+            self.ssl_context = ssl.create_default_context(cafile=certifi.where())
 
         self._stop_event = threading.Event()
         self.thread = None
