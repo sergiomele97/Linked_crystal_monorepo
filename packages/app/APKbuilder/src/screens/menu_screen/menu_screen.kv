@@ -69,11 +69,13 @@
             source: 'resources/image/wifi.png'
             size_hint: 0.1, 0.1
             pos_hint: {"x": 0.02, "y": 0.91}
-            disabled: root.mostrarConexionOK
+            opacity: 0.75 if root.mostrarConexionOK else 0
+            disabled: not root.mostrarConexionOK
 
         ImageButton:
-            id: conexionOK
+            id: conexionNOK
             source: 'resources/image/wifi-slash.png'
             size_hint: 0.1, 0.1
             pos_hint: {"x": 0.02, "y": 0.91}
-            disabled: root.mostrarConexionNOK
+            opacity: 0.75 if root.mostrarConexionNOK else 0
+            disabled: not root.mostrarConexionNOK
