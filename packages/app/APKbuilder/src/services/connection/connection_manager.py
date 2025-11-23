@@ -8,12 +8,24 @@ from kivy.metrics import dp
 from kivy.core.window import Window
 
 from env import URL
+from services.connection.connection_loop import ConnectionLoop
+
 
 class ConnectionManager:
     def __init__(self, base_url=URL):
         self.base_url = base_url
         self.server_list = []
         self.selected_server = None
+
+        self.connectionLoop = ConnectionLoop(
+            get_url_callback=self._get_selected_server
+        )
+
+    def _get_selected_server(self):
+        """
+        Required by ConnectionLoop para obtener la URL elegida.
+        """
+        return self.selected_server
 
     def getServerListAndSelect(self, parent_screen):
         url = f"{self.base_url}/servers"
@@ -22,7 +34,6 @@ class ConnectionManager:
         parent_screen.loading = True
         parent_screen.ids.label_servidor.text = "Cargando servidores..."
         parent_screen.ids.loading_spinner.anim_delay = 0.05
-        parent_screen.ids.label_servidor.text = f"Base url: {self.base_url}"
 
         def _success(req, result):
             try:
@@ -30,7 +41,7 @@ class ConnectionManager:
                     result = json.loads(result)
                 self.server_list = result
             except Exception as e:
-                #parent_screen.ids.label_servidor.text = f"Error parseando JSON: {e}"
+                parent_screen.ids.label_servidor.text = f"Error parseando JSON: {e}"
                 parent_screen.loading = False
                 parent_screen.ids.loading_spinner.anim_delay = -1
                 return
@@ -82,6 +93,9 @@ class ConnectionManager:
         parent_screen.ids.label_servidor.text = f"Servidor elegido:\n {servidor}"
         parent_screen.connectionManager.selected_server = servidor
         popup.dismiss()
+
+        # Iniciar conexión WebSocket
+        self.connectionLoop.start()
 
     def get_online_data(self):
         pass
