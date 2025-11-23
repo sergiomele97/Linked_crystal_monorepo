@@ -1,15 +1,19 @@
 <ConnectionStatus>:
-    size_hint: None, None 
+    size_hint: 0.1, 0.1  
     pos_hint: {"x": 0.02, "top": 0.98}
 
     Image:
         id: conexionOK1
         source: 'resources/image/wifi.png'
-        size_hint: None, None
+        size_hint: 1, 1
+        allow_stretch: True
+        keep_ratio: True
         opacity: 0.75 if root.mostrarConexionOK else 0
 
     Image:
         id: conexionNOK1
         source: 'resources/image/wifi-slash.png'
-        size_hint: None, None
+        size_hint: 1, 1
+        allow_stretch: True
+        keep_ratio: True
         opacity: 0.75 if root.mostrarConexionNOK else 0
