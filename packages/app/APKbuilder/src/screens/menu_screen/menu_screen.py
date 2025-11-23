@@ -16,6 +16,8 @@ class MenuScreen(Screen):
     loading = BooleanProperty(False)
     listaServidores = ListProperty([])
     current_path = StringProperty("/")
+    mostrarConexionOK = BooleanProperty(True)
+    mostrarConexionNOK = BooleanProperty(False)
 
     def on_pre_enter(self):
         self.connectionManager = App.get_running_app().connection_manager

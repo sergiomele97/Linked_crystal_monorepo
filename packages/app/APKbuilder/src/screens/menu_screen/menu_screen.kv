@@ -63,3 +63,17 @@
             size_hint: 0.1, 0.1
             pos_hint: {"x": 0.88, "y": 0.91}
             on_release: root.open_menu(self)
+        
+        ImageButton:
+            id: conexionOK
+            source: 'resources/image/wifi.png'
+            size_hint: 0.1, 0.1
+            pos_hint: {"x": 0.02, "y": 0.91}
+            disabled: root.mostrarConexionOK
+
+        ImageButton:
+            id: conexionOK
+            source: 'resources/image/wifi-slash.png'
+            size_hint: 0.1, 0.1
+            pos_hint: {"x": 0.02, "y": 0.91}
+            disabled: root.mostrarConexionNOK
