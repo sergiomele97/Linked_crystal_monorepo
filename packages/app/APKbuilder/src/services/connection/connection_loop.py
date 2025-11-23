@@ -5,7 +5,7 @@ import ssl
 import websockets
 from kivy.clock import Clock
 
-from env import STATIC_TOKEN, ENV
+from env import STATIC_TOKEN, ENV, SSL_URL
 
 class ConnectionLoop:
     def __init__(self, get_url_callback):
@@ -14,7 +14,7 @@ class ConnectionLoop:
         self.env = ENV
 
         self.ssl_context = None
-        self.hostname = None
+        self.hostname = SSL_URL
 
         if self.env != "local":
             self.ssl_context = ssl.create_default_context()
@@ -63,6 +63,7 @@ class ConnectionLoop:
                 async with websockets.connect(
                     full_url,
                     ssl=self.ssl_context,
+                    server_hostname=self.hostname,
                     ping_interval=10,
                     ping_timeout=5,
                     close_timeout=3,

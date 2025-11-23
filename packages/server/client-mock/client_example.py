@@ -12,7 +12,7 @@ load_dotenv()
 # Variables de entorno
 ENV = os.getenv("ENV", "local")
 STATIC_TOKEN = os.getenv("STATIC_TOKEN", "demo_token")
-URL = os.getenv("URL") # Not needed in local
+SSL_URL = os.getenv("SSL_URL") # Not needed in local
 SERVER_URL = os.getenv("SERVER_URL", "ws://localhost:8080/ws")
 FULL_URL = f"{SERVER_URL}?token={STATIC_TOKEN}"
 
@@ -21,7 +21,7 @@ server_hostname = None
 
 if (ENV != "local"):
     ssl_context = ssl.create_default_context()
-    server_hostname=URL
+    server_hostname=SSL_URL
 
 
 
