@@ -266,7 +266,7 @@ android.gradle_dependencies = androidx.documentfile:documentfile:1.0.1
 #android.wakelock = False
 
 # (list) Android application meta-data to set (key=value format)
-android.meta_data = android:usesCleartextTraffic="true"
+#android.meta_data =
 
 # (list) Android library project to add (will be added in the
 # project.properties automatically.)
