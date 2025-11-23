@@ -86,6 +86,7 @@ jobs:
         PORT: ${{ vars.PORT }}
         SERVERS: ${{ vars.SERVERS }}
         URL: ${{ vars.URL }}
+        SSL_URL: ${{ vars.SSL_URL }}
 
     - name: Build debug APK
       working-directory: packages/app/APKbuilder
