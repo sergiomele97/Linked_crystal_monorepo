@@ -19,11 +19,12 @@ class ConnectionLoop:
         self.env = ENV
 
         self.ssl_context = None
-        self.hostname = SSL_URL
+        self.hostname = None
 
         # ⚡ Usar certificados de certifi en Android
         if self.env != "local":
             self.ssl_context = ssl.create_default_context(cafile=certifi.where())
+            self.hostname = SSL_URL
 
         self._stop_event = threading.Event()
         self.thread = None
