@@ -4,9 +4,9 @@ from kivy.properties import BooleanProperty
 from kivy.lang import Builder
 import os
 
-Builder.load_file(os.path.join(os.path.dirname(__file__), "connection_indicator.kv"))
+Builder.load_file(os.path.join(os.path.dirname(__file__), "connection_status.kv"))
 
-class ConnectionIndicator(FloatLayout):
+class ConnectionStatus(FloatLayout):
     mostrarConexionOK = BooleanProperty(False)
     mostrarConexionNOK = BooleanProperty(False)
 
