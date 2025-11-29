@@ -2,7 +2,7 @@ from kivy.clock import Clock
 from kivy.app import App
 
 from models.ramData import RamData
-from models.packet import packet
+from models.packet import Packet
 
 from services.emulator.ram_scrapper import RamScrapper
 from services.audio.audio_manager import AudioManagerKivy

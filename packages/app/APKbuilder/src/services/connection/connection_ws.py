@@ -1,13 +1,17 @@
 import asyncio
-import struct
 import ssl
 import websockets
+import struct
 import certifi
 from kivy.app import App
-
 from env import STATIC_TOKEN, ENV, SSL_URL
+from models.packet import Packet
 
 class ConnectionWS:
+    """
+    WebSocket handler: envía el paquete local y recibe paquetes del servidor.
+    """
+
     def __init__(self):
         self.token = STATIC_TOKEN
         self.env = ENV
@@ -28,20 +32,24 @@ class ConnectionWS:
             ping_timeout=5,
             close_timeout=3
         ) as ws:
-            await self._mock_send_receive_loop(ws)
+            await self._send_receive_loop(ws)
 
-    async def _mock_send_receive_loop(self, ws):
-        x = y = z = 0
+    async def _send_receive_loop(self, ws):
+        """
+        Loop principal para enviar el paquete local y recibir paquetes de otros jugadores.
+        """
+        app = App.get_running_app()
+        local_packet = app.appData.packet
+        server_packets = app.appData.serverPackets
+
         while True:  
-            await ws.send(self._generate_mock_packet(x, y, z))
+            await ws.send(local_packet.to_bytes())
+
             try:
-                await asyncio.wait_for(ws.recv(), timeout=0.1)
+                data = await asyncio.wait_for(ws.recv(), timeout=0.1)
+                packet_received = Packet.from_bytes(data)
+                server_packets.append(packet_received)
             except asyncio.TimeoutError:
                 pass
-            x += 1
-            y += 1
-            z += 1
-            await asyncio.sleep(0.1)
 
-    def _generate_mock_packet(self, x, y, z):
-        return struct.pack("<3i", x, y, z)
+            await asyncio.sleep(0.1)

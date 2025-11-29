@@ -16,11 +16,13 @@ import (
 	"github.com/joho/godotenv"
 )
 
-type DataCliente struct {
-	ID int32
-	X  int32
-	Y  int32
-	Z  int32
+// ------------------ NUEVO MODELO ------------------
+type Packet struct {
+	PlayerX   int32
+	PlayerY   int32
+	MapNumber int32
+	MapBank   int32
+	IsPlaying uint32
 }
 
 // ------------------ CONFIG ------------------
@@ -45,7 +47,7 @@ var upgrader = websocket.Upgrader{
 // ------------------ IDs y slots ------------------
 
 var freeIDs = make(chan int, MaxClients)
-var latestData []atomic.Value
+var latestPackets []atomic.Value
 var clients sync.Map
 
 // ------------------ SERVERS LIST ------------------
@@ -133,7 +135,7 @@ func btoi(b bool) int {
 
 var bufferPool = sync.Pool{
 	New: func() any {
-		return bytes.NewBuffer(make([]byte, 0, 16*100))
+		return bytes.NewBuffer(make([]byte, 0, 20*100))
 	},
 }
 
@@ -164,7 +166,7 @@ func (c *Client) close() {
 		close(c.send)
 		clients.Delete(c)
 		if c.id >= 0 {
-			latestData[c.id].Store((*DataCliente)(nil))
+			latestPackets[c.id].Store((*Packet)(nil))
 			select {
 			case freeIDs <- c.id:
 			default:
@@ -208,9 +210,9 @@ func (c *Client) pingLoop(interval, timeout time.Duration) {
 
 func init() {
 	// Cargar .env si existe
-    if err := godotenv.Load(); err != nil {
-        log.Println("⚠️ No se encontró .env, usando variables de entorno del sistema")
-    }
+	if err := godotenv.Load(); err != nil {
+		log.Println("⚠️ No se encontró .env, usando variables de entorno del sistema")
+	}
 
 	envServers := os.Getenv("SERVERS")
 	if envServers == "" {
@@ -226,24 +228,22 @@ func init() {
 			}
 		}
 	}
-	
-	latestData = make([]atomic.Value, MaxClients)
+
+	latestPackets = make([]atomic.Value, MaxClients)
 	for i := 0; i < MaxClients; i++ {
 		freeIDs <- i
-		latestData[i].Store((*DataCliente)(nil))
+		latestPackets[i].Store((*Packet)(nil))
 	}
 }
 
 func main() {
-	// cargar token del entorno
 	staticToken := os.Getenv("STATIC_TOKEN")
 	if staticToken == "" {
-        staticToken = "demo_token"
-        log.Println("⚠️ STATIC_TOKEN no definido, usando default")
-    }
+		staticToken = "demo_token"
+		log.Println("⚠️ STATIC_TOKEN no definido, usando default")
+	}
 
 	http.HandleFunc("/ws", func(w http.ResponseWriter, r *http.Request) {
-		// validar token antes de aceptar
 		token := r.URL.Query().Get("token")
 		if token != staticToken {
 			http.Error(w, "unauthorized", http.StatusUnauthorized)
@@ -259,11 +259,11 @@ func main() {
 
 	port := os.Getenv("PORT")
 	if port == "" {
-		port = "8080" 
+		port = "8080"
 		log.Println("⚠️ STATIC_TOKEN no definido, usando default")
 	}
 	log.Println("Servidor WebSocket corriendo en :" + port)
-	log.Fatal(http.ListenAndServe(":" + port, nil))
+	log.Fatal(http.ListenAndServe(":"+port, nil))
 }
 
 // ------------------ HANDLERS ------------------
@@ -305,24 +305,19 @@ func handleConnection(w http.ResponseWriter, r *http.Request) {
 		if err != nil {
 			break
 		}
-		if len(msg) < 12 {
+		if len(msg) < 20 { 
 			continue
 		}
 
 		start := time.Now()
-		var d DataCliente
-		if len(msg) >= 16 {
-			d.X = int32(binary.LittleEndian.Uint32(msg[4:8]))
-			d.Y = int32(binary.LittleEndian.Uint32(msg[8:12]))
-			d.Z = int32(binary.LittleEndian.Uint32(msg[12:16]))
-		} else {
-			d.X = int32(binary.LittleEndian.Uint32(msg[0:4]))
-			d.Y = int32(binary.LittleEndian.Uint32(msg[4:8]))
-			d.Z = int32(binary.LittleEndian.Uint32(msg[8:12]))
-		}
+		var p Packet
+		p.PlayerX = int32(binary.LittleEndian.Uint32(msg[0:4]))
+		p.PlayerY = int32(binary.LittleEndian.Uint32(msg[4:8]))
+		p.MapNumber = int32(binary.LittleEndian.Uint32(msg[8:12]))
+		p.MapBank = int32(binary.LittleEndian.Uint32(msg[12:16]))
+		p.IsPlaying = binary.LittleEndian.Uint32(msg[16:20])
 
-		d.ID = int32(client.id)
-		latestData[client.id].Store(&d)
+		latestPackets[client.id].Store(&p)
 		recordMetrics(1, 0, time.Since(start))
 	}
 
@@ -366,15 +361,15 @@ func broadcastLoop() {
 
 	for {
 		<-ticker.C
-		accum := make([]DataCliente, 0, 256)
+		accum := make([]Packet, 0, 256)
 		for id := 0; id < MaxClients; id++ {
-			v := latestData[id].Load()
+			v := latestPackets[id].Load()
 			if v == nil {
 				continue
 			}
-			if p, ok := v.(*DataCliente); ok && p != nil {
+			if p, ok := v.(*Packet); ok && p != nil {
 				accum = append(accum, *p)
-				latestData[id].Store((*DataCliente)(nil))
+				latestPackets[id].Store((*Packet)(nil))
 			}
 		}
 
@@ -386,9 +381,9 @@ func broadcastLoop() {
 	}
 }
 
-func processAndBroadcast(accum []DataCliente) {
+func processAndBroadcast(accum []Packet) {
 	start := time.Now()
-	message := serializeSlice(accum)
+	message := serializePackets(accum)
 
 	sent := 0
 	clients.Range(func(key, value any) bool {
@@ -405,16 +400,17 @@ func processAndBroadcast(accum []DataCliente) {
 	recordMetrics(0, sent, time.Since(start))
 }
 
-func serializeSlice(data []DataCliente) []byte {
+func serializePackets(data []Packet) []byte {
 	buf := bufferPool.Get().(*bytes.Buffer)
 	buf.Reset()
 
-	var tmp [16]byte
-	for _, d := range data {
-		binary.LittleEndian.PutUint32(tmp[0:4], uint32(d.ID))
-		binary.LittleEndian.PutUint32(tmp[4:8], uint32(d.X))
-		binary.LittleEndian.PutUint32(tmp[8:12], uint32(d.Y))
-		binary.LittleEndian.PutUint32(tmp[12:16], uint32(d.Z))
+	var tmp [20]byte
+	for _, p := range data {
+		binary.LittleEndian.PutUint32(tmp[0:4], uint32(p.PlayerX))
+		binary.LittleEndian.PutUint32(tmp[4:8], uint32(p.PlayerY))
+		binary.LittleEndian.PutUint32(tmp[8:12], uint32(p.MapNumber))
+		binary.LittleEndian.PutUint32(tmp[12:16], uint32(p.MapBank))
+		binary.LittleEndian.PutUint32(tmp[16:20], p.IsPlaying)
 		buf.Write(tmp[:])
 	}
 

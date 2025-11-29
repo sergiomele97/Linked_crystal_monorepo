@@ -1,9 +1,14 @@
 import asyncio
 import threading
 from kivy.clock import Clock
-from .connection_ws import ConnectionWS 
+from kivy.app import App
+from .connection_ws import ConnectionWS
 
 class ConnectionLoop:
+    """
+    Loop principal en hilo separado: gestiona reconexión, backoff y callbacks UI.
+    """
+
     def __init__(self, get_url_callback):
         self.get_url_callback = get_url_callback
         self._stop_event = threading.Event()
@@ -36,6 +41,9 @@ class ConnectionLoop:
         self.loop.run_until_complete(self._main())
 
     async def _main(self):
+        """
+        Loop de conexión con reconexión y backoff exponencial.
+        """
         backoff = 1
         max_backoff = 30
         was_connected = False
@@ -51,12 +59,18 @@ class ConnectionLoop:
             try:
                 await self.connection_ws.connect(full_url)
                 if not was_connected and self.on_connected:
-                    Clock.schedule_once(lambda dt: self.on_connected())
+                    self._schedule_callback(self.on_connected)
                 was_connected = True
             except Exception as e:
                 if was_connected and self.on_disconnected:
-                    Clock.schedule_once(lambda dt: self.on_disconnected(str(e)))
+                    self._schedule_callback(lambda: self.on_disconnected(str(e)))
                 was_connected = False
 
             await asyncio.sleep(backoff)
             backoff = min(backoff * 2, max_backoff)
+
+    def _schedule_callback(self, callback):
+        """
+        Scheduler seguro para llamar callbacks en el hilo principal de Kivy.
+        """
+        Clock.schedule_once(lambda dt: callback())

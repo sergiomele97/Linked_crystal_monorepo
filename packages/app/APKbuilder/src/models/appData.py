@@ -1,10 +1,10 @@
-from models.packet import packet
+from models.packet import Packet
 from models.ramData import RamData
 
 class appData:
     def __init__(self):
         self.romPath = ''
         self.ramData = RamData()
-        self.packet = packet()
+        self.packet = Packet()
         self.serverPackets = []
         
