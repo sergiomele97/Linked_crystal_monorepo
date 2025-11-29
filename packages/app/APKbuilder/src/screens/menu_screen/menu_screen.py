@@ -29,7 +29,7 @@ class MenuScreen(Screen):
     def abrir_explorador(self):
         def cuando_selecciona_archivo(destino_path):
             if destino_path:
-                App.get_running_app().rom_path = destino_path
+                App.get_running_app().appData.romPath = destino_path
                 self.ids.label_rom.text = f"ROM seleccionada:\n{os.path.basename(destino_path)}"
                 self.rom_cargado = True
             else:

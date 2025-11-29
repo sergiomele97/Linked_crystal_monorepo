@@ -25,14 +25,14 @@ class EmulatorCoreInterface:
     def _initialize(self):
         solicitar_permisos()
 
-        if not os.path.exists(App.get_running_app().rom_path):
+        if not os.path.exists(App.get_running_app().appData.romPath):
             if self.on_text_output:
                 Clock.schedule_once(lambda dt: self.on_text_output("ROM no encontrada"), 0)
             return
 
         try:
             self.pyboy = PyBoy(
-                App.get_running_app().rom_path,
+                App.get_running_app().appData.romPath,
                 window="null",
                 sound_emulated=True,
                 sound_volume=100,
@@ -59,11 +59,11 @@ class EmulatorCoreInterface:
 
     def save_RAM(self):
         try:
-            rom_dir = os.path.dirname(App.get_running_app().rom_path)
+            rom_dir = os.path.dirname(App.get_running_app().appData.romPath)
             RAMfile = (
                 os.path.join(rom_dir, "rom_seleccionada.gbc")
                 if platform == "android"
-                else App.get_running_app().rom_path
+                else App.get_running_app().appData.romPath
             ) + ".ram"
 
             with open(RAMfile, "wb") as f:

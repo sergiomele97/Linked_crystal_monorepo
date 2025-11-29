@@ -95,8 +95,8 @@ else:
         def seleccionar_archivo(instance):
             selected = selector.selection
             if selected and selected[0].lower().endswith(".gbc"):
-                App.get_running_app().rom_path = selected[0]
-                screen_instance.ids.label_rom.text = f"ROM seleccionada:\n{os.path.basename(App.get_running_app().rom_path)}"
+                App.get_running_app().appData.romPath = selected[0]
+                screen_instance.ids.label_rom.text = f"ROM seleccionada:\n{os.path.basename(App.get_running_app().appData.romPath)}"
                 screen_instance.rom_cargado = True
                 popup.dismiss()
             else:

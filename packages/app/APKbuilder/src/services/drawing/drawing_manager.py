@@ -24,7 +24,11 @@ class DrawingManager:
             frame_arr = self.pyboy.screen.ndarray
 
             # Draws foreign sprites
-            self.spriteRenderer.draw_first_frame(frame_arr, 0, 0)
+            self.spriteRenderer.draw_first_frame(
+                frame_arr, 
+                self.connectionData.player_x_coord, 
+                self.connectionData.player_y_coord
+            )
 
             # Sends update to kivy
             Clock.schedule_once(lambda dt: self.on_frame(frame_arr), 0)

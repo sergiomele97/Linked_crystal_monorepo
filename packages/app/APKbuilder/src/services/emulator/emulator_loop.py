@@ -24,8 +24,8 @@ class EmulationLoop:
         self.on_frame = on_frame
         self.on_text_output = on_text_output
     #Models
-        self.ramData = RamData()
-        self.connectionData = ConnectionData()
+        self.ramData = App.get_running_app().appData.ramData
+        self.connectionData = App.get_running_app().appData.connectionData
     #Services
         self.connectionManager = App.get_running_app().connection_manager
         self.audioManager = AudioManagerKivy(self.pyboy)

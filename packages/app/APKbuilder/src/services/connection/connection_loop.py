@@ -6,7 +6,6 @@ import websockets
 from kivy.app import App
 from kivy.clock import Clock
 
-# ✅ Import certifi y fuerza SSL_CERT_FILE
 import os
 import certifi
 os.environ['SSL_CERT_FILE'] = certifi.where()
@@ -97,14 +96,12 @@ class ConnectionLoop:
                             await asyncio.wait_for(ws.recv(), timeout=0.1)
                         except asyncio.TimeoutError:
                             pass
-
                         x += 1
                         y += 1
                         z += 1
                         await asyncio.sleep(0.1)
 
             except Exception as e:
-
                 if was_connected and self.on_disconnected:
                     Clock.schedule_once(lambda dt, err=str(e): self.on_disconnected(err))
                 was_connected = False
