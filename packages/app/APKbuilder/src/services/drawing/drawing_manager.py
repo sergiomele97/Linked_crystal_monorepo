@@ -5,14 +5,14 @@ from services.drawing.sprite_renderer import SpriteRenderer
 
 class DrawingManager:
 
-    def __init__(self, ramData, connectionData, pyboy, on_frame=None,):
+    def __init__(self, ramData, serverPackets, pyboy, on_frame=None,):
         #Callbacks
         self.on_frame = on_frame
         #Emulator instance
         self.pyboy = pyboy
         #Models
         self.ramData = ramData
-        self.connectionData = connectionData
+        self.serverPackets = serverPackets
         #Services
         self.spriteRenderer = SpriteRenderer()
         self.spriteRenderer.load_sprite_sheet("resources/image/OW_default_sprite.png")
@@ -24,11 +24,12 @@ class DrawingManager:
             frame_arr = self.pyboy.screen.ndarray
 
             # Draws foreign sprites
-            self.spriteRenderer.draw_first_frame(
-                frame_arr, 
-                self.connectionData.player_x_coord, 
-                self.connectionData.player_y_coord
-            )
+            for packet in self.serverPackets:
+                self.spriteRenderer.draw_first_frame(
+                    frame_arr,
+                    packet.player_x_coord,
+                    packet.player_y_coord
+                )
 
             # Sends update to kivy
             Clock.schedule_once(lambda dt: self.on_frame(frame_arr), 0)

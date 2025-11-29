@@ -1,4 +1,4 @@
-class ConnectionData:
+class packet:
     def __init__(self):
         self.player_x_coord = 50
         self.player_y_coord = 50

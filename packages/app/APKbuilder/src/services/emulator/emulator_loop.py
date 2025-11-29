@@ -2,7 +2,7 @@ from kivy.clock import Clock
 from kivy.app import App
 
 from models.ramData import RamData
-from models.connectionData import ConnectionData
+from models.packet import packet
 
 from services.emulator.ram_scrapper import RamScrapper
 from services.audio.audio_manager import AudioManagerKivy
@@ -25,12 +25,13 @@ class EmulationLoop:
         self.on_text_output = on_text_output
     #Models
         self.ramData = App.get_running_app().appData.ramData
-        self.connectionData = App.get_running_app().appData.connectionData
+        self.packet = App.get_running_app().appData.packet
+        self.serverPackets = App.get_running_app().appData.serverPackets
     #Services
         self.connectionManager = App.get_running_app().connection_manager
         self.audioManager = AudioManagerKivy(self.pyboy)
         self.ramScrapper = RamScrapper(self.pyboy, self.ramData)
-        self.drawingManager = DrawingManager(self.ramData, self.connectionData, self.pyboy, self.on_frame)
+        self.drawingManager = DrawingManager(self.ramData, self.serverPackets, self.pyboy, self.on_frame)
     #Others
         self.running = False
         self._clock_event = None
@@ -58,7 +59,7 @@ class EmulationLoop:
             return False
 
         if self.pyboy.tick():
-            self.connectionData = self.connectionManager.get_online_data()
+            self.serverPackets = self.connectionManager.get_online_data()
             self.ramScrapper.update_ram_data()
             self.drawingManager.update_frame()
             self.audioManager.update_audio()
