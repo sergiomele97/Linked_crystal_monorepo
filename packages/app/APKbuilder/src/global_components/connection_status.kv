@@ -1,6 +1,6 @@
 <ConnectionStatus>:
     size_hint: 0.1, 0.1  
-    pos_hint: {"x": 0.02, "top": 0.98}
+    pos_hint: {"x": 0, "top": 1}
 
     Image:
         id: conexionOK1
@@ -8,6 +8,7 @@
         size_hint: 1, 1
         allow_stretch: True
         keep_ratio: True
+        pos_hint: {"center_x": 0.8, "center_y": 0.6}  
         opacity: 0.75 if root.mostrarConexionOK else 0
 
     Image:
@@ -16,4 +17,5 @@
         size_hint: 1, 1
         allow_stretch: True
         keep_ratio: True
+        pos_hint: {"center_x": 0.8, "center_y": 0.6}  
         opacity: 0.75 if root.mostrarConexionNOK else 0
