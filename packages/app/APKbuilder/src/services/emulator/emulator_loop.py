@@ -7,7 +7,6 @@ from models.packet import Packet
 from services.emulator.ram_scrapper import RamScrapper
 from services.audio.audio_manager import AudioManagerKivy
 from services.drawing.drawing_manager import DrawingManager
-from services.connection.connection_manager import ConnectionManager
 
 
 class EmulationLoop:
@@ -28,7 +27,6 @@ class EmulationLoop:
         self.packet = App.get_running_app().appData.packet
         self.serverPackets = App.get_running_app().appData.serverPackets
     #Services
-        self.connectionManager = App.get_running_app().connection_manager
         self.audioManager = AudioManagerKivy(self.pyboy)
         self.ramScrapper = RamScrapper(self.pyboy, self.ramData)
         self.drawingManager = DrawingManager(self.ramData, self.serverPackets, self.pyboy, self.on_frame)

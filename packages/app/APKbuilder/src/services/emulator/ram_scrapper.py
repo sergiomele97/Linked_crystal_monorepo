@@ -1,7 +1,10 @@
+from kivy.app import App
+
 class RamScrapper:
     def __init__(self, pyboy, ramData):
         self.pyboy = pyboy
         self.ramData = ramData
+        self.localPacket = App.get_running_app().appData.packet
     
     '''
     Function which will run every pyboy tick and updates
@@ -42,3 +45,12 @@ class RamScrapper:
         self.ramData.y_coord_sprite[3] = self.ramData.y_coord_sprite[2]
         self.ramData.y_coord_sprite[2] = self.ramData.y_coord_sprite[1]
         self.ramData.y_coord_sprite[1] = self.ramData.y_coord_sprite[0]
+    
+    def updateOnlinePacket(self):
+        self.localPacket.player_x_coord = self.ramData.player_x_coord
+        self.localPacket.player_y_coord = self.ramData.player_y_coord
+
+        self.localPacket.map_number = self.ramData.map_number
+        self.localPacket.map_bank = self.ramData.map_bank
+
+        self.localPacket.isPlaying = True
