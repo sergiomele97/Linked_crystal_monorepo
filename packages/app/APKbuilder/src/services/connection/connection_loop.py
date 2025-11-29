@@ -1,36 +1,17 @@
 import asyncio
-import struct
 import threading
-import ssl
-import websockets
-from kivy.app import App
 from kivy.clock import Clock
-
-import os
-import certifi
-os.environ['SSL_CERT_FILE'] = certifi.where()
-
-from env import STATIC_TOKEN, ENV, SSL_URL
+from .connection_ws import ConnectionWS 
 
 class ConnectionLoop:
     def __init__(self, get_url_callback):
         self.get_url_callback = get_url_callback
-        self.token = STATIC_TOKEN
-        self.env = ENV
-
-        self.ssl_context = None
-        self.hostname = None
-
-        # ⚡ Usar certificados de certifi en Android
-        if self.env != "local":
-            self.ssl_context = ssl.create_default_context(cafile=certifi.where())
-            self.hostname = SSL_URL
-
         self._stop_event = threading.Event()
         self.thread = None
         self.loop = None
+        self.connection_ws = ConnectionWS()
 
-        # Callbacks internos al componente global
+        # Callbacks para UI
         self.on_connected = lambda: Clock.schedule_once(
             lambda dt: App.get_running_app().root.connection_status.show_ok()
         )
@@ -47,10 +28,7 @@ class ConnectionLoop:
     def stop(self):
         self._stop_event.set()
         if self.loop:
-            try:
-                self.loop.call_soon_threadsafe(self.loop.stop)
-            except:
-                print("ANDROID_DEBUG: Failed to stop loop safely.")
+            self.loop.call_soon_threadsafe(self.loop.stop)
 
     def _run_loop(self):
         asyncio.set_event_loop(asyncio.new_event_loop())
@@ -63,47 +41,21 @@ class ConnectionLoop:
         was_connected = False
 
         while not self._stop_event.is_set():
-
             base_url = self.get_url_callback()
-
             if not base_url:
                 await asyncio.sleep(1)
                 continue
 
-
-            full_url = f"{base_url}?token={self.token}"
+            full_url = f"{base_url}?token={self.connection_ws.token}"
 
             try:
-                async with websockets.connect(
-                    full_url,
-                    ssl=self.ssl_context,
-                    server_hostname=self.hostname,
-                    ping_interval=10,
-                    ping_timeout=5,
-                    close_timeout=3,
-                ) as ws:
-
-                    if not was_connected and self.on_connected:
-                        Clock.schedule_once(lambda dt: self.on_connected())
-                    was_connected = True
-
-                    x = y = z = 0
-                    while not self._stop_event.is_set():
-                        msg = struct.pack("<3i", x, y, z)
-                        await ws.send(msg)
-
-                        try:
-                            await asyncio.wait_for(ws.recv(), timeout=0.1)
-                        except asyncio.TimeoutError:
-                            pass
-                        x += 1
-                        y += 1
-                        z += 1
-                        await asyncio.sleep(0.1)
-
+                await self.connection_ws.connect(full_url)
+                if not was_connected and self.on_connected:
+                    Clock.schedule_once(lambda dt: self.on_connected())
+                was_connected = True
             except Exception as e:
                 if was_connected and self.on_disconnected:
-                    Clock.schedule_once(lambda dt, err=str(e): self.on_disconnected(err))
+                    Clock.schedule_once(lambda dt: self.on_disconnected(str(e)))
                 was_connected = False
 
             await asyncio.sleep(backoff)

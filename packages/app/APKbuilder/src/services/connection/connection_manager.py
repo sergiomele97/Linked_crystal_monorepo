@@ -94,5 +94,3 @@ class ConnectionManager:
         # Iniciar conexión automática
         self.connectionLoop.start()
 
-    def get_online_data(self):
-        pass

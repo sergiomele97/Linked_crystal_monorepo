@@ -59,7 +59,6 @@ class EmulationLoop:
             return False
 
         if self.pyboy.tick():
-            self.serverPackets = self.connectionManager.get_online_data()
             self.ramScrapper.update_ram_data()
             self.drawingManager.update_frame()
             self.audioManager.update_audio()
