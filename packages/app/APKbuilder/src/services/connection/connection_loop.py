@@ -1,11 +1,13 @@
-# connection_loop_packet.py
-
 import asyncio
 import threading
 import ssl
+import os
+import certifi
 import websockets
 from kivy.app import App
-from env import STATIC_TOKEN, ENV
+from kivy.clock import Clock
+
+from env import STATIC_TOKEN, ENV, SSL_URL
 from models.packet import Packet  # tu clase Packet
 
 class ConnectionLoop:
@@ -14,20 +16,49 @@ class ConnectionLoop:
         self.token = STATIC_TOKEN
         self.env = ENV
 
+        # -----------------------------
+        #   SSL + CERTIFICADOS ANDROID
+        # -----------------------------
         self.ssl_context = None
         self.hostname = None
+
         if self.env != "local":
-            self.ssl_context = ssl.create_default_context()
+            # Fuerza ruta del bundle de certifi (Android necesita esto)
+            os.environ["SSL_CERT_FILE"] = certifi.where()
+            self.ssl_context = ssl.create_default_context(cafile=certifi.where())
+            self.hostname = SSL_URL  
+        else:
+            self.ssl_context = None
             self.hostname = None
 
+        # -----------------------------
+        #   THREAD / LOOP
+        # -----------------------------
         self._stop_event = threading.Event()
         self.thread = None
         self.loop = None
 
+        # -----------------------------
+        #   ACCESO A DATOS DEL APP
+        # -----------------------------
         app = App.get_running_app()
         self.localPacket = app.appData.packet
-        self.serverPackets = app.appData.serverPackets  
+        self.serverPackets = app.appData.serverPackets
 
+        # -----------------------------
+        #   CALLBACKS VISUALES WIFI
+        # -----------------------------
+        self.on_connected = lambda: Clock.schedule_once(
+            lambda dt: App.get_running_app().root.connection_status.show_ok()
+        )
+
+        self.on_disconnected = lambda err="": Clock.schedule_once(
+            lambda dt: App.get_running_app().root.connection_status.show_nok()
+        )
+
+    # ====================================================================================
+    #   START / STOP
+    # ====================================================================================
     def start(self):
         if self.thread and self.thread.is_alive():
             return
@@ -47,9 +78,9 @@ class ConnectionLoop:
         self.loop = asyncio.get_event_loop()
         self.loop.run_until_complete(self._main())
 
-    # ---------------------------------------------------------------------
-    # ✔ NUEVO: Bucle únicamente de envío
-    # ---------------------------------------------------------------------
+    # ====================================================================================
+    #   SEND
+    # ====================================================================================
     async def send_loop(self, ws):
         while not self._stop_event.is_set():
             try:
@@ -57,13 +88,13 @@ class ConnectionLoop:
                 await ws.send(pkt_bytes)
             except Exception as e:
                 print("❌ Error en send_loop:", e)
-                return 
+                return
 
             await asyncio.sleep(0.1)
 
-    # ---------------------------------------------------------------------
-    # ✔ NUEVO: Bucle únicamente de recepción
-    # ---------------------------------------------------------------------
+    # ====================================================================================
+    #   RECV
+    # ====================================================================================
     async def recv_loop(self, ws):
         PACKET_SIZE = 20
 
@@ -76,8 +107,7 @@ class ConnectionLoop:
                     latest_packets = []
 
                     for i in range(n):
-                        start = i * PACKET_SIZE
-                        chunk = data[start:start + PACKET_SIZE]
+                        chunk = data[i * PACKET_SIZE:(i + 1) * PACKET_SIZE]
                         if len(chunk) == PACKET_SIZE:
                             try:
                                 p = Packet.from_bytes(chunk)
@@ -85,24 +115,22 @@ class ConnectionLoop:
                             except:
                                 continue
 
-                    # Reemplazar el contenido anterior
                     self.serverPackets[:] = latest_packets
-                    print(self.serverPackets)
 
             except websockets.exceptions.ConnectionClosed:
                 print("❌ Conexión cerrada en recv_loop")
                 return
-
             except Exception as e:
                 print("❌ Error en recv_loop:", e)
                 return
 
-    # ---------------------------------------------------------------------
-    # ✔ MODIFICADO: ahora main lanza send_loop + recv_loop en paralelo
-    # ---------------------------------------------------------------------
+    # ====================================================================================
+    #   MAIN (conectividad + callbacks)
+    # ====================================================================================
     async def _main(self):
         backoff = 1
         max_backoff = 30
+        was_connected = False
 
         while not self._stop_event.is_set():
             base_url = self.get_url_callback()
@@ -123,25 +151,34 @@ class ConnectionLoop:
                 ) as ws:
 
                     print("✔ Conectado:", full_url)
-                    backoff = 1
 
-                    # Lanzamos envío y recepción simultáneos en la misma conexión
+                    # -----------------------------
+                    #   CALLBACK WIFI OK
+                    # -----------------------------
+                    if not was_connected:
+                        self.on_connected()
+                    was_connected = True
+
+                    # -----------------------------
+                    #   SEND + RECV EN PARALELO
+                    # -----------------------------
                     send_task = asyncio.create_task(self.send_loop(ws))
                     recv_task = asyncio.create_task(self.recv_loop(ws))
 
-                    # Esperamos a que una falle (o stop_event)
                     done, pending = await asyncio.wait(
                         {send_task, recv_task},
                         return_when=asyncio.FIRST_COMPLETED
                     )
 
-                    # Cancelar las otras
-                    for task in pending:
-                        task.cancel()
+                    for t in pending:
+                        t.cancel()
 
             except Exception as e:
                 print(f"⚠ Error WebSocket: {e}")
 
+                if was_connected:
+                    self.on_disconnected(str(e))
+                was_connected = False
             print(f"Reintentando en {backoff}s…")
             await asyncio.sleep(backoff)
             backoff = min(backoff * 2, max_backoff)
