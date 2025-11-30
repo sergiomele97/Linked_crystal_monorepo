@@ -30,6 +30,9 @@ class RamScrapper:
         self.ramData.collision_up = self.pyboy.memory[0xC2FB]
         self.ramData.collision_left = self.pyboy.memory[0xC2FC]
         self.ramData.collision_right = self.pyboy.memory[0xC2FD]
+
+        # Actualizar el paquete que se va a enviar
+        self.updateOnlinePacket()
     
     '''
     In order to have a fluid animation, we need information from 

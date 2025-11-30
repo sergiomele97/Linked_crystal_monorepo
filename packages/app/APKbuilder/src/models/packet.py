@@ -15,9 +15,8 @@ class Packet:
     # ------------------------
     def to_bytes(self):
         import struct
-        # "<3i" es un ejemplo, ajusta según los campos que quieras enviar
         return struct.pack(
-            "<2i2iI",  # 2 coords, 2 map info, isPlaying
+            "<2i2iI",
             self.player_x_coord,
             self.player_y_coord,
             self.map_number,
@@ -33,3 +32,21 @@ class Packet:
         import struct
         x, y, map_number, map_bank, is_playing = struct.unpack("<2i2iI", data)
         return cls(x, y, map_number, map_bank, is_playing)
+
+    # ------------------------
+    # Representación en string (humana)
+    # ------------------------
+    def __str__(self):
+        return (
+            f"Packet(x={self.player_x_coord}, "
+            f"y={self.player_y_coord}, "
+            f"map={self.map_number}, "
+            f"bank={self.map_bank}, "
+            f"isPlaying={self.isPlaying})"
+        )
+
+    # ------------------------
+    # Representación en listas / consola
+    # ------------------------
+    def __repr__(self):
+        return str(self)

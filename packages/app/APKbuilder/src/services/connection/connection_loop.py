@@ -26,7 +26,7 @@ class ConnectionLoop:
 
         app = App.get_running_app()
         self.localPacket = app.appData.packet
-        self.serverPackets = app.appData.serverPackets  # lista compartida
+        self.serverPackets = app.appData.serverPackets  
 
     def start(self):
         if self.thread and self.thread.is_alive():
@@ -57,7 +57,7 @@ class ConnectionLoop:
                 await ws.send(pkt_bytes)
             except Exception as e:
                 print("❌ Error en send_loop:", e)
-                return  # deja que main fuerce reconexión
+                return 
 
             await asyncio.sleep(0.1)
 
@@ -87,6 +87,7 @@ class ConnectionLoop:
 
                     # Reemplazar el contenido anterior
                     self.serverPackets[:] = latest_packets
+                    print(self.serverPackets)
 
             except websockets.exceptions.ConnectionClosed:
                 print("❌ Conexión cerrada en recv_loop")
