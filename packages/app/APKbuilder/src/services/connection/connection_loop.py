@@ -47,6 +47,58 @@ class ConnectionLoop:
         self.loop = asyncio.get_event_loop()
         self.loop.run_until_complete(self._main())
 
+    # ---------------------------------------------------------------------
+    # ✔ NUEVO: Bucle únicamente de envío
+    # ---------------------------------------------------------------------
+    async def send_loop(self, ws):
+        while not self._stop_event.is_set():
+            try:
+                pkt_bytes = self.localPacket.to_bytes()
+                await ws.send(pkt_bytes)
+            except Exception as e:
+                print("❌ Error en send_loop:", e)
+                return  # deja que main fuerce reconexión
+
+            await asyncio.sleep(0.1)
+
+    # ---------------------------------------------------------------------
+    # ✔ NUEVO: Bucle únicamente de recepción
+    # ---------------------------------------------------------------------
+    async def recv_loop(self, ws):
+        PACKET_SIZE = 20
+
+        while not self._stop_event.is_set():
+            try:
+                data = await ws.recv()
+
+                if isinstance(data, (bytes, bytearray)):
+                    n = len(data) // PACKET_SIZE
+                    latest_packets = []
+
+                    for i in range(n):
+                        start = i * PACKET_SIZE
+                        chunk = data[start:start + PACKET_SIZE]
+                        if len(chunk) == PACKET_SIZE:
+                            try:
+                                p = Packet.from_bytes(chunk)
+                                latest_packets.append(p)
+                            except:
+                                continue
+
+                    # Reemplazar el contenido anterior
+                    self.serverPackets[:] = latest_packets
+
+            except websockets.exceptions.ConnectionClosed:
+                print("❌ Conexión cerrada en recv_loop")
+                return
+
+            except Exception as e:
+                print("❌ Error en recv_loop:", e)
+                return
+
+    # ---------------------------------------------------------------------
+    # ✔ MODIFICADO: ahora main lanza send_loop + recv_loop en paralelo
+    # ---------------------------------------------------------------------
     async def _main(self):
         backoff = 1
         max_backoff = 30
@@ -72,33 +124,19 @@ class ConnectionLoop:
                     print("✔ Conectado:", full_url)
                     backoff = 1
 
-                    while not self._stop_event.is_set():
-                        # Enviar snapshot de localPacket
-                        pkt_bytes = self.localPacket.to_bytes()
-                        await ws.send(pkt_bytes)
+                    # Lanzamos envío y recepción simultáneos en la misma conexión
+                    send_task = asyncio.create_task(self.send_loop(ws))
+                    recv_task = asyncio.create_task(self.recv_loop(ws))
 
-                        # Recibir y reemplazar serverPackets
-                        try:
-                            data = await asyncio.wait_for(ws.recv(), timeout=0.1)
-                            if isinstance(data, (bytes, bytearray)):
-                                PACKET_SIZE = 20
-                                n = len(data) // PACKET_SIZE
-                                latest_packets = []
-                                for i in range(n):
-                                    start = i * PACKET_SIZE
-                                    chunk = data[start:start + PACKET_SIZE]
-                                    if len(chunk) == PACKET_SIZE:
-                                        try:
-                                            p = Packet.from_bytes(chunk)
-                                            latest_packets.append(p)
-                                        except Exception:
-                                            continue
-                                # Reemplazar todo el contenido anterior
-                                self.serverPackets[:] = latest_packets
-                        except asyncio.TimeoutError:
-                            pass
+                    # Esperamos a que una falle (o stop_event)
+                    done, pending = await asyncio.wait(
+                        {send_task, recv_task},
+                        return_when=asyncio.FIRST_COMPLETED
+                    )
 
-                        await asyncio.sleep(0.1)
+                    # Cancelar las otras
+                    for task in pending:
+                        task.cancel()
 
             except Exception as e:
                 print(f"⚠ Error WebSocket: {e}")
