@@ -1,6 +1,7 @@
 from kivy.clock import Clock
 import numpy as np
 
+from services.drawing.coordinate_calculator import CoordinateCalculator
 from services.drawing.sprite_renderer import SpriteRenderer
 
 class DrawingManager:
@@ -14,6 +15,7 @@ class DrawingManager:
         self.ramData = ramData
         self.serverPackets = serverPackets
         #Services
+        self.coordinateCalculator = CoordinateCalculator(self.ramData)
         self.spriteRenderer = SpriteRenderer()
         self.spriteRenderer.load_sprite_sheet("resources/image/OW_default_sprite.png")
 
@@ -25,10 +27,22 @@ class DrawingManager:
 
             # Draws foreign sprites
             for packet in self.serverPackets:
-                self.spriteRenderer.draw_first_frame(
-                    frame_arr,
+
+                # Filter outbounds players
+                if(self.coordinateCalculator.shouldFilter(packet)):
+                    continue
+
+                # Calculate where to draw 
+                x_render_coord, y_render_coord = self.coordinateCalculator.calculate_player_coords(
                     packet.player_x_coord,
                     packet.player_y_coord
+                )
+
+                # Render sprite
+                self.spriteRenderer.draw_first_frame(
+                    frame_arr,
+                    x_render_coord,
+                    y_render_coord
                 )
 
             # Sends update to kivy

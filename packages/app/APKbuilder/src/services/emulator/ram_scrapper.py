@@ -56,4 +56,4 @@ class RamScrapper:
         self.localPacket.map_number = self.ramData.map_number
         self.localPacket.map_bank = self.ramData.map_bank
 
-        self.localPacket.isPlaying = True
+        self.localPacket.IsOverworld = True

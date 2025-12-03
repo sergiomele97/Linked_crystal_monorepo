@@ -68,7 +68,7 @@ async def run_client():
                                     f"  → Packet: X={p.player_x_coord}, "
                                     f"Y={p.player_y_coord}, "
                                     f"Map={p.map_number}:{p.map_bank}, "
-                                    f"Playing={p.isPlaying}"
+                                    f"Playing={p.IsOverworld}"
                                 )
 
                     except asyncio.TimeoutError:
@@ -79,7 +79,7 @@ async def run_client():
                     pkt.player_y_coord += 1
                     pkt.map_number += 1
                     pkt.map_bank += 1
-                    pkt.isPlaying = 1
+                    pkt.IsOverworld = 1
 
                     await asyncio.sleep(0.1)
 

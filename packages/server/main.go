@@ -18,11 +18,11 @@ import (
 
 // ------------------ NUEVO MODELO ------------------
 type Packet struct {
-	PlayerX   int32
-	PlayerY   int32
-	MapNumber int32
-	MapBank   int32
-	IsPlaying uint32
+	PlayerX     int32
+	PlayerY     int32
+	MapNumber   int32
+	MapBank     int32
+	IsOverworld uint32
 }
 
 // ------------------ CONFIG ------------------
@@ -54,7 +54,7 @@ var clients sync.Map
 
 var (
 	serversMu sync.RWMutex
-	servers []string
+	servers   []string
 )
 
 // ------------------ MÉTRICAS ------------------
@@ -305,7 +305,7 @@ func handleConnection(w http.ResponseWriter, r *http.Request) {
 		if err != nil {
 			break
 		}
-		if len(msg) < 20 { 
+		if len(msg) < 20 {
 			continue
 		}
 
@@ -315,7 +315,7 @@ func handleConnection(w http.ResponseWriter, r *http.Request) {
 		p.PlayerY = int32(binary.LittleEndian.Uint32(msg[4:8]))
 		p.MapNumber = int32(binary.LittleEndian.Uint32(msg[8:12]))
 		p.MapBank = int32(binary.LittleEndian.Uint32(msg[12:16]))
-		p.IsPlaying = binary.LittleEndian.Uint32(msg[16:20])
+		p.IsOverworld = binary.LittleEndian.Uint32(msg[16:20])
 
 		latestPackets[client.id].Store(&p)
 		recordMetrics(1, 0, time.Since(start))
@@ -410,7 +410,7 @@ func serializePackets(data []Packet) []byte {
 		binary.LittleEndian.PutUint32(tmp[4:8], uint32(p.PlayerY))
 		binary.LittleEndian.PutUint32(tmp[8:12], uint32(p.MapNumber))
 		binary.LittleEndian.PutUint32(tmp[12:16], uint32(p.MapBank))
-		binary.LittleEndian.PutUint32(tmp[16:20], p.IsPlaying)
+		binary.LittleEndian.PutUint32(tmp[16:20], p.IsOverworld)
 		buf.Write(tmp[:])
 	}
 
