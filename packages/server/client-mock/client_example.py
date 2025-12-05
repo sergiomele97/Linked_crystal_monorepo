@@ -54,8 +54,8 @@ async def run_client():
                     try:
                         data = await asyncio.wait_for(ws.recv(), timeout=0.1)
 
-                        # Cada paquete tiene exactamente 20 bytes
-                        packet_size = 20
+                        # Cada paquete tiene exactamente 24 bytes
+                        packet_size = 24
 
                         print(f"Broadcast recibido: {len(data)} bytes")
 
@@ -68,7 +68,8 @@ async def run_client():
                                     f"  → Packet: X={p.player_x_coord}, "
                                     f"Y={p.player_y_coord}, "
                                     f"Map={p.map_number}:{p.map_bank}, "
-                                    f"Playing={p.IsOverworld}"
+                                    f"Playing={p.IsOverworld}, "
+                                    f"PlayerID={p.player_id}"
                                 )
 
                     except asyncio.TimeoutError:

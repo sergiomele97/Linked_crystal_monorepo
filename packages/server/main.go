@@ -18,6 +18,7 @@ import (
 
 // ------------------ NUEVO MODELO ------------------
 type Packet struct {
+	PlayerID    uint32
 	PlayerX     int32
 	PlayerY     int32
 	MapNumber   int32
@@ -135,7 +136,7 @@ func btoi(b bool) int {
 
 var bufferPool = sync.Pool{
 	New: func() any {
-		return bytes.NewBuffer(make([]byte, 0, 20*100))
+		return bytes.NewBuffer(make([]byte, 0, 24*100))
 	},
 }
 
@@ -305,17 +306,18 @@ func handleConnection(w http.ResponseWriter, r *http.Request) {
 		if err != nil {
 			break
 		}
-		if len(msg) < 20 {
+		if len(msg) < 24 {
 			continue
 		}
 
 		start := time.Now()
 		var p Packet
-		p.PlayerX = int32(binary.LittleEndian.Uint32(msg[0:4]))
-		p.PlayerY = int32(binary.LittleEndian.Uint32(msg[4:8]))
-		p.MapNumber = int32(binary.LittleEndian.Uint32(msg[8:12]))
-		p.MapBank = int32(binary.LittleEndian.Uint32(msg[12:16]))
-		p.IsOverworld = binary.LittleEndian.Uint32(msg[16:20])
+		p.PlayerID = uint32(client.id)
+		p.PlayerX = int32(binary.LittleEndian.Uint32(msg[4:8]))
+		p.PlayerY = int32(binary.LittleEndian.Uint32(msg[8:12]))
+		p.MapNumber = int32(binary.LittleEndian.Uint32(msg[12:16]))
+		p.MapBank = int32(binary.LittleEndian.Uint32(msg[16:20]))
+		p.IsOverworld = binary.LittleEndian.Uint32(msg[20:24])
 
 		latestPackets[client.id].Store(&p)
 		recordMetrics(1, 0, time.Since(start))
@@ -404,13 +406,14 @@ func serializePackets(data []Packet) []byte {
 	buf := bufferPool.Get().(*bytes.Buffer)
 	buf.Reset()
 
-	var tmp [20]byte
+	var tmp [24]byte
 	for _, p := range data {
-		binary.LittleEndian.PutUint32(tmp[0:4], uint32(p.PlayerX))
-		binary.LittleEndian.PutUint32(tmp[4:8], uint32(p.PlayerY))
-		binary.LittleEndian.PutUint32(tmp[8:12], uint32(p.MapNumber))
-		binary.LittleEndian.PutUint32(tmp[12:16], uint32(p.MapBank))
-		binary.LittleEndian.PutUint32(tmp[16:20], p.IsOverworld)
+		binary.LittleEndian.PutUint32(tmp[0:4], p.PlayerID)
+		binary.LittleEndian.PutUint32(tmp[4:8], uint32(p.PlayerX))
+		binary.LittleEndian.PutUint32(tmp[8:12], uint32(p.PlayerY))
+		binary.LittleEndian.PutUint32(tmp[12:16], uint32(p.MapNumber))
+		binary.LittleEndian.PutUint32(tmp[16:20], uint32(p.MapBank))
+		binary.LittleEndian.PutUint32(tmp[20:24], p.IsOverworld)
 		buf.Write(tmp[:])
 	}
 

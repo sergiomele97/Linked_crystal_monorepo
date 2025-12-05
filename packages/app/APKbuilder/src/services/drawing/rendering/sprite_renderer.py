@@ -70,7 +70,7 @@ class SpriteRenderer:
             raise ValueError("No se ha cargado ningún sprite sheet todavía.")
         return self.sprite_frames[0]
 
-    def draw_first_frame(self, frame, x, y):
+    def draw_first_frame(self, frame, x, y, current_sprite):
         """
         Dibuja el primer frame del sprite sheet en pantalla.
         """

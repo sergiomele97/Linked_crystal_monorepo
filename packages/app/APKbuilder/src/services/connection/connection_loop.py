@@ -96,7 +96,7 @@ class ConnectionLoop:
     #   RECV
     # ====================================================================================
     async def recv_loop(self, ws):
-        PACKET_SIZE = 20
+        PACKET_SIZE = 24  
 
         while not self._stop_event.is_set():
             try:
@@ -112,10 +112,12 @@ class ConnectionLoop:
                             try:
                                 p = Packet.from_bytes(chunk)
                                 latest_packets.append(p)
-                            except:
+                            except Exception as e:
+                                print("Error decodificando packet:", e)
                                 continue
 
-                    self.serverPackets[:] = latest_packets
+                    self.serverPackets.clear()
+                    self.serverPackets.extend(latest_packets)
 
             except websockets.exceptions.ConnectionClosed:
                 print("❌ Conexión cerrada en recv_loop")

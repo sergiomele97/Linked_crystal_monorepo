@@ -1,8 +1,10 @@
 from kivy.clock import Clock
 import numpy as np
 
-from services.drawing.coordinate_calculator import CoordinateCalculator
-from services.drawing.sprite_renderer import SpriteRenderer
+from services.drawing.entities.remote_player_manager import RemotePlayerManager
+from services.drawing.coordination.coordination_manager import CoordinationManager
+from services.drawing.rendering.sprite_renderer import SpriteRenderer
+from services.drawing.entities.remote_player_entity import RemotePlayerEntity
 
 class DrawingManager:
 
@@ -14,36 +16,42 @@ class DrawingManager:
         #Models
         self.ramData = ramData
         self.serverPackets = serverPackets
+        #Entities
+        self.onScreenPlayers = {} 
         #Services
-        self.coordinateCalculator = CoordinateCalculator(self.ramData)
+        self.remotePlayerManager = RemotePlayerManager(
+            self.ramData,
+            self.serverPackets, 
+            self.onScreenPlayers
+            )
+        self.coordinationManager = CoordinationManager(self.ramData)
         self.spriteRenderer = SpriteRenderer()
         self.spriteRenderer.load_sprite_sheet("resources/image/OW_default_sprite.png")
 
 
     def update_frame(self):
         if self.on_frame:
-            # Gets current native frame
-            frame_arr = self.pyboy.screen.ndarray
+            frame_array = self.pyboy.screen.ndarray
 
-            # Draws foreign sprites
-            for packet in self.serverPackets:
+            self.remotePlayerManager.updateOnScreenPlayersFromNetwork()
+            self.coordinationManager.updateLocalFineCoords()
 
-                # Filter outbounds players
-                if(self.coordinateCalculator.shouldFilter(packet)):
-                    continue
+            print(self.onScreenPlayers.values())
+            for player in self.onScreenPlayers.values():
 
-                # Calculate where to draw 
-                x_render_coord, y_render_coord = self.coordinateCalculator.calculate_player_coords(
-                    packet.player_x_coord,
-                    packet.player_y_coord
+                player.updateFineCoords()
+                x_render_coord, y_render_coord = self.coordinationManager.calculate_render_coords(
+                    player.x_fine_coord, player.y_fine_coord
                 )
-
+                print(x_render_coord)
+                print(y_render_coord)
                 # Render sprite
                 self.spriteRenderer.draw_first_frame(
-                    frame_arr,
+                    frame_array,
                     x_render_coord,
-                    y_render_coord
+                    y_render_coord,
+                    player.current_sprite
                 )
 
-            # Sends update to kivy
-            Clock.schedule_once(lambda dt: self.on_frame(frame_arr), 0)
+            Clock.schedule_once(lambda dt: self.on_frame(frame_array), 0)
+    
