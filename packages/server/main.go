@@ -287,6 +287,19 @@ func handleConnection(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
+	// --- Enviar mensaje de bienvenida con el ID ---
+	welcome := make([]byte, 4)
+	binary.LittleEndian.PutUint32(welcome, uint32(id))
+	if err := conn.WriteMessage(websocket.BinaryMessage, welcome); err != nil {
+		log.Println("Error enviando ID de bienvenida:", err)
+		conn.Close()
+		select {
+		case freeIDs <- id:
+		default:
+		}
+		return
+	}
+
 	conn.SetReadLimit(ReadLimit)
 	conn.SetReadDeadline(time.Now().Add(IdleReadDeadline))
 	conn.SetPongHandler(func(string) error {

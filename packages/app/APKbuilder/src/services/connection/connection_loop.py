@@ -11,10 +11,13 @@ from env import STATIC_TOKEN, ENV, SSL_URL
 from models.packet import Packet  # tu clase Packet
 
 class ConnectionLoop:
+    PACKET_SIZE = 24
+
     def __init__(self, get_url_callback):
         self.get_url_callback = get_url_callback
         self.token = STATIC_TOKEN
         self.env = ENV
+        self.my_id = None
 
         # -----------------------------
         #   SSL + CERTIFICADOS ANDROID
@@ -97,28 +100,36 @@ class ConnectionLoop:
     #   RECV
     # ====================================================================================
     async def recv_loop(self, ws):
-        PACKET_SIZE = 24  
 
         while not self._stop_event.is_set():
             try:
                 data = await ws.recv()
 
+                # --- Mensaje de bienvenida (4 bytes) ---
+                if isinstance(data, (bytes, bytearray)) and len(data) == 4 and self.my_id is None:
+                    self.my_id = int.from_bytes(data, "little")
+                    print("Mi ID recibido:", self.my_id)
+                    continue
+
                 if isinstance(data, (bytes, bytearray)):
-                    n = len(data) // PACKET_SIZE
-                    latest_packets = []
+                    n = len(data) // self.PACKET_SIZE
 
-                    for i in range(n):
-                        chunk = data[i * PACKET_SIZE:(i + 1) * PACKET_SIZE]
-                        if len(chunk) == PACKET_SIZE:
-                            try:
-                                p = Packet.from_bytes(chunk)
-                                latest_packets.append(p)
-                            except Exception as e:
-                                print("Error decodificando packet:", e)
-                                continue
-
+                    # Limpiamos la lista existente y agregamos solo paquetes válidos
                     self.serverPackets.clear()
-                    self.serverPackets.extend(latest_packets)
+                    for i in range(n):
+                        chunk = data[i * self.PACKET_SIZE:(i + 1) * self.PACKET_SIZE]
+                        if len(chunk) != self.PACKET_SIZE:
+                            continue
+
+                        try:
+                            p = Packet.from_bytes(chunk)
+                            # Ignorar mi propio paquete
+                            if self.my_id is not None and p.player_id == self.my_id:
+                                continue
+                            self.serverPackets.append(p)
+                        except Exception as e:
+                            print("Error decodificando packet:", e)
+                            continue
 
             except websockets.exceptions.ConnectionClosed:
                 print("❌ Conexión cerrada en recv_loop")

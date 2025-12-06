@@ -1,5 +1,8 @@
 class CoordinationManager:  
 
+    CENTER_SCREEN_CORRECTION = 64
+    VERTICAL_SPRITE_CORRECTION = 4
+
     def __init__(self, ramData):
         self.ram = ramData
         self.x_fine_coord = self.ram.player_x_coord * 16
@@ -14,14 +17,11 @@ class CoordinationManager:
         Devuelve las coordenadas de pantalla donde dibujar a otro jugador.
         """
 
-        # --- 1. Diferencia en tiles ---
         dx = other_fine_x - self.x_fine_coord
         dy = other_fine_y - self.y_fine_coord
 
-        # ... sin implementar
+        render_x = dx + self.CENTER_SCREEN_CORRECTION
+        render_y = dy + self.CENTER_SCREEN_CORRECTION - self.VERTICAL_SPRITE_CORRECTION
 
-        return dx, dy
-
-
-
+        return render_x, render_y
 

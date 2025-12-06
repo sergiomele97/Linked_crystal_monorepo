@@ -10,6 +10,14 @@
             "console": "integratedTerminal"
         },
         {
+            "name": "Python: cliente-mock",
+            "type": "debugpy",
+            "request": "launch",
+            "program": "${workspaceFolder}/packages/server/client-mock/client_example.py",
+            "cwd": "${workspaceFolder}/packages/server/client-mock",
+            "console": "integratedTerminal"
+        },
+        {
             "name": "Go: server",
             "type": "go",
             "request": "launch",
@@ -21,8 +29,8 @@
     ],
     "compounds": [
         {
-            "name": "Development: Python + Go",
-            "configurations": ["Python: cliente", "Go: server"]
+            "name": "Development: Python + Go + Mock-client",
+            "configurations": ["Python: cliente", "Python: cliente-mock", "Go: server"]
         }
     ]
 }
