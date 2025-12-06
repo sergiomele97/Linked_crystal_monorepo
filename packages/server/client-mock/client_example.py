@@ -30,6 +30,14 @@ if ENV != "local":
 # ---------------------------
 async def run_client():
     pkt = Packet()   # paquete inicial
+
+    pkt.player_x_coord = 12
+    pkt.player_y_coord = 7
+    pkt.map_number = 4
+    pkt.map_bank = 24
+    pkt.IsOverworld = True
+    pkt.player_id = 0
+
     backoff = 1
     max_backoff = 30
 
@@ -76,11 +84,11 @@ async def run_client():
                         pass
 
                     # Cambiar datos del paquete para test (como tu ejemplo original)
-                    pkt.player_x_coord += 1
-                    pkt.player_y_coord += 1
-                    pkt.map_number += 1
-                    pkt.map_bank += 1
-                    pkt.IsOverworld = 1
+                    # pkt.player_x_coord += 1
+                    # pkt.player_y_coord += 1
+                    # pkt.map_number += 1
+                    # pkt.map_bank += 1
+                    # pkt.IsOverworld = 1
 
                     await asyncio.sleep(0.1)
 

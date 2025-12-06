@@ -36,15 +36,12 @@ class DrawingManager:
             self.remotePlayerManager.updateOnScreenPlayersFromNetwork()
             self.coordinationManager.updateLocalFineCoords()
 
-            print(self.onScreenPlayers.values())
             for player in self.onScreenPlayers.values():
 
                 player.updateFineCoords()
                 x_render_coord, y_render_coord = self.coordinationManager.calculate_render_coords(
                     player.x_fine_coord, player.y_fine_coord
                 )
-                print(x_render_coord)
-                print(y_render_coord)
                 # Render sprite
                 self.spriteRenderer.draw_first_frame(
                     frame_array,

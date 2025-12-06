@@ -83,6 +83,7 @@ class ConnectionLoop:
     # ====================================================================================
     async def send_loop(self, ws):
         while not self._stop_event.is_set():
+            #print(self.localPacket)
             try:
                 pkt_bytes = self.localPacket.to_bytes()
                 await ws.send(pkt_bytes)
