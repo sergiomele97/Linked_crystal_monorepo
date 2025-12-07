@@ -31,8 +31,8 @@ if ENV != "local":
 async def run_client():
     pkt = Packet()   # paquete inicial
 
-    pkt.player_x_coord = 9
-    pkt.player_y_coord = 9
+    pkt.player_x_coord = 8
+    pkt.player_y_coord = 8
     pkt.map_number = 4
     pkt.map_bank = 24
     pkt.IsOverworld = True
