@@ -2,7 +2,7 @@ class CoordinationManager:
 
     CENTER_SCREEN_CORRECTION = 64
     VERTICAL_SPRITE_CORRECTION = 4
-    PIXEL_MOVEMENT_CORRECTION = [2,2,4,4,6,6,8,8,10,10,12,12,14,14]
+    PIXEL_MOVEMENT_CORRECTION = [0,0,2,2,4,4,6,6,8,8,10,10,12,12,14,14]
 
     def __init__(self, ramData):
         self.ram = ramData
@@ -16,8 +16,8 @@ class CoordinationManager:
         self.base_y_during_cycle = 0
 
     def get_local_direction(self):
-        x0, x1 = self.ram.x_coord_sprite[1],self.ram.x_coord_sprite[2]
-        y0, y1 = self.ram.y_coord_sprite[1],self.ram.y_coord_sprite[2]
+        x0, x1 = self.ram.x_coord_sprite[0],self.ram.x_coord_sprite[1]
+        y0, y1 = self.ram.y_coord_sprite[0],self.ram.y_coord_sprite[1]
 
         dx = (x0 - x1 + 128) % 256 - 128
         dy = (y0 - y1 + 128) % 256 - 128
@@ -45,7 +45,7 @@ class CoordinationManager:
             self.local_moving_count = 0
             self.x_fine_coord = self.ram.player_x_coord * 16
             self.y_fine_coord = self.ram.player_y_coord * 16
-            print(f"y fine {self.y_fine_coord}")
+            print(f"x fine {self.x_fine_coord}")
             return
 
         # Inicio de moving cycle
@@ -53,11 +53,12 @@ class CoordinationManager:
             print("INICIO DE MOVING CYCLE")
             self.local_moving_cycle = True
             self.local_moving_count = 0
+            self.applyFrameInstabilityCorrection()
             self.local_direction = direction  
             self.base_x_during_cycle = self.ram.player_x_coord * 16
             self.base_y_during_cycle = self.ram.player_y_coord * 16
 
-        correction = self.PIXEL_MOVEMENT_CORRECTION[min(self.local_moving_count, 14)]
+        correction = self.PIXEL_MOVEMENT_CORRECTION[min(self.local_moving_count, 15)]
 
         base_x = self.base_x_during_cycle
         base_y = self.base_y_during_cycle
@@ -82,13 +83,13 @@ class CoordinationManager:
 
         
         # Fin del ciclo
-        if self.local_moving_count >= 14:
+        if self.local_moving_count > 15:
             print("FIN DE MOVING CYCLE")
             self.local_moving_cycle = False
             self.local_moving_count = 0
         
-        print(f"base y {base_y} // correction: {correction} // y_fine: {self.y_fine_coord} // moving_cycle {self.local_moving_cycle} //moving count {self.local_moving_count}")
-
+        print(f"base x {base_x} // correction: {correction} // x_fine: {self.x_fine_coord} // moving_cycle {self.local_moving_cycle} //moving count {self.local_moving_count}")
+        print(f"ram posiciones: {self.ram.x_coord_sprite[0]} {self.ram.x_coord_sprite[1]} {self.ram.x_coord_sprite[2]} {self.ram.x_coord_sprite[3]} {self.ram.x_coord_sprite[4]}")
 
 
     def calculate_render_coords(self, other_fine_x, other_fine_y):
@@ -102,4 +103,9 @@ class CoordinationManager:
         render_y = dy + self.CENTER_SCREEN_CORRECTION - self.VERTICAL_SPRITE_CORRECTION
 
         return render_x, render_y
+
+    def applyFrameInstabilityCorrection(self):
+        if (abs(self.ram.x_coord_sprite[0] - self.ram.x_coord_sprite[1]) == 4 or
+            abs(self.ram.y_coord_sprite[0] - self.ram.y_coord_sprite[1]) == 4):
+            self.local_moving_count += 1
 
