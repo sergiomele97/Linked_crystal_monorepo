@@ -2,7 +2,7 @@ from kivy.clock import Clock
 import numpy as np
 
 from services.drawing.entities.remote_player_manager import RemotePlayerManager
-from services.drawing.coordination.coordination_manager import CoordinationManager
+from services.drawing.synchronization.synchro_manager import SynchronizationManager
 from services.drawing.rendering.sprite_renderer import SpriteRenderer
 from services.drawing.entities.remote_player_entity import RemotePlayerEntity
 
@@ -24,7 +24,7 @@ class DrawingManager:
             self.serverPackets, 
             self.onScreenPlayers
             )
-        self.coordinationManager = CoordinationManager(self.ramData)
+        self.synchronizationManager = SynchronizationManager(self.ramData)
         self.spriteRenderer = SpriteRenderer()
         self.spriteRenderer.load_sprite_sheet("resources/image/OW_default_sprite.png")
 
@@ -35,12 +35,12 @@ class DrawingManager:
             frame_array = self.pyboy.screen.ndarray
 
             self.remotePlayerManager.updateOnScreenPlayersFromNetwork()
-            self.coordinationManager.updateLocalFineCoords()
+            self.synchronizationManager.updateLocalFineCoords()
 
             for player in self.onScreenPlayers.values():
 
                 player.updateFineCoords()
-                x_render_coord, y_render_coord = self.coordinationManager.calculate_render_coords(
+                x_render_coord, y_render_coord = self.synchronizationManager.calculate_render_coords(
                     player.x_fine_coord, player.y_fine_coord
                 )
                 # Render sprite
