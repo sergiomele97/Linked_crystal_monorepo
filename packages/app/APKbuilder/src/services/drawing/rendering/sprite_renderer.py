@@ -62,17 +62,15 @@ class SpriteRenderer:
         self.sprite_frames = frames
         return frames
 
-    def get_first_frame(self):
+    def draw_sprite(self, frame, x, y, current_sprite):
         """
-        Devuelve el primer frame (16x16) del sprite sheet cargado.
+        Dibuja el frame indicado por current_sprite.
         """
-        if not hasattr(self, 'sprite_frames') or len(self.sprite_frames) == 0:
-            raise ValueError("No se ha cargado ningún sprite sheet todavía.")
-        return self.sprite_frames[0]
+        if not hasattr(self, 'sprite_frames'):
+            raise ValueError("No se han cargado sprites con load_sprite_sheet().")
 
-    def draw_first_frame(self, frame, x, y, current_sprite):
-        """
-        Dibuja el primer frame del sprite sheet en pantalla.
-        """
-        first_frame = self.get_first_frame()
-        self.draw(frame, first_frame, x, y)
+        if current_sprite < 0 or current_sprite >= len(self.sprite_frames):
+            raise IndexError(f"Frame inválido: {current_sprite}")
+
+        sprite = self.sprite_frames[current_sprite]
+        self.draw(frame, sprite, x, y)

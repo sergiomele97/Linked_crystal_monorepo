@@ -44,7 +44,7 @@ class DrawingManager:
                     player.x_fine_coord, player.y_fine_coord
                 )
                 # Render sprite
-                self.spriteRenderer.draw_first_frame(
+                self.spriteRenderer.draw_sprite(
                     frame_array,
                     x_render_coord,
                     y_render_coord,
