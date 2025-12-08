@@ -1,3 +1,11 @@
+# Valores por defecto
+ENV = "local"
+URL = "http://localhost:8080"
+SSL_URL = ""
+STATIC_TOKEN = "demo_token"
+PORT = "8080"
+SERVERS = "localhost"
+
 try:
     from config import ENV, URL, SSL_URL, STATIC_TOKEN, PORT, SERVERS
     ENV = ENV
