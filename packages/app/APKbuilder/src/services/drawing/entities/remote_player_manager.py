@@ -10,7 +10,7 @@ class RemotePlayerManager:
         self.serverPackets = serverPackets
         self.onScreenPlayers = onScreenPlayers
 
-        self.players_missing_ticks = {}  # player_id → int
+        self.players_missing_ticks = {}  
 
     def updateOnScreenPlayersFromNetwork(self):
         for pid in self.onScreenPlayers:
@@ -39,6 +39,7 @@ class RemotePlayerManager:
                     initial_y=packet.player_y_coord
                 )
             
+            # Update del target
             self.onScreenPlayers[pid].update_from_network(packet)
 
         # Eliminar jugadores que llevan demasiado tiempo sin paquete
