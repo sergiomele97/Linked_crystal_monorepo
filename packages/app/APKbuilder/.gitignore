@@ -3,3 +3,6 @@
 
 # Output binaries (APK, etc.)
 bin/
+
+# Variables de entorno y secretos
+src/config.py
