@@ -29,14 +29,27 @@ if ENV != "local":
 # Cliente principal
 # ---------------------------
 async def run_client():
-    pkt = Packet()   # paquete inicial
+    pkt = Packet()
 
-    pkt.player_x_coord = 8
-    pkt.player_y_coord = 8
+    pkt.player_x_coord = 5
+    pkt.player_y_coord = 4
     pkt.map_number = 4
     pkt.map_bank = 24
     pkt.IsOverworld = True
     pkt.player_id = 0
+
+    # Ruta cerrada
+    path = [
+        (5, 4),
+        (5, 6),
+        (7, 6),
+        (7, 4),
+    ]
+
+    current_target = 1
+    ticks_per_step = 16
+    tick_duration = 1 / 60  # 60 ticks por segundo
+    tick_count = 0
 
     backoff = 1
     max_backoff = 30
@@ -51,56 +64,48 @@ async def run_client():
                 ping_timeout=5,
                 close_timeout=3,
             ) as ws:
-                print("Conectado al servidor WebSocket")
-                backoff = 1  # reinicia backoff
+
+                backoff = 1
 
                 while True:
-                    # Enviar paquete actual
+                    # Enviar estado actual
                     await ws.send(pkt.to_bytes())
 
-                    # Intentar leer broadcast
+                    # Movimiento cada 16 ticks
+                    tick_count += 1
+                    if tick_count >= ticks_per_step:
+                        tick_count = 0
+
+                        target_x, target_y = path[current_target]
+
+                        # mover 1 casilla por eje
+                        if pkt.player_x_coord < target_x:
+                            pkt.player_x_coord += 1
+                        elif pkt.player_x_coord > target_x:
+                            pkt.player_x_coord -= 1
+                        elif pkt.player_y_coord < target_y:
+                            pkt.player_y_coord += 1
+                        elif pkt.player_y_coord > target_y:
+                            pkt.player_y_coord -= 1
+                        else:
+                            # alcanzado el target → siguiente
+                            current_target = (current_target + 1) % len(path)
+
+                    # Leer broadcast sin bloquear
                     try:
-                        data = await asyncio.wait_for(ws.recv(), timeout=0.1)
-
-                        # Cada paquete tiene exactamente 24 bytes
-                        packet_size = 24
-
-                        print(f"Broadcast recibido: {len(data)} bytes")
-
-                        # Procesar todos los paquetes concatenados
-                        for i in range(0, len(data), packet_size):
-                            chunk = data[i:i + packet_size]
-                            if len(chunk) == packet_size:
-                                p = Packet.from_bytes(chunk)
-                                print(
-                                    f"  → Packet: X={p.player_x_coord}, "
-                                    f"Y={p.player_y_coord}, "
-                                    f"Map={p.map_number}:{p.map_bank}, "
-                                    f"Playing={p.IsOverworld}, "
-                                    f"PlayerID={p.player_id}"
-                                )
-
+                        await asyncio.wait_for(ws.recv(), timeout=0.01)
                     except asyncio.TimeoutError:
                         pass
 
-                    # Cambiar datos del paquete para test (como tu ejemplo original)
-                    # pkt.player_x_coord += 1
-                    # pkt.player_y_coord += 1
-                    # pkt.map_number += 1
-                    # pkt.map_bank += 1
-                    # pkt.IsOverworld = 1
+                    await asyncio.sleep(tick_duration)
 
-                    await asyncio.sleep(0.1)
-
-        except (websockets.ConnectionClosedError, OSError) as e:
-            print(f"Conexión perdida: {e}")
+        except (websockets.ConnectionClosedError, OSError):
+            pass
         except Exception as e:
             print(f"Error inesperado: {e}")
 
-        print(f"Reintentando conexión en {backoff}s...")
         await asyncio.sleep(backoff)
         backoff = min(backoff * 2, max_backoff)
-
 
 # ---------------------------
 # Entrypoint
