@@ -30,7 +30,6 @@ class DrawingManager:
 
 
     def update_frame(self):
-        print("NEW FRAME UPDATE --------------------------------------")
         if self.on_frame:
             frame_array = self.pyboy.screen.ndarray
 
