@@ -4,6 +4,8 @@ from kivy.uix.label import Label
 from kivy.uix.image import Image
 from kivy.graphics import Color, RoundedRectangle
 
+from kivy.app import App
+
 
 class LinkInterface:
     def __init__(self, father_screen):
@@ -30,7 +32,7 @@ class LinkInterface:
 
         # ---- YOUR ID ----
         self.lbl_your_id = Label(
-            text="Your ID: ----",
+            text=f"Your ID: {App.get_running_app().appData.userID}",
             size_hint=(1, 0.1),
             pos_hint={"x": 0.05, "y": 0.9},
             halign="left",

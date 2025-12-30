@@ -7,4 +7,5 @@ class appData:
         self.ramData = RamData()
         self.packet = Packet()
         self.serverPackets = []
+        self.userID = None
         
