@@ -1,14 +1,18 @@
 from kivy.uix.floatlayout import FloatLayout
 from kivy.uix.button import Button
 from kivy.uix.label import Label
-from kivy.properties import ObjectProperty
+from kivy.uix.image import Image
+from kivy.properties import ObjectProperty, StringProperty
 from kivy.graphics import Color, RoundedRectangle
 
 from services.devTools.devTools import DevTools
 
+
 class MenuDropdown(FloatLayout):
     father_screen = ObjectProperty(None)
     devTools = DevTools()
+
+    your_id = StringProperty("----")
 
     def __init__(self, **kwargs):
         super().__init__(**kwargs)
@@ -18,11 +22,19 @@ class MenuDropdown(FloatLayout):
         self.teclado_visible = False
 
     def build_content(self):
-        btn1 = Button(text="Opción 1", size_hint=(1, 0.3), pos_hint={"x": 0, "y": 0.7})
+        btn1 = Button(
+            text="Save RAM",
+            size_hint=(1, 0.3),
+            pos_hint={"x": 0, "y": 0.7}
+        )
         btn1.bind(on_release=self.opcion1)
         self.add_widget(btn1)
 
-        btn2 = Button(text="Opción 2", size_hint=(1, 0.3), pos_hint={"x": 0, "y": 0.4})
+        btn2 = Button(
+            text="Link",
+            size_hint=(1, 0.3),
+            pos_hint={"x": 0, "y": 0.4}
+        )
         btn2.bind(on_release=self.opcion2)
         self.add_widget(btn2)
 
@@ -36,88 +48,127 @@ class MenuDropdown(FloatLayout):
         if self.teclado_visible:
             self.cerrar_teclado()
         self.close()
-        self.mostrar_teclado_numerico()
+        self.mostrar_teclado_link()
 
-    # ---------------- TECLADO NUMÉRICO ---------------- #
+    # ---------------- INTERFAZ LINK ---------------- #
 
-    def mostrar_teclado_numerico(self):
+    def mostrar_teclado_link(self):
         self.numero_actual = ""
         self.teclado_visible = True
 
-        # Teclado más alto para que cubra todos los botones
         self.teclado = FloatLayout(
-            size_hint=(0.5, 0.65),
-            pos_hint={"center_x": 0.5, "center_y": 0.5}
+            size_hint=(1, 0.45),
+            pos_hint={"x": 0, "y": 0}
         )
 
-        # Fondo
         with self.teclado.canvas.before:
-            Color(0.15, 0.15, 0.2, 0.95)
-            self.rect_fondo = RoundedRectangle(pos=self.teclado.pos, size=self.teclado.size, radius=[20])
+            Color(0.12, 0.12, 0.18, 0.97)
+            self.rect_fondo = RoundedRectangle(
+                pos=self.teclado.pos,
+                size=self.teclado.size,
+                radius=[20]
+            )
         self.teclado.bind(pos=self._update_rect, size=self._update_rect)
 
-        # Mensaje superior
-        self.label_mensaje = Label(
-            text="Enter the other player's ID",
+        # ---- YOUR ID ----
+        lbl_your_id = Label(
+            text=f"Your ID: {self.your_id}",
             size_hint=(1, 0.1),
-            pos_hint={"x": 0, "y": 0.87},
+            pos_hint={"x": 0.05, "y": 0.9},
+            halign="left",
+            valign="middle",
             font_size=16,
+            color=(0.8, 0.9, 1, 1)
+        )
+        lbl_your_id.bind(size=lbl_your_id.setter("text_size"))
+        self.teclado.add_widget(lbl_your_id)
+
+        # ---- SPINNER (VISUAL, SEGURO) ----
+        self.spinner = Image(
+            source="resources/image/spinner.zip",
+            size_hint=(0.12, 0.12),
+            pos_hint={"right": 0.97, "top": 0.97},
+            allow_stretch=True,
+            keep_ratio=True,
+            anim_delay=0.05,   # animación normal
+            opacity=0          # oculto por defecto
+        )
+        self.teclado.add_widget(self.spinner)
+
+        # ---- ENTER OTHER ID ----
+        lbl_msg = Label(
+            text="Enter the other player's ID:",
+            size_hint=(1, 0.08),
+            pos_hint={"x": 0.05, "y": 0.82},
+            halign="left",
+            valign="middle",
+            font_size=15,
             color=(1, 1, 1, 1)
         )
-        self.teclado.add_widget(self.label_mensaje)
+        lbl_msg.bind(size=lbl_msg.setter("text_size"))
+        self.teclado.add_widget(lbl_msg)
 
-        # Display del número
+        # ---- DISPLAY ----
         self.display = Label(
             text="",
-            size_hint=(1, 0.15),
-            pos_hint={"x": 0, "y": 0.72},
-            font_size=32,
+            size_hint=(1, 0.12),
+            pos_hint={"x": 0.05, "y": 0.68},
+            halign="left",
+            valign="middle",
+            font_size=28,
             color=(1, 1, 0.8, 1)
         )
+        self.display.bind(size=self.display.setter("text_size"))
         self.teclado.add_widget(self.display)
 
-        # Botones numéricos
-        numeros = [
-            ("1", 0, 0.48), ("2", 0.33, 0.48), ("3", 0.66, 0.48),
-            ("4", 0, 0.32), ("5", 0.33, 0.32), ("6", 0.66, 0.32),
-            ("7", 0, 0.16), ("8", 0.33, 0.16), ("9", 0.66, 0.16),
-            ("0", 0.33, 0.0),
+        # ---- BOTONES ----
+        btn_w = 0.28
+        btn_h = 0.12
+
+        posiciones = [
+            ("1", 0.08, 0.50), ("2", 0.36, 0.50), ("3", 0.64, 0.50),
+            ("4", 0.08, 0.36), ("5", 0.36, 0.36), ("6", 0.64, 0.36),
+            ("7", 0.08, 0.22), ("8", 0.36, 0.22), ("9", 0.64, 0.22),
         ]
-        for texto, x, y in numeros:
+
+        for texto, x, y in posiciones:
             btn = Button(
                 text=texto,
-                size_hint=(0.33, 0.16),
-                pos_hint={"x": x, "y": y},
-                background_color=(0.2, 0.6, 0.8, 1),
-                color=(1, 1, 1, 1)
+                size_hint=(btn_w, btn_h),
+                pos_hint={"x": x, "y": y}
             )
             btn.bind(on_release=self.pulsar_numero)
             self.teclado.add_widget(btn)
 
-        # Botón borrar
-        btn_borrar = Button(
-            text="BORRAR",
-            size_hint=(0.33, 0.16),
-            pos_hint={"x": 0, "y": 0.0},
-            background_color=(0.8, 0.3, 0.3, 1),
-            color=(1, 1, 1, 1)
+        # ---- FILA INFERIOR ----
+        btn_clear = Button(
+            text="CLEAR",
+            size_hint=(btn_w, btn_h),
+            pos_hint={"x": 0.08, "y": 0.08}
         )
-        btn_borrar.bind(on_release=self.borrar_numero)
-        self.teclado.add_widget(btn_borrar)
+        btn_clear.bind(on_release=self.borrar_numero)
+        self.teclado.add_widget(btn_clear)
 
-        # Botón enter
-        btn_enter = Button(
-            text="ENTER",
-            size_hint=(0.33, 0.16),
-            pos_hint={"x": 0.66, "y": 0.0},
-            background_color=(0.3, 0.8, 0.4, 1),
-            color=(1, 1, 1, 1)
+        btn_zero = Button(
+            text="0",
+            size_hint=(btn_w, btn_h),
+            pos_hint={"x": 0.36, "y": 0.08}
         )
-        btn_enter.bind(on_release=self.confirmar_numero)
-        self.teclado.add_widget(btn_enter)
+        btn_zero.bind(on_release=self.pulsar_numero)
+        self.teclado.add_widget(btn_zero)
+
+        btn_connect = Button(
+            text="CONNECT",
+            size_hint=(btn_w, btn_h),
+            pos_hint={"x": 0.64, "y": 0.08}
+        )
+        btn_connect.bind(on_release=self.confirmar_numero)
+        self.teclado.add_widget(btn_connect)
 
         self.father_screen.bind(on_touch_down=self._cerrar_si_fuera)
         self.father_screen.add_widget(self.teclado)
+
+    # ---------------- LOGICA ---------------- #
 
     def _update_rect(self, *args):
         self.rect_fondo.pos = self.teclado.pos
@@ -133,8 +184,9 @@ class MenuDropdown(FloatLayout):
         self.display.text = self.numero_actual
 
     def confirmar_numero(self, *args):
-        print(f"Número introducido: {self.numero_actual}")
-        self.cerrar_teclado()
+        print(f"Connect pressed. Other ID: {self.numero_actual}")
+        # SOLO visual
+        self.spinner.opacity = 1
 
     def cerrar_teclado(self):
         if self.teclado_visible:
@@ -148,7 +200,7 @@ class MenuDropdown(FloatLayout):
             return True
         return False
 
-    # ---------------- FUNCIONES BASE ---------------- #
+    # ---------------- DROPDOWN ---------------- #
 
     def open(self, caller=None):
         if not self.parent:
