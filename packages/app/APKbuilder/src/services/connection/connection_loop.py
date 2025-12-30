@@ -108,6 +108,7 @@ class ConnectionLoop:
                 # --- Mensaje de bienvenida (4 bytes) ---
                 if isinstance(data, (bytes, bytearray)) and len(data) == 4 and self.my_id is None:
                     self.my_id = int.from_bytes(data, "little")
+                    App.get_running_app().appData.userID = self.my_id
                     print("Mi ID recibido:", self.my_id)
                     continue
 
