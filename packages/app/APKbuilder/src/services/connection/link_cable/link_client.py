@@ -29,7 +29,7 @@ class LinkClient:
         self.loop = None
 
         self.recv_queue = queue.Queue(maxsize=10000)
-        self.send_queue_async = None 
+        self.send_queue_async = None
         self.target_url = None
 
         # --- TELEMETRÍA ---
@@ -45,9 +45,7 @@ class LinkClient:
         port_url = "" if self.env != "local" else f":{port}"
         base_url = f"{protocol}://{host}{port_url}/link"
         self.target_url = f"{base_url}?token={self.token}&id={my_id}&target={target_id}"
-        
         print(f"[LinkClient] Intentando conectar a: {self.target_url}")
-        
         self._stop_event.clear()
         self.count_sent = 0
         self.count_recv = 0
@@ -69,7 +67,7 @@ class LinkClient:
         try:
             self.count_sent += 1
             self.loop.call_soon_threadsafe(
-                self.send_queue_async.put_nowait, 
+                self.send_queue_async.put_nowait,
                 bytes([b & 0xFF])
             )
         except Exception as e:
@@ -81,17 +79,15 @@ class LinkClient:
             self.count_recv += 1
             return b
         except queue.Empty:
-            return 0xFF 
+            return 0xFF
 
     def _run_loop(self):
         asyncio.set_event_loop(asyncio.new_event_loop())
         self.loop = asyncio.get_event_loop()
         self.send_queue_async = asyncio.Queue()
-        
         # Hilo para printear estadísticas cada 2 segundos sin bloquear nada
         stats_thread = threading.Thread(target=self._stats_logger, daemon=True)
         stats_thread.start()
-        
         self.loop.run_until_complete(self._main())
 
     def _stats_logger(self):
@@ -107,33 +103,42 @@ class LinkClient:
                 await asyncio.sleep(0.5)
                 continue
             try:
+                # --- INTEGRACIÓN DE LA LIMPIEZA ---
+                # LIMPIEZA: Si hay basura de una conexión anterior rota, la tiramos
+                while not self.recv_queue.empty():
+                    try:
+                        self.recv_queue.get_nowait()
+                    except queue.Empty:
+                        break
+                
                 async with websockets.connect(
                     self.target_url,
                     ssl=self.ssl_context,
                     server_hostname=self.hostname,
                     compression=None,
-                    ping_interval=None 
+                    extensions=[], # ESTO evita el error 1002 RSV1
+                    ping_interval=None
                 ) as ws:
-                    print("[LinkClient] ✔ Conectado al Bridge")
-                    
+                    print(f"[LinkClient] ✔ Conectado. RX/TX reseteados para sincronía.")
                     send_task = asyncio.create_task(self.send_loop(ws))
                     recv_task = asyncio.create_task(self.recv_loop(ws))
-                    
                     await asyncio.wait({send_task, recv_task}, return_when=asyncio.FIRST_COMPLETED)
+                    
+                    # Cancelar tareas si una falla
+                    send_task.cancel()
+                    recv_task.cancel()
             except Exception as e:
-                print(f"[LinkClient] Error de conexión: {e}")
-                await asyncio.sleep(2)
+                print(f"[LinkClient] Error de protocolo o red: {e}")
+                await asyncio.sleep(1) # Espera antes de reintentar
 
     async def send_loop(self, ws):
         while not self._stop_event.is_set():
             try:
                 byte_data = await self.send_queue_async.get()
                 payload = bytearray(byte_data)
-                
                 # Agrupación para optimizar el túnel
                 while not self.send_queue_async.empty() and len(payload) < 128:
                     payload.extend(self.send_queue_async.get_nowait())
-                
                 await ws.send(payload)
             except Exception as e:
                 print(f"[LinkClient] Error en send_loop: {e}")
