@@ -7,7 +7,7 @@ import os
 
 from services.environment.environment_manager import solicitar_permisos
 from services.emulator.emulator_loop import EmulationLoop
-from services.emulator.link_client import LinkClient
+from services.connection.link_cable.link_client import LinkClient
 
 
 class EmulatorCoreInterface:
@@ -19,8 +19,6 @@ class EmulatorCoreInterface:
         self.on_text_output = on_text_output
         self.pyboy = None
         self.loop = None
-        
-        # Cliente basado en AsyncIO para el túnel de baja latencia
         self.link_client = LinkClient()
 
     def start(self):

@@ -11,7 +11,7 @@ logging.getLogger("websockets.server").setLevel(logging.CRITICAL)
 from kivy.app import App
 from models.appData import appData
 from global_components.global_layout import GlobalLayout
-from services.connection.connection_manager import ConnectionManager
+from services.connection.main_conn.connection_manager import ConnectionManager
 
 class LinkedCrystalApp(App):
     def __init__(self, **kwargs):

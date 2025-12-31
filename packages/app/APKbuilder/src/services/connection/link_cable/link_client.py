@@ -74,8 +74,14 @@ class LinkClient:
             pass
 
     def get_byte(self):
+        """
+        MODIFICADO: Si la cola está vacía, esperamos un tiempo mínimo 
+        en lugar de devolver basura (0xFF) inmediatamente.
+        """
         try:
-            b = self.recv_queue.get_nowait()
+            # Esperamos hasta 1ms. Si no hay nada, devolvemos 0xFF.
+            # Esto da margen a que el recv_loop rellene la cola.
+            b = self.recv_queue.get(timeout=0.001)
             self.count_recv += 1
             return b
         except queue.Empty:
@@ -106,7 +112,6 @@ class LinkClient:
                 await asyncio.sleep(0.5)
                 continue
             try:
-                # --- LIMPIEZA TOTAL ANTES DE CONECTAR ---
                 # 1. Vaciar cola de RECEPCIÓN (hilos)
                 for _ in range(10001):
                     if self.recv_queue.empty(): break
@@ -124,11 +129,10 @@ class LinkClient:
                     server_hostname=self.hostname,
                     compression=None,
                     extensions=[],
-                    ping_interval=10,    # Detecta si la conexión cae en 10s
-                    ping_timeout=5,      # Espera 5s al ping antes de cerrar
+                    ping_interval=10,
+                    ping_timeout=5,
                     close_timeout=1
                 ) as ws:
-                    # Reseteamos telemetría para empezar sesión limpia
                     self.count_sent = 0
                     self.count_recv = 0
                     print(f"[LinkClient] ✔ Conectado y Sincronizado.")
@@ -170,6 +174,7 @@ class LinkClient:
             while not self._stop_event.is_set():
                 data = await ws.recv()
                 if isinstance(data, (bytes, bytearray)):
+                    # Procesamiento masivo para ganar microsegundos
                     for b in data:
                         try:
                             self.recv_queue.put_nowait(b)
@@ -177,6 +182,6 @@ class LinkClient:
                             try: self.recv_queue.get_nowait()
                             except: pass
                             self.recv_queue.put_nowait(b)
-                await asyncio.sleep(0)
+                # Eliminado sleep(0) para máxima prioridad
         except:
             return

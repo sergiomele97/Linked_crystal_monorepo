@@ -154,6 +154,7 @@ class ConnectionLoop:
                 continue
 
             full_url = f"{base_url}?token={self.token}"
+            print(f"Intentando conectar a: {full_url}")
 
             try:
                 async with websockets.connect(

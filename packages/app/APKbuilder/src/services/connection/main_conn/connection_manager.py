@@ -8,7 +8,7 @@ from kivy.metrics import dp
 from kivy.core.window import Window
 
 from env import URL
-from services.connection.connection_loop import ConnectionLoop
+from services.connection.main_conn.connection_loop import ConnectionLoop
 
 
 class ConnectionManager:
