@@ -335,24 +335,38 @@ func handleLink(w http.ResponseWriter, r *http.Request) {
 }
 
 func bridge(c1, c2 *websocket.Conn) {
-	errChan := make(chan error, 2)
-	copyWS := func(dst, src *websocket.Conn) {
-		for {
-			_, msg, err := src.ReadMessage()
-			if err != nil {
-				errChan <- err
-				return
-			}
-			if err := dst.WriteMessage(websocket.BinaryMessage, msg); err != nil {
-				errChan <- err
-				return
-			}
-		}
-	}
-	go copyWS(c1, c2)
-	go copyWS(c2, c1)
-	<-errChan
-}
+    // Canal para detectar el fin de la sesión
+    done := make(chan struct{})
+
+    pipe := func(dst, src *websocket.Conn) {
+        defer func() {
+            // Si un lado falla, notificamos para cerrar todo
+            select {
+            case done <- struct{}{}:
+            default:
+            }
+        }()
+        
+        for {
+            mt, msg, err := src.ReadMessage()
+            if err != nil {
+                return
+            }
+            // Importante: propagar el mismo tipo de mensaje (Binary/Text)
+            if err := dst.WriteMessage(mt, msg); err != nil {
+                return
+            }
+        }
+    }
+
+    go pipe(c1, c2)
+    go pipe(c2, c1)
+
+    // Esperar a que cualquiera de los dos muera
+    <-done
+    c1.Close()
+    c2.Close()
+    log.Println("[Bridge] Conexiones cerradas y limpias.")
 
 func handleConnection(w http.ResponseWriter, r *http.Request) {
 	var id int
