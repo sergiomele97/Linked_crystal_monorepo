@@ -7,6 +7,7 @@ import (
 	"log"
 	"net/http"
 	"os"
+	"strconv"
 	"strings"
 	"sync"
 	"sync/atomic"
@@ -50,6 +51,15 @@ var upgrader = websocket.Upgrader{
 var freeIDs = make(chan int, MaxClients)
 var latestPackets []atomic.Value
 var clients sync.Map
+
+// ------------------ LINK SYSTEM ------------------
+
+var linkMatches sync.Map
+
+type linkWaiter struct {
+	conn *websocket.Conn
+	peer chan *websocket.Conn
+}
 
 // ------------------ SERVERS LIST ------------------
 
@@ -253,6 +263,14 @@ func main() {
 		handleConnection(w, r)
 	})
 
+	http.HandleFunc("/link", func(w http.ResponseWriter, r *http.Request) {
+		if r.URL.Query().Get("token") != staticToken {
+			http.Error(w, "unauthorized", http.StatusUnauthorized)
+			return
+		}
+		handleLink(w, r)
+	})
+
 	http.HandleFunc("/health", handleHealth)
 	http.HandleFunc("/servers", handleServers)
 
@@ -268,6 +286,73 @@ func main() {
 }
 
 // ------------------ HANDLERS ------------------
+
+func handleLink(w http.ResponseWriter, r *http.Request) {
+	idStr := r.URL.Query().Get("id")
+	targetStr := r.URL.Query().Get("target")
+	id, _ := strconv.Atoi(idStr)
+	target, _ := strconv.Atoi(targetStr)
+
+	if id == target {
+		http.Error(w, "invalid target", http.StatusBadRequest)
+		return
+	}
+
+	conn, err := upgrader.Upgrade(w, r, nil)
+	if err != nil {
+		return
+	}
+	defer conn.Close()
+
+	// Crear clave única para el par (siempre el menor primero)
+	p1, p2 := id, target
+	if p1 > p2 {
+		p1, p2 = p2, p1
+	}
+	pairKey := strconv.Itoa(p1) + "-" + strconv.Itoa(p2)
+
+	actual, loaded := linkMatches.LoadOrStore(pairKey, &linkWaiter{
+		conn: conn,
+		peer: make(chan *websocket.Conn, 1),
+	})
+
+	waiter := actual.(*linkWaiter)
+
+	if loaded {
+		// Somos el segundo en llegar. Despertamos al primero.
+		waiter.peer <- conn
+		bridge(conn, waiter.conn)
+		linkMatches.Delete(pairKey)
+	} else {
+		// Somos el primero. Esperamos al compañero o al cierre.
+		select {
+		case peerConn := <-waiter.peer:
+			bridge(conn, peerConn)
+		case <-time.After(30 * time.Second):
+			linkMatches.Delete(pairKey)
+		}
+	}
+}
+
+func bridge(c1, c2 *websocket.Conn) {
+	errChan := make(chan error, 2)
+	copyWS := func(dst, src *websocket.Conn) {
+		for {
+			_, msg, err := src.ReadMessage()
+			if err != nil {
+				errChan <- err
+				return
+			}
+			if err := dst.WriteMessage(websocket.BinaryMessage, msg); err != nil {
+				errChan <- err
+				return
+			}
+		}
+	}
+	go copyWS(c1, c2)
+	go copyWS(c2, c1)
+	<-errChan
+}
 
 func handleConnection(w http.ResponseWriter, r *http.Request) {
 	var id int
@@ -291,7 +376,7 @@ func handleConnection(w http.ResponseWriter, r *http.Request) {
 	welcome := make([]byte, 4)
 	binary.LittleEndian.PutUint32(welcome, uint32(id))
 	if err := conn.WriteMessage(websocket.BinaryMessage, welcome); err != nil {
-		log.Println("Error enviando ID de bienvenida:", err)
+			log.Println("Error enviando ID de bienvenida:", err)
 		conn.Close()
 		select {
 		case freeIDs <- id:
@@ -309,7 +394,7 @@ func handleConnection(w http.ResponseWriter, r *http.Request) {
 
 	client := newClient(conn, SendBufPerClient, id)
 	clients.Store(client, id)
-	log.Printf("Cliente conectado: id=%d addr=%s", client.id, client.addr)
+		log.Printf("Cliente conectado: id=%d addr=%s", client.id, client.addr)
 
 	go client.writerLoop(5 * time.Second)
 	go client.pingLoop(10*time.Second, 5*time.Second)

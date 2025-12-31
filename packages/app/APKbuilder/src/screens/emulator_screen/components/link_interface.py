@@ -151,9 +151,58 @@ class LinkInterface:
         self.numero_actual = self.numero_actual[:-1]
         self.display.text = self.numero_actual
 
+    # ---------------- LOGICA ---------------- #
+
     def confirmar_numero(self, *args):
+        if not self.numero_actual:
+            return
+
         print(f"Connect pressed. Other ID: {self.numero_actual}")
         self.spinner.opacity = 1
+        
+        # 1. Obtenemos la App y el ID propio
+        app = App.get_running_app()
+        my_id = app.appData.userID
+        target_id = int(self.numero_actual)
+
+        # 2. Accedemos a la URL a través del manager de conexión
+        # Asumiendo que en tu App tienes algo como: self.connection_manager = ConnectionManager()
+        try:
+            # Intentamos obtener la URL del loop de conexión
+            manager = app.connection_manager 
+            full_url = manager.connectionLoop.get_url_callback() 
+            
+            if not full_url:
+                print("Error: No hay un servidor seleccionado")
+                return
+
+            # Limpiamos la URL (ej: "ws://192.168.1.15:8080/ws" -> "192.168.1.15", 8080)
+            # Quitamos protocolo y el path final (/ws)
+            clean_address = full_url.replace("ws://", "").replace("wss://", "").split("/")[0]
+            
+            if ":" in clean_address:
+                host, port = clean_address.split(":")
+                port = int(port)
+            else:
+                host = clean_address
+                port = 8080 # Puerto por defecto si no viene en la URL
+
+            # 3. Ordenamos al emulador conectar
+            # father_screen es EmulatorScreen -> tiene el objeto emulator
+            self.father_screen.emulator.connect_link(
+                my_id=my_id,
+                target_id=target_id,
+                host=host,
+                port=port
+            )
+            
+        except AttributeError as e:
+            print(f"Error de referencia: Asegúrate de que app.connection_manager existe. {e}")
+        except Exception as e:
+            print(f"Error al conectar Link: {e}")
+        
+        # Opcional: Cerrar el teclado tras conectar
+        # Clock.schedule_once(lambda dt: self.cerrar_teclado(), 2)
 
     def cerrar_teclado(self):
         if self.teclado_visible:
