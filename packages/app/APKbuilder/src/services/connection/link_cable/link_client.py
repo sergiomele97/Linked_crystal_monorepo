@@ -70,8 +70,8 @@ class LinkClient:
                 self.send_queue_async.put_nowait,
                 bytes([b & 0xFF])
             )
-        except Exception as e:
-            print(f"[LinkClient] Error send_byte: {e}")
+        except Exception:
+            pass
 
     def get_byte(self):
         try:
@@ -85,17 +85,20 @@ class LinkClient:
         asyncio.set_event_loop(asyncio.new_event_loop())
         self.loop = asyncio.get_event_loop()
         self.send_queue_async = asyncio.Queue()
-        # Hilo para printear estadísticas cada 2 segundos sin bloquear nada
+        
         stats_thread = threading.Thread(target=self._stats_logger, daemon=True)
         stats_thread.start()
-        self.loop.run_until_complete(self._main())
+        
+        try:
+            self.loop.run_until_complete(self._main())
+        except Exception as e:
+            print(f"[LinkClient] Loop asyncio colapsado: {e}")
 
     def _stats_logger(self):
-        """Printea el estado del tráfico para debuggear la pantalla azul"""
         while not self._stop_event.is_set():
             time.sleep(2)
             if self.count_sent > 0 or self.count_recv > 0:
-                print(f"[Link-Stats] TX: {self.count_sent} bytes | RX: {self.count_recv} bytes | Queue: {self.recv_queue.qsize()}")
+                print(f"[Link-Stats] TX: {self.count_sent} | RX: {self.count_recv} | Queue: {self.recv_queue.qsize()}")
 
     async def _main(self):
         while not self._stop_event.is_set():
@@ -103,58 +106,77 @@ class LinkClient:
                 await asyncio.sleep(0.5)
                 continue
             try:
-                # --- INTEGRACIÓN DE LA LIMPIEZA ---
-                # LIMPIEZA: Si hay basura de una conexión anterior rota, la tiramos
-                while not self.recv_queue.empty():
-                    try:
-                        self.recv_queue.get_nowait()
-                    except queue.Empty:
-                        break
-                
+                # --- LIMPIEZA TOTAL ANTES DE CONECTAR ---
+                # 1. Vaciar cola de RECEPCIÓN (hilos)
+                for _ in range(10001):
+                    if self.recv_queue.empty(): break
+                    try: self.recv_queue.get_nowait()
+                    except queue.Empty: break
+
+                # 2. Vaciar cola de ENVÍO (asyncio)
+                while not self.send_queue_async.empty():
+                    try: self.send_queue_async.get_nowait()
+                    except: break
+
                 async with websockets.connect(
                     self.target_url,
                     ssl=self.ssl_context,
                     server_hostname=self.hostname,
                     compression=None,
-                    extensions=[], # ESTO evita el error 1002 RSV1
-                    ping_interval=None
+                    extensions=[],
+                    ping_interval=10,    # Detecta si la conexión cae en 10s
+                    ping_timeout=5,      # Espera 5s al ping antes de cerrar
+                    close_timeout=1
                 ) as ws:
-                    print(f"[LinkClient] ✔ Conectado. RX/TX reseteados para sincronía.")
+                    # Reseteamos telemetría para empezar sesión limpia
+                    self.count_sent = 0
+                    self.count_recv = 0
+                    print(f"[LinkClient] ✔ Conectado y Sincronizado.")
+                    
                     send_task = asyncio.create_task(self.send_loop(ws))
                     recv_task = asyncio.create_task(self.recv_loop(ws))
-                    await asyncio.wait({send_task, recv_task}, return_when=asyncio.FIRST_COMPLETED)
                     
-                    # Cancelar tareas si una falla
-                    send_task.cancel()
-                    recv_task.cancel()
+                    done, pending = await asyncio.wait(
+                        {send_task, recv_task}, 
+                        return_when=asyncio.FIRST_COMPLETED
+                    )
+                    
+                    for task in pending:
+                        task.cancel()
+                        try: await task
+                        except: pass
+                        
             except Exception as e:
-                print(f"[LinkClient] Error de protocolo o red: {e}")
-                await asyncio.sleep(1) # Espera antes de reintentar
+                print(f"[LinkClient] Error/Desconexión: {e}")
+                await asyncio.sleep(2) 
 
     async def send_loop(self, ws):
-        while not self._stop_event.is_set():
-            try:
+        try:
+            while not self._stop_event.is_set():
                 byte_data = await self.send_queue_async.get()
                 payload = bytearray(byte_data)
-                # Agrupación para optimizar el túnel
-                while not self.send_queue_async.empty() and len(payload) < 128:
+                
+                count = 0
+                while not self.send_queue_async.empty() and len(payload) < 128 and count < 64:
                     payload.extend(self.send_queue_async.get_nowait())
+                    count += 1
+                
                 await ws.send(payload)
-            except Exception as e:
-                print(f"[LinkClient] Error en send_loop: {e}")
-                return
+        except:
+            return
 
     async def recv_loop(self, ws):
-        while not self._stop_event.is_set():
-            try:
+        try:
+            while not self._stop_event.is_set():
                 data = await ws.recv()
                 if isinstance(data, (bytes, bytearray)):
                     for b in data:
                         try:
                             self.recv_queue.put_nowait(b)
                         except queue.Full:
-                            self.recv_queue.get_nowait()
+                            try: self.recv_queue.get_nowait()
+                            except: pass
                             self.recv_queue.put_nowait(b)
-            except Exception as e:
-                print(f"[LinkClient] Error en recv_loop: {e}")
-                return
+                await asyncio.sleep(0)
+        except:
+            return
