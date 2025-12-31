@@ -288,89 +288,70 @@ func main() {
 // ------------------ HANDLERS ------------------
 
 func handleLink(w http.ResponseWriter, r *http.Request) {
-    idStr := r.URL.Query().Get("id")
-    targetStr := r.URL.Query().Get("target")
-    id, _ := strconv.Atoi(idStr)
-    target, _ := strconv.Atoi(targetStr)
+	idStr := r.URL.Query().Get("id")
+	targetStr := r.URL.Query().Get("target")
+	id, _ := strconv.Atoi(idStr)
+	target, _ := strconv.Atoi(targetStr)
 
-    if id == target {
-        http.Error(w, "invalid target", http.StatusBadRequest)
-        return
-    }
+	if id == target {
+		http.Error(w, "invalid target", http.StatusBadRequest)
+		return
+	}
 
-    conn, err := upgrader.Upgrade(w, r, nil)
-    if err != nil {
-        return
-    }
-    // IMPORTANTE: No cerramos aquí con defer conn.Close() porque bridge se encarga
-    // de cerrar ambos de forma controlada.
+	conn, err := upgrader.Upgrade(w, r, nil)
+	if err != nil {
+		return
+	}
+	defer conn.Close()
 
-    p1, p2 := id, target
-    if p1 > p2 {
-        p1, p2 = p2, p1
-    }
-    pairKey := strconv.Itoa(p1) + "-" + strconv.Itoa(p2)
+	// Crear clave única para el par (siempre el menor primero)
+	p1, p2 := id, target
+	if p1 > p2 {
+		p1, p2 = p2, p1
+	}
+	pairKey := strconv.Itoa(p1) + "-" + strconv.Itoa(p2)
 
-    actual, loaded := linkMatches.LoadOrStore(pairKey, &linkWaiter{
-        conn: conn,
-        peer: make(chan *websocket.Conn, 1),
-    })
+	actual, loaded := linkMatches.LoadOrStore(pairKey, &linkWaiter{
+		conn: conn,
+		peer: make(chan *websocket.Conn, 1),
+	})
 
-    waiter := actual.(*linkWaiter)
+	waiter := actual.(*linkWaiter)
 
-    if loaded {
-        // Somos el segundo. Notificamos al primero.
-        select {
-        case waiter.peer <- conn:
-            bridge(conn, waiter.conn)
-        default:
-            // Si el canal estaba lleno o cerrado, limpiamos
-            conn.Close()
-        }
-        linkMatches.Delete(pairKey)
-    } else {
-        // Somos el primero. Esperamos al compañero.
-        select {
-        case peerConn := <-waiter.peer:
-            bridge(conn, peerConn)
-        case <-time.After(45 * time.Second):
-            linkMatches.Delete(pairKey)
-            conn.Close()
-        }
-    }
+	if loaded {
+		// Somos el segundo en llegar. Despertamos al primero.
+		waiter.peer <- conn
+		bridge(conn, waiter.conn)
+		linkMatches.Delete(pairKey)
+	} else {
+		// Somos el primero. Esperamos al compañero o al cierre.
+		select {
+		case peerConn := <-waiter.peer:
+			bridge(conn, peerConn)
+		case <-time.After(30 * time.Second):
+			linkMatches.Delete(pairKey)
+		}
+	}
 }
 
 func bridge(c1, c2 *websocket.Conn) {
-    log.Println("[Bridge] Iniciando túnel entre dos emuladores")
-    
-    // Usamos un canal para detectar cuando cualquiera de los dos falla
-    done := make(chan struct{}, 2)
-
-    copyWS := func(dst, src *websocket.Conn) {
-        defer func() { done <- struct{}{} }()
-        for {
-            // Leemos el tipo de mensaje para mantener la integridad del protocolo
-            mt, msg, err := src.ReadMessage()
-            if err != nil {
-                return
-            }
-            if err := dst.WriteMessage(mt, msg); err != nil {
-                return
-            }
-        }
-    }
-
-    go copyWS(c1, c2)
-    go copyWS(c2, c1)
-
-    // Esperamos a que la primera goroutine termine
-    <-done
-    
-    // CERRAMOS AMBOS: Esto es vital para que el cliente Python 
-    // reciba un error de conexión limpia y pueda reconectar.
-    c1.Close()
-    c2.Close()
-    log.Println("[Bridge] Túnel cerrado por desconexión de un extremo")
+	errChan := make(chan error, 2)
+	copyWS := func(dst, src *websocket.Conn) {
+		for {
+			_, msg, err := src.ReadMessage()
+			if err != nil {
+				errChan <- err
+				return
+			}
+			if err := dst.WriteMessage(websocket.BinaryMessage, msg); err != nil {
+				errChan <- err
+				return
+			}
+		}
+	}
+	go copyWS(c1, c2)
+	go copyWS(c2, c1)
+	<-errChan
 }
 
 func handleConnection(w http.ResponseWriter, r *http.Request) {
