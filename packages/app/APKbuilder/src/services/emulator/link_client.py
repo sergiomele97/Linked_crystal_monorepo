@@ -6,6 +6,7 @@ import certifi
 import websockets
 import queue
 import time
+from collections import deque
 
 from env import STATIC_TOKEN, ENV, SSL_URL
 
@@ -30,12 +31,14 @@ class LinkClient:
 
         self.recv_queue = queue.Queue(maxsize=100000)
         self.send_queue_async = None
-        self.target_url = None
-
-        # --- DEBUG METRICS ---
+        
+        # --- NUEVO: REGISTRO DE HISTORIAL ---
+        # Guardamos los últimos 1000 bytes enviados para poder retransmitirlos
+        self.sent_history = deque(maxlen=1000)
+        
         self.count_sent = 0
-        self.count_recv_network = 0 # Bytes que entran desde el socket
-        self.count_recv_emulator = 0 # Bytes que el emulador saca de la cola
+        self.count_recv_network = 0
+        self.count_recv_emulator = 0
         self.is_connected = False
 
     def start(self, host, port, my_id, target_id):
@@ -60,30 +63,31 @@ class LinkClient:
             except: pass
 
     def send_byte(self, b: int):
-        """Llamado por PyBoy para enviar un byte"""
         if self._stop_event.is_set() or self.loop is None:
             return
         try:
+            val = b & 0xFF
             self.count_sent += 1
+            # Guardamos en el registro histórico antes de enviar
+            self.sent_history.append(val)
+            
             self.loop.call_soon_threadsafe(
                 self.send_queue_async.put_nowait,
-                bytes([b & 0xFF])
+                bytes([val])
             )
         except Exception as e:
-            # Si esto falla, el emulador está intentando enviar pero el loop de asyncio ha muerto
-            print(f"[DEBUG-TX-ERR] Error en send_byte: {e}")
+            print(f"[DEBUG-TX-ERR] {e}")
 
     def get_byte(self):
-        """Llamado por PyBoy para recibir un byte"""
+        """
+        Retorna el byte de la cola. Si no hay, retorna 0x00 para que 
+        el emulador no se bloquee y pueda seguir llamando a send_byte().
+        """
         try:
-            # NO BLOQUEANTE: get_nowait nunca congelará tu PC.
-            # Si hay algo, lo devuelve; si no, lanza Empty.
             b = self.recv_queue.get_nowait()
             self.count_recv_emulator += 1
             return b
         except queue.Empty:
-            # IMPORTANTE: Devolvemos 0x00 para que el emulador NO se pare.
-            # Si devolvemos algo o esperamos, PyBoy se bloquea y deja de llamar a send_byte.
             return 0x00
 
     def _run_loop(self):
@@ -96,16 +100,15 @@ class LinkClient:
         try:
             self.loop.run_until_complete(self._main())
         except Exception as e:
-            print(f"[DEBUG-FATAL] Loop asyncio colapsado: {e}")
+            print(f"[DEBUG-FATAL] {e}")
 
     def _stats_logger(self):
         while not self._stop_event.is_set():
             time.sleep(2)
             conn_status = "OK" if self.is_connected else "DISCONNECTED"
-            # Este print es vital para entender dónde está el atasco
-            print(f"[DEBUG-STATS] Conn: {conn_status} | TX (Emu): {self.count_sent} | "
-                  f"RX (Net): {self.count_recv_network} | RX (Emu): {self.count_recv_emulator} | "
-                  f"Queue: {self.recv_queue.qsize()}")
+            print(f"[DEBUG-STATS] Conn: {conn_status} | TX: {self.count_sent} | "
+                  f"RX_Net: {self.count_recv_network} | RX_Emu: {self.count_recv_emulator} | "
+                  f"History: {len(self.sent_history)}")
 
     async def _main(self):
         while not self._stop_event.is_set():
@@ -113,7 +116,6 @@ class LinkClient:
                 await asyncio.sleep(0.5)
                 continue
             
-            print(f"[DEBUG-NET] Intentando conectar...")
             try:
                 async with websockets.connect(
                     self.target_url,
@@ -122,26 +124,25 @@ class LinkClient:
                     ping_interval=5,
                     ping_timeout=5
                 ) as ws:
-                    print(f"[DEBUG-NET] ✔ Conectado al servidor Go")
                     self.is_connected = True
-                    
-                    # Al reconectar, podríamos vaciar la cola para evitar basura vieja
-                    # pero según tu petición, queremos que intente sincronizar.
-                    
+                    print(f"[DEBUG-NET] ✔ Conectado. Enviando ráfaga de sincronización...")
+
+                    # --- EL "EMPUJÓN" DE SINCRONIZACIÓN ---
+                    # Al conectar (o reconectar), enviamos los últimos 500 bytes 
+                    # que tenemos registrados para asegurar que el otro lado despierte.
+                    if len(self.sent_history) > 0:
+                        burst_size = min(len(self.sent_history), 500)
+                        burst = bytes(list(self.sent_history)[-burst_size:])
+                        await ws.send(burst)
+
                     send_task = asyncio.create_task(self.send_loop(ws))
                     recv_task = asyncio.create_task(self.recv_loop(ws))
                     
-                    done, pending = await asyncio.wait(
-                        {send_task, recv_task}, 
-                        return_when=asyncio.FIRST_COMPLETED
-                    )
+                    await asyncio.wait({send_task, recv_task}, return_when=asyncio.FIRST_COMPLETED)
                     
-                    for task in pending:
-                        task.cancel()
-                        
             except Exception as e:
                 self.is_connected = False
-                print(f"[DEBUG-NET-ERR] Error conexión: {e}")
+                print(f"[DEBUG-NET-ERR] {e}")
                 await asyncio.sleep(1.5)
 
     async def send_loop(self, ws):
@@ -149,18 +150,10 @@ class LinkClient:
             while not self._stop_event.is_set():
                 byte_data = await self.send_queue_async.get()
                 payload = bytearray(byte_data)
-                
-                # Agrupamos bytes pendientes para vaciar el buffer rápido
                 while not self.send_queue_async.empty() and len(payload) < 512:
                     payload.extend(self.send_queue_async.get_nowait())
-                
-                try:
-                    await ws.send(payload)
-                except Exception as e:
-                    print(f"[DEBUG-WS-SEND-ERR] Fallo al enviar payload: {e}")
-                    raise e # Rompe para que el main reconecte
-        except asyncio.CancelledError:
-            pass
+                await ws.send(payload)
+        except: pass
 
     async def recv_loop(self, ws):
         try:
@@ -171,11 +164,6 @@ class LinkClient:
                         try:
                             self.recv_queue.put_nowait(b)
                         except queue.Full:
-                            # Si la cola está llena, el emulador no está consumiendo bytes
-                            # Quitamos uno viejo para meter el nuevo
-                            try: self.recv_queue.get_nowait()
-                            except: pass
+                            self.recv_queue.get_nowait()
                             self.recv_queue.put_nowait(b)
-        except Exception as e:
-            print(f"[DEBUG-WS-RECV-ERR] Fallo al recibir: {e}")
-            raise e
+        except: pass
