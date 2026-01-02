@@ -10,7 +10,7 @@ Here's a quick demo:
 
 *(Insert demo image or GIF here if available)*
 
-## Progress and Future Releases
+## Roadmap
 
 You can find all the progress and information about future releases on this board:  
 [Project Board](https://github.com/users/sergiomele97/projects/4)
