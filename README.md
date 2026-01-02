@@ -1,4 +1,4 @@
-# Welcome to Linked-Crystal
+# Welcome to this repository!
 
 This GitHub repository is the center of the **Linked-Crystal** project.
 
