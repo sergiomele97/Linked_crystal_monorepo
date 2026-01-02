@@ -1,16 +1,29 @@
-Welcome to this repository!
+# Welcome to Linked-Crystal
 
-This github repository is the center of the linked-crystal project.
+This GitHub repository is the center of the **Linked-Crystal** project.
 
-Our aim is to convert pokemon Crystal into an MMO experience that everyone can play on their phones. All while keeping it legal, simple and open source.
+Our aim is to convert **Pokémon Crystal** into an MMO experience that everyone can play on their phones. All while keeping it **legal, simple, and open source**.
+
+## Demo
 
 Here's a quick demo:
 
+*(Insert demo image or GIF here if available)*
 
+## Progress and Future Releases
 
+You can find all the progress and information about future releases on this board:  
+[Project Board](https://github.com/users/sergiomele97/projects/4)
 
-You can find all the progress and information about future releases on this board: https://github.com/users/sergiomele97/projects/4
+## Play the Game
 
-If you want to play, download the latest apk release on your android device: (While que don't have an official release yet, you can download development versions from this pipeline: https://github.com/sergiomele97/Linked_crystal_monorepo/actions/workflows/buildAPK_development.yml)
+To play, download the latest APK release on your Android device:  
 
-If you want to develop, our wiki will try to sum up the most important information you need.
+> While we don't have an official release yet, you can download development versions from this pipeline:  
+> [Development APK Pipeline](https://github.com/sergiomele97/Linked_crystal_monorepo/actions/workflows/buildAPK_development.yml)
+
+## Development
+
+If you want to develop, our wiki will try to sum up the most important information you need.  
+
+*(Consider linking to your wiki here if available)*
