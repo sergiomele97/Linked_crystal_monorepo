@@ -11,10 +11,18 @@ class RamScrapper:
     all the information we need from the GBC RAM
     '''
     def update_ram_data(self):
-        # Detecting if the player is saving
-        self.ramData.is_saving = self.pyboy.memory[0xD151]
         # Detecting which WRAM bank is active
         self.ramData.wram_bank = self.pyboy.memory[0xFF70] & 0x07
+
+        # Detectamos si hay una UI abierta (menú o diálogo)
+        # WY (0xFF4A) < 144 significa que la capa de Window está visible
+        # wMenuState (0xCF14) > 0 significa que el motor de menús está activo
+        wy = self.pyboy.memory[0xFF4A]
+        menu_state = self.pyboy.memory[0xCF14]
+        self.ramData.is_gui_open = (wy < 144) or (menu_state > 0)
+
+        # Detecting if the player is saving
+        self.ramData.is_saving = self.pyboy.memory[0xD151]
 
         # We only update positions if the WRAM bank is 1
         if self.ramData.wram_bank != 1:

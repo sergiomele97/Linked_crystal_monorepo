@@ -39,6 +39,8 @@ class DrawingManager:
             for player in self.onScreenPlayers.values():
 
                 player.updateFineCoords()
+                if self.ramData.is_gui_open:
+                    continue
                 x_render_coord, y_render_coord = self.synchronizationManager.calculate_render_coords(
                     player.x_fine_coord, player.y_fine_coord
                 )
