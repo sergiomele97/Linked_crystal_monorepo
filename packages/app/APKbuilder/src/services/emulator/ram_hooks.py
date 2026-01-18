@@ -2,24 +2,23 @@ class RamHooks:
     def __init__(self, ramData, on_save=None):
         self.ramData = ramData
         self.on_save = on_save
-        self._is_saving_frames = 0
-        self._prev_is_saving = 0
+        self._prev_bank = 0
+        self._prev_save_val = 0
 
     def handle_hooks(self):
         """
         Monitoriza la RAM en cada tick para disparar efectos secundarios automáticos.
         """
-        # Auto-save detection robusto
-        current_save_val = self.ramData.is_saving
+        curr_bank = self.ramData.wram_bank
+        curr_val = self.ramData.is_saving
         
-        if current_save_val > 0:
-            self._is_saving_frames += 1
-        else:
-            # Si volvemos a 0 tras haber detectado un "guardado largo" (> 60 ticks / 1 seg)
-            if self._is_saving_frames > 60:
-                print(f"[DEBUG] Guardado detectado ({self._is_saving_frames} frames). Lanzando backup...")
-                if self.on_save:
-                    self.on_save()
-            self._is_saving_frames = 0
+        # TRANSICIÓN PROPUESTA: Banco 1 (255) -> Banco 6 (0)
+        if (self._prev_bank == 1 and self._prev_save_val == 255) and \
+           (curr_bank == 6 and curr_val == 0):
+            
+            # print(f"[DEBUG] ¡Transición de Guardado Detectada! (Bank 1:255 -> Bank 6:0). Lanzando backup...")
+            if self.on_save:
+                self.on_save()
         
-        self._prev_is_saving = current_save_val
+        self._prev_bank = curr_bank
+        self._prev_save_val = curr_val

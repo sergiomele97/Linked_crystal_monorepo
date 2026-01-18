@@ -30,7 +30,13 @@ class RamScrapper:
         self.ramData.collision_up = self.pyboy.memory[0xC2FB]
         self.ramData.collision_left = self.pyboy.memory[0xC2FC]
         self.ramData.collision_right = self.pyboy.memory[0xC2FD]
+
+        # Detecting if the player is saving
         self.ramData.is_saving = self.pyboy.memory[0xD151]
+        self.ramData.wram_bank = self.pyboy.memory[0xFF70] & 0x07
+        
+        # Debugeo de bancos
+        # print(f"[DEBUG] WRAM Bank (0xFF70): {self.ramData.wram_bank} | Save Value (0xD151): {self.ramData.is_saving}")
 
         # Actualizar el paquete que se va a enviar
         self.updateOnlinePacket()

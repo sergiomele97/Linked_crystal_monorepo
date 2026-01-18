@@ -13,4 +13,6 @@ class RamData:
         self.collision_up = 0
         self.collision_left = 0
         self.collision_right = 0
+        
         self.is_saving = 0
+        self.wram_bank = 0
