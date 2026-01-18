@@ -5,6 +5,7 @@ from models.ramData import RamData
 from models.packet import Packet
 
 from services.emulator.ram_scrapper import RamScrapper
+from services.emulator.ram_hooks import RamHooks
 from services.audio.audio_manager import AudioManagerKivy
 from services.drawing.drawing_manager import DrawingManager
 
@@ -16,12 +17,13 @@ class EmulationLoop:
     a la interfaz de usuario mediante callbacks.
     """
 
-    def __init__(self, pyboy, on_frame=None, on_text_output=None):
+    def __init__(self, pyboy, on_frame=None, on_text_output=None, on_save=None):
     #EmulatorInstance
         self.pyboy = pyboy
     #Callbacks
         self.on_frame = on_frame
         self.on_text_output = on_text_output
+        self.on_save = on_save
     #Models
         self.ramData = App.get_running_app().appData.ramData
         self.packet = App.get_running_app().appData.packet
@@ -29,6 +31,7 @@ class EmulationLoop:
     #Services
         self.audioManager = AudioManagerKivy(self.pyboy)
         self.ramScrapper = RamScrapper(self.pyboy, self.ramData)
+        self.ramHooks = RamHooks(self.ramData, self.on_save)
         self.drawingManager = DrawingManager(self.ramData, self.serverPackets, self.pyboy, self.on_frame)
     #Others
         self.running = False
@@ -60,6 +63,7 @@ class EmulationLoop:
             self.ramScrapper.update_ram_data()
             self.drawingManager.update_frame()
             self.audioManager.update_audio()
+            self.ramHooks.handle_hooks()
             
         else:
             self.stop()

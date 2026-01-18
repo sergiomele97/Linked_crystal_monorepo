@@ -71,7 +71,7 @@ class EmulatorCoreInterface:
 
         # Crear y lanzar el loop de emulación
         self.loop = EmulationLoop(
-            self.pyboy, self.on_frame, self.on_text_output
+            self.pyboy, self.on_frame, self.on_text_output, on_save=self.save_RAM
         )
         self.loop.start(fps=60)
 

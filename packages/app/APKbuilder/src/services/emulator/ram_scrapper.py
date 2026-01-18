@@ -30,6 +30,7 @@ class RamScrapper:
         self.ramData.collision_up = self.pyboy.memory[0xC2FB]
         self.ramData.collision_left = self.pyboy.memory[0xC2FC]
         self.ramData.collision_right = self.pyboy.memory[0xC2FD]
+        self.ramData.is_saving = self.pyboy.memory[0xD151]
 
         # Actualizar el paquete que se va a enviar
         self.updateOnlinePacket()
