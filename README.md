@@ -6,7 +6,7 @@ Our aim is to convert **Pokémon Crystal** into an MMO experience that everyone 
 
 ## Demo
 
-<video src="https://github.com/user-attachments/assets/1f6d0277-f599-4ef4-94f1-08c1e748329a" width="100%" controls muted autoplay loop>
+<video src="https://github.com/user-attachments/assets/1f6d0277-f599-4ef4-94f1-08c1e748329a" controls muted autoplay loop>
   Tu navegador no soporta el elemento de video.
 </video>
 
