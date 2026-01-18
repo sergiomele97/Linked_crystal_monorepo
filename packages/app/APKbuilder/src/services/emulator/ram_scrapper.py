@@ -11,6 +11,15 @@ class RamScrapper:
     all the information we need from the GBC RAM
     '''
     def update_ram_data(self):
+        # Detecting if the player is saving
+        self.ramData.is_saving = self.pyboy.memory[0xD151]
+        # Detecting which WRAM bank is active
+        self.ramData.wram_bank = self.pyboy.memory[0xFF70] & 0x07
+
+        # We only update positions if the WRAM bank is 1
+        if self.ramData.wram_bank != 1:
+            return
+
         # Absolute player position
         # Doesn't update until moving cycle has completed.
         self.ramData.player_x_coord = self.pyboy.memory[0xDCB8]
@@ -20,7 +29,7 @@ class RamScrapper:
         self.ramData.map_number = self.pyboy.memory[0xDCB6]
         self.ramData.map_bank = self.pyboy.memory[0xDCB5]
 
-        # More dinamical player position
+        # Updating sprite position
         self.updateSpriteCoord()
         self.ramData.x_coord_sprite[0] = self.pyboy.memory[0xD14C]
         self.ramData.y_coord_sprite[0] = self.pyboy.memory[0xD14D]
@@ -30,13 +39,6 @@ class RamScrapper:
         self.ramData.collision_up = self.pyboy.memory[0xC2FB]
         self.ramData.collision_left = self.pyboy.memory[0xC2FC]
         self.ramData.collision_right = self.pyboy.memory[0xC2FD]
-
-        # Detecting if the player is saving
-        self.ramData.is_saving = self.pyboy.memory[0xD151]
-        self.ramData.wram_bank = self.pyboy.memory[0xFF70] & 0x07
-        
-        # Debugeo de bancos
-        # print(f"[DEBUG] WRAM Bank (0xFF70): {self.ramData.wram_bank} | Save Value (0xD151): {self.ramData.is_saving}")
 
         # Actualizar el paquete que se va a enviar
         self.updateOnlinePacket()
