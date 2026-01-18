@@ -6,9 +6,7 @@ Our aim is to convert **Pokémon Crystal** into an MMO experience that everyone 
 
 ## Demo
 
-<video src="https://github.com/sergiomele97/Linked_crystal_monorepo/blob/main/.github/assets/pre-beta-demo.mp4" width="100%" controls muted autoplay loop>
-  Tu navegador no soporta el elemento de video.
-</video>
+https://github.com/user-attachments/assets/1f6d0277-f599-4ef4-94f1-08c1e748329a
 
 ## Roadmap
 
