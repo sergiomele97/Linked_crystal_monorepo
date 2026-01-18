@@ -6,11 +6,11 @@ Our aim is to convert **Pokémon Crystal** into an MMO experience that everyone 
 
 ## Quick demo:
 
-<p align="center">
-  <a href="https://www.youtube.com/watch?v=TUTjPQ11K_I">
-    <img src="https://github.com/user-attachments/assets/ea79d7b3-79d5-4772-81c3-9181a0efe24a" alt="pre beta demo">
-  </a>
-</p>
+
+<a href="https://www.youtube.com/watch?v=TUTjPQ11K_I">
+  <img src="https://github.com/user-attachments/assets/ea79d7b3-79d5-4772-81c3-9181a0efe24a" alt="pre beta demo">
+</a>
+
 
 ## Roadmap
 
