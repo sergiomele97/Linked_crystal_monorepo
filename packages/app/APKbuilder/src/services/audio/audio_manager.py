@@ -32,6 +32,11 @@ class AudioManagerKivy:
         self.audio_track = None
         self.android_audio_initialized = False
         self._android_writer_thread = None
+        
+        # Normalización suavizada
+        self._smoothed_peak = 1.0
+        self._peak_decay = 0.95  # Qué tan rápido baja (más lento = más estable)
+        self._peak_attack = 0.8  # Qué tan rápido sube (más alto = más reactivo)
 
         self._running = True
 
@@ -67,16 +72,25 @@ class AudioManagerKivy:
         if need_init:
             self.init_audio_stream(sample_rate, channels)
 
-        # Normalización solo si no es int16
-        if arr.dtype != np.int16:
-            arr = arr.astype(np.float32)
-            if arr.ndim == 1:
-                arr -= (arr.max() + arr.min()) / 2
-            else:
-                for ch in range(arr.shape[1]):
-                    arr[:, ch] -= (arr[:, ch].max() + arr[:, ch].min()) / 2
+        # Si ya es int16, no tocamos nada (PyBoy suele dar int16)
+        if arr.dtype == np.int16:
+            pass
+        else:
+            # Normalización con seguidor de pico suavizado
             max_abs = np.max(np.abs(arr)) or 1.0
-            arr = (arr / max_abs * 32767).astype(np.int16)
+            
+            # Si el pico nuevo es mayor, subimos rápido
+            if max_abs > self._smoothed_peak:
+                self._smoothed_peak = self._smoothed_peak * (1 - self._peak_attack) + max_abs * self._peak_attack
+            else:
+                # Si es menor, bajamos lento
+                self._smoothed_peak = self._smoothed_peak * self._peak_decay + max_abs * (1 - self._peak_decay)
+
+            # Evitamos que baje demasiado
+            self._smoothed_peak = max(self._smoothed_peak, 0.1)
+
+            # Aplicamos ganancia basada en el pico suavizado
+            arr = (arr / self._smoothed_peak * 32767).clip(-32768, 32767).astype(np.int16)
 
         # Desktop shape
         if self.platform != 'android' and arr.ndim == 1:
