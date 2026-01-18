@@ -6,7 +6,9 @@ Our aim is to convert **Pokémon Crystal** into an MMO experience that everyone 
 
 ## Demo
 
-[![Título del Video](https://img.shields.io/badge/YouTube-Video-red?logo=youtube)](https://youtu.be/TUTjPQ11K_I)
+<video src=".github/assets/pre-beta-demo.mp4" width="100%" controls muted autoplay loop>
+  Tu navegador no soporta el elemento de video.
+</video>
 
 ## Roadmap
 
