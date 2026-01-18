@@ -25,9 +25,11 @@ class RamScrapper:
         self.ramData.is_saving = self.pyboy.memory[0xD151]
 
         # We only update positions if the WRAM bank is 1
-        if self.ramData.wram_bank != 1:
-            return
+        if self.ramData.wram_bank == 1:
+            self.update_overworld_info()
 
+
+    def update_overworld_info(self):
         # Absolute player position
         # Doesn't update until moving cycle has completed.
         self.ramData.player_x_coord = self.pyboy.memory[0xDCB8]
@@ -42,20 +44,12 @@ class RamScrapper:
         self.ramData.x_coord_sprite[0] = self.pyboy.memory[0xD14C]
         self.ramData.y_coord_sprite[0] = self.pyboy.memory[0xD14D]
 
-        # Gives info about potential collision
-        self.ramData.collision_down = self.pyboy.memory[0xC2FA]
-        self.ramData.collision_up = self.pyboy.memory[0xC2FB]
-        self.ramData.collision_left = self.pyboy.memory[0xC2FC]
-        self.ramData.collision_right = self.pyboy.memory[0xC2FD]
-
         # Actualizar el paquete que se va a enviar
         self.updateOnlinePacket()
-    
-    '''
-    In order to have a fluid animation, we need information from 
-    4 ticks before
-    '''
+
+
     def updateSpriteCoord(self):
+        # In order to have a fluid animation, we need information from 4 ticks before
         self.ramData.x_coord_sprite[4] = self.ramData.x_coord_sprite[3]
         self.ramData.x_coord_sprite[3] = self.ramData.x_coord_sprite[2]
         self.ramData.x_coord_sprite[2] = self.ramData.x_coord_sprite[1]
@@ -66,6 +60,7 @@ class RamScrapper:
         self.ramData.y_coord_sprite[2] = self.ramData.y_coord_sprite[1]
         self.ramData.y_coord_sprite[1] = self.ramData.y_coord_sprite[0]
     
+
     def updateOnlinePacket(self):
         self.localPacket.player_x_coord = self.ramData.player_x_coord
         self.localPacket.player_y_coord = self.ramData.player_y_coord
