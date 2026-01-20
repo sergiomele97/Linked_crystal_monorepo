@@ -9,8 +9,10 @@ if platform == 'android':
             Permission.READ_EXTERNAL_STORAGE,
             Permission.WRITE_EXTERNAL_STORAGE
         ])
-
-    # Otros imports o funciones específicas Android pueden ir aquí
+else:
+    def solicitar_permisos():
+        # No se necesitan permisos en escritorio
+        pass
 
 def inicializar_entorno():
     if platform != 'android':
@@ -18,7 +20,3 @@ def inicializar_entorno():
         Config.set('graphics', 'width', '360')
         Config.set('graphics', 'height', '640')
         Config.set('graphics', 'resizable', False)
-
-def solicitar_permisos():
-        # No se necesitan permisos en escritorio
-        pass
