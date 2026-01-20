@@ -1,5 +1,6 @@
 from kivy.uix.modalview import ModalView
 from kivy.uix.boxlayout import BoxLayout
+from kivy.uix.anchorlayout import AnchorLayout
 from kivy.uix.scrollview import ScrollView
 from kivy.uix.label import Label
 from kivy.uix.textinput import TextInput
@@ -41,6 +42,10 @@ class ChatInterface:
 
         # ScrollView for messages
         self.scroll = ScrollView(size_hint=(1, 0.8), do_scroll_x=False)
+        
+        # AnchorLayout ensures messages are pinned at the bottom when there are few
+        self.anchor = AnchorLayout(anchor_y='bottom', size_hint_y=None)
+        
         self.messages_layout = BoxLayout(
             orientation='vertical', 
             size_hint_y=None, 
@@ -49,8 +54,13 @@ class ChatInterface:
         )
         self.messages_layout.bind(minimum_height=self.messages_layout.setter('height'))
         
-        self.scroll.add_widget(self.messages_layout)
+        self.anchor.add_widget(self.messages_layout)
+        self.scroll.add_widget(self.anchor)
         layout.add_widget(self.scroll)
+
+        # Bind heights to update anchor height
+        self.scroll.bind(height=self._update_anchor_height)
+        self.messages_layout.bind(height=self._update_anchor_height)
 
         # Input area
         input_layout = BoxLayout(orientation='horizontal', size_hint=(1, 0.2), spacing=10)
@@ -96,6 +106,9 @@ class ChatInterface:
         self.rect_fondo.pos = instance.pos
         self.rect_fondo.size = instance.size
 
+    def _update_anchor_height(self, *args):
+        self.anchor.height = max(self.scroll.height, self.messages_layout.height)
+
     def enviar_mensaje(self, *args):
         msg = self.text_input.text.strip()
         if msg:
@@ -130,8 +143,9 @@ class ChatInterface:
         # Scroll to bottom after layout update
         Clock.schedule_once(self._scroll_to_bottom, 0.1)
 
-    def _scroll_to_bottom(self, dt):
-        self.scroll.scroll_y = 0
+    def _scroll_to_bottom(self, dt=None):
+        if self.scroll.height < self.messages_layout.height:
+            self.scroll.scroll_y = 0
 
     def cerrar_chat(self):
         if self.view:
