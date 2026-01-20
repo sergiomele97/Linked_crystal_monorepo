@@ -40,10 +40,10 @@ async def run_client():
 
     # Ruta cerrada
     path = [
-        (5, 4),
-        (5, 6),
-        (7, 6),
-        (7, 4),
+        (2, 4),
+        (2, 6),
+        (4, 6),
+        (4, 4),
     ]
 
     current_target = 1
