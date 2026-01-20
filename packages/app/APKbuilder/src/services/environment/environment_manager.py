@@ -12,14 +12,13 @@ if platform == 'android':
 
     # Otros imports o funciones específicas Android pueden ir aquí
 
-else:
-    from kivy.config import Config
+def inicializar_entorno():
+    if platform != 'android':
+        from kivy.config import Config
+        Config.set('graphics', 'width', '360')
+        Config.set('graphics', 'height', '640')
+        Config.set('graphics', 'resizable', False)
 
-    # Configuraciones para escritorio
-    Config.set('graphics', 'width', '360')
-    Config.set('graphics', 'height', '640')
-    Config.set('graphics', 'resizable', False)
-
-    def solicitar_permisos():
+def solicitar_permisos():
         # No se necesitan permisos en escritorio
         pass
