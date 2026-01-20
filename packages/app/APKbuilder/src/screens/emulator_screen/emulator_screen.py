@@ -5,6 +5,7 @@ from kivy.lang import Builder
 from screens.emulator_screen.components.controlpad import ControlPad
 from screens.emulator_screen.components.menu_dropdown import MenuDropdown
 from screens.emulator_screen.components.video_display import VideoDisplay
+from screens.emulator_screen.components.chat_interface import ChatInterface
 from services.emulator.emulator_core_interface import EmulatorCoreInterface
 
 Builder.load_file("screens/emulator_screen/emulator_screen.kv")
@@ -32,7 +33,9 @@ class EmulatorScreen(Screen):
         self.emulator.start()
 
     def onChatPressed(self):
-        print("Chat button pressed")
+        if not hasattr(self, "chat_interface"):
+            self.chat_interface = ChatInterface(father_screen=self)
+        self.chat_interface.mostrar_chat()
     
     def onMenuPressed(self, caller):
         if not hasattr(self, "dropdown"):
