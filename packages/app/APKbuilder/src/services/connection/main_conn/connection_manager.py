@@ -22,6 +22,10 @@ class ConnectionManager:
             get_url_callback=self._get_selected_server
         )
 
+    def set_chat_manager(self, chat_manager):
+        """Called by EmulatorScreen when initialized."""
+        self.connectionLoop.set_chat_manager(chat_manager)
+
     def _get_selected_server(self):
         return self.selected_server
 

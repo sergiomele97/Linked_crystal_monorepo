@@ -68,8 +68,8 @@ async def run_client():
                 backoff = 1
 
                 while True:
-                    # Enviar estado actual
-                    await ws.send(pkt.to_bytes())
+                    # Enviar estado actual (Prefijo 0x01)
+                    await ws.send(b'\x01' + pkt.to_bytes())
 
                     # Movimiento cada 16 ticks
                     tick_count += 1
