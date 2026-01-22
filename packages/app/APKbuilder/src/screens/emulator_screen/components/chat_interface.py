@@ -1,3 +1,4 @@
+from kivy.app import App
 from kivy.uix.modalview import ModalView
 from kivy.uix.boxlayout import BoxLayout
 from kivy.uix.anchorlayout import AnchorLayout
@@ -93,11 +94,23 @@ class ChatInterface:
         
         # Focus management
         self.view.bind(on_open=self._on_open)
+        self.view.bind(on_dismiss=self._on_dismiss)
         self.view.open()
 
     def _on_open(self, instance):
+        # Register chat callback
+        app = App.get_running_app()
+        if hasattr(app, "connection_manager"):
+            app.connection_manager.connectionLoop.on_chat_received = self._incoming_chat_callback
+
         # Focus on text input with a small delay for PC
         Clock.schedule_once(lambda dt: self._set_focus(), 0.1)
+
+    def _on_dismiss(self, instance):
+        # Unregister callback to avoid memory leaks or ghost updates
+        app = App.get_running_app()
+        if hasattr(app, "connection_manager"):
+            app.connection_manager.connectionLoop.on_chat_received = None
 
     def _set_focus(self):
         self.text_input.focus = True
@@ -114,11 +127,20 @@ class ChatInterface:
         if msg:
             self.agregar_mensaje(msg, sender="Tú")
             self.text_input.text = ""
-            # Here we would send it to the server in the future
-            print(f"Chat: {msg}")
+            
+            # Real send via ConnectionLoop
+            app = App.get_running_app()
+            if hasattr(app, "connection_manager"):
+                app.connection_manager.connectionLoop.send_chat(msg)
+            
+            print(f"Chat (Sent): {msg}")
         
         # Regain focus after sending
         Clock.schedule_once(lambda dt: self._set_focus(), 0.05)
+
+    def _incoming_chat_callback(self, sender_id, message):
+        # Use Clock to ensure UI update happens on the main thread
+        Clock.schedule_once(lambda dt: self.agregar_mensaje(message, sender=f"Jugador {sender_id}"), 0)
 
     def agregar_mensaje(self, text, sender="Sistema"):
         full_text = f"[b]{sender}:[/b] {text}"

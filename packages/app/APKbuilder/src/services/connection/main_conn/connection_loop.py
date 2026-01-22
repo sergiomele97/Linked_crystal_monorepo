@@ -59,6 +59,12 @@ class ConnectionLoop:
             lambda dt: App.get_running_app().root.connection_status.show_nok()
         )
 
+        # -----------------------------
+        #   CHAT QUEUE & CALLBACKS
+        # -----------------------------
+        self.chat_queue = None # Will be created in _run_loop (asyncio)
+        self.on_chat_received = None # Callback (sender_id, msg)
+
     # ====================================================================================
     #   START / STOP
     # ====================================================================================
@@ -79,6 +85,7 @@ class ConnectionLoop:
     def _run_loop(self):
         asyncio.set_event_loop(asyncio.new_event_loop())
         self.loop = asyncio.get_event_loop()
+        self.chat_queue = asyncio.Queue()
         self.loop.run_until_complete(self._main())
 
     # ====================================================================================
@@ -86,10 +93,15 @@ class ConnectionLoop:
     # ====================================================================================
     async def send_loop(self, ws):
         while not self._stop_event.is_set():
-            #print(self.localPacket)
             try:
+                # 1. Send all pending chat messages
+                while not self.chat_queue.empty():
+                    msg = self.chat_queue.get_nowait()
+                    await ws.send(b'\x02' + msg.encode('utf-8'))
+
+                # 2. Send game packet with prefix 0x01
                 pkt_bytes = self.localPacket.to_bytes()
-                await ws.send(pkt_bytes)
+                await ws.send(b'\x01' + pkt_bytes)
             except Exception as e:
                 print("❌ Error en send_loop:", e)
                 return
@@ -100,12 +112,13 @@ class ConnectionLoop:
     #   RECV
     # ====================================================================================
     async def recv_loop(self, ws):
-
         while not self._stop_event.is_set():
             try:
                 data = await ws.recv()
+                if not data:
+                    continue
 
-                # --- Mensaje de bienvenida (4 bytes) ---
+                # --- Welcome message (4 bytes, RAW - NO PREFIX) ---
                 if isinstance(data, (bytes, bytearray)) and len(data) == 4 and self.my_id is None:
                     self.my_id = int.from_bytes(data, "little")
                     App.get_running_app().appData.userID = self.my_id
@@ -113,24 +126,38 @@ class ConnectionLoop:
                     continue
 
                 if isinstance(data, (bytes, bytearray)):
-                    n = len(data) // self.PACKET_SIZE
+                    if len(data) < 1:
+                        continue
+                        
+                    type_byte = data[0]
+                    payload = data[1:]
 
-                    # Limpiamos la lista existente y agregamos solo paquetes válidos
-                    self.serverPackets.clear()
-                    for i in range(n):
-                        chunk = data[i * self.PACKET_SIZE:(i + 1) * self.PACKET_SIZE]
-                        if len(chunk) != self.PACKET_SIZE:
-                            continue
-
-                        try:
-                            p = Packet.from_bytes(chunk)
-                            # Ignorar mi propio paquete
-                            if self.my_id is not None and p.player_id == self.my_id:
+                    if type_byte == 0x01: # Game Data
+                        n = len(payload) // self.PACKET_SIZE
+                        self.serverPackets.clear()
+                        for i in range(n):
+                            chunk = payload[i * self.PACKET_SIZE:(i + 1) * self.PACKET_SIZE]
+                            if len(chunk) != self.PACKET_SIZE:
                                 continue
-                            self.serverPackets.append(p)
-                        except Exception as e:
-                            print("Error decodificando packet:", e)
-                            continue
+
+                            try:
+                                p = Packet.from_bytes(chunk)
+                                if self.my_id is not None and p.player_id == self.my_id:
+                                    continue
+                                self.serverPackets.append(p)
+                            except Exception as e:
+                                print("Error decodificando packet:", e)
+                                continue
+                    
+                    elif type_byte == 0x02: # Chat Message
+                        if len(payload) >= 4:
+                            sender_id = int.from_bytes(payload[0:4], "little")
+                            try:
+                                msg = payload[4:].decode('utf-8')
+                                if self.on_chat_received:
+                                    self.on_chat_received(sender_id, msg)
+                            except:
+                                print(f"DEBUG CHAT DECODE ERROR: payload={payload}")
 
             except websockets.exceptions.ConnectionClosed:
                 print("❌ Conexión cerrada en recv_loop")
@@ -138,6 +165,11 @@ class ConnectionLoop:
             except Exception as e:
                 print("❌ Error en recv_loop:", e)
                 return
+
+    def send_chat(self, message):
+        """Adds a chat message to the queue to be sent."""
+        if self.chat_queue and self.loop:
+            self.loop.call_soon_threadsafe(self.chat_queue.put_nowait, message)
 
     # ====================================================================================
     #   MAIN (conectividad + callbacks)

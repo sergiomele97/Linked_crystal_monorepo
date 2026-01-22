@@ -288,89 +288,89 @@ func main() {
 // ------------------ HANDLERS ------------------
 
 func handleLink(w http.ResponseWriter, r *http.Request) {
-    idStr := r.URL.Query().Get("id")
-    targetStr := r.URL.Query().Get("target")
-    id, _ := strconv.Atoi(idStr)
-    target, _ := strconv.Atoi(targetStr)
+	idStr := r.URL.Query().Get("id")
+	targetStr := r.URL.Query().Get("target")
+	id, _ := strconv.Atoi(idStr)
+	target, _ := strconv.Atoi(targetStr)
 
-    if id == target {
-        http.Error(w, "invalid target", http.StatusBadRequest)
-        return
-    }
+	if id == target {
+		http.Error(w, "invalid target", http.StatusBadRequest)
+		return
+	}
 
-    conn, err := upgrader.Upgrade(w, r, nil)
-    if err != nil {
-        return
-    }
-    // IMPORTANTE: No cerramos aquí con defer conn.Close() porque bridge se encarga
-    // de cerrar ambos de forma controlada.
+	conn, err := upgrader.Upgrade(w, r, nil)
+	if err != nil {
+		return
+	}
+	// IMPORTANTE: No cerramos aquí con defer conn.Close() porque bridge se encarga
+	// de cerrar ambos de forma controlada.
 
-    p1, p2 := id, target
-    if p1 > p2 {
-        p1, p2 = p2, p1
-    }
-    pairKey := strconv.Itoa(p1) + "-" + strconv.Itoa(p2)
+	p1, p2 := id, target
+	if p1 > p2 {
+		p1, p2 = p2, p1
+	}
+	pairKey := strconv.Itoa(p1) + "-" + strconv.Itoa(p2)
 
-    actual, loaded := linkMatches.LoadOrStore(pairKey, &linkWaiter{
-        conn: conn,
-        peer: make(chan *websocket.Conn, 1),
-    })
+	actual, loaded := linkMatches.LoadOrStore(pairKey, &linkWaiter{
+		conn: conn,
+		peer: make(chan *websocket.Conn, 1),
+	})
 
-    waiter := actual.(*linkWaiter)
+	waiter := actual.(*linkWaiter)
 
-    if loaded {
-        // Somos el segundo. Notificamos al primero.
-        select {
-        case waiter.peer <- conn:
-            bridge(conn, waiter.conn)
-        default:
-            // Si el canal estaba lleno o cerrado, limpiamos
-            conn.Close()
-        }
-        linkMatches.Delete(pairKey)
-    } else {
-        // Somos el primero. Esperamos al compañero.
-        select {
-        case peerConn := <-waiter.peer:
-            bridge(conn, peerConn)
-        case <-time.After(45 * time.Second):
-            linkMatches.Delete(pairKey)
-            conn.Close()
-        }
-    }
+	if loaded {
+		// Somos el segundo. Notificamos al primero.
+		select {
+		case waiter.peer <- conn:
+			bridge(conn, waiter.conn)
+		default:
+			// Si el canal estaba lleno o cerrado, limpiamos
+			conn.Close()
+		}
+		linkMatches.Delete(pairKey)
+	} else {
+		// Somos el primero. Esperamos al compañero.
+		select {
+		case peerConn := <-waiter.peer:
+			bridge(conn, peerConn)
+		case <-time.After(45 * time.Second):
+			linkMatches.Delete(pairKey)
+			conn.Close()
+		}
+	}
 }
 
 func bridge(c1, c2 *websocket.Conn) {
-    log.Println("[Bridge] Iniciando túnel entre dos emuladores")
-    
-    // Usamos un canal para detectar cuando cualquiera de los dos falla
-    done := make(chan struct{}, 2)
+	log.Println("[Bridge] Iniciando túnel entre dos emuladores")
 
-    copyWS := func(dst, src *websocket.Conn) {
-        defer func() { done <- struct{}{} }()
-        for {
-            // Leemos el tipo de mensaje para mantener la integridad del protocolo
-            mt, msg, err := src.ReadMessage()
-            if err != nil {
-                return
-            }
-            if err := dst.WriteMessage(mt, msg); err != nil {
-                return
-            }
-        }
-    }
+	// Usamos un canal para detectar cuando cualquiera de los dos falla
+	done := make(chan struct{}, 2)
 
-    go copyWS(c1, c2)
-    go copyWS(c2, c1)
+	copyWS := func(dst, src *websocket.Conn) {
+		defer func() { done <- struct{}{} }()
+		for {
+			// Leemos el tipo de mensaje para mantener la integridad del protocolo
+			mt, msg, err := src.ReadMessage()
+			if err != nil {
+				return
+			}
+			if err := dst.WriteMessage(mt, msg); err != nil {
+				return
+			}
+		}
+	}
 
-    // Esperamos a que la primera goroutine termine
-    <-done
-    
-    // CERRAMOS AMBOS: Esto es vital para que el cliente Python 
-    // reciba un error de conexión limpia y pueda reconectar.
-    c1.Close()
-    c2.Close()
-    log.Println("[Bridge] Túnel cerrado por desconexión de un extremo")
+	go copyWS(c1, c2)
+	go copyWS(c2, c1)
+
+	// Esperamos a que la primera goroutine termine
+	<-done
+
+	// CERRAMOS AMBOS: Esto es vital para que el cliente Python
+	// reciba un error de conexión limpia y pueda reconectar.
+	c1.Close()
+	c2.Close()
+	log.Println("[Bridge] Túnel cerrado por desconexión de un extremo")
 }
 
 func handleConnection(w http.ResponseWriter, r *http.Request) {
@@ -395,7 +395,7 @@ func handleConnection(w http.ResponseWriter, r *http.Request) {
 	welcome := make([]byte, 4)
 	binary.LittleEndian.PutUint32(welcome, uint32(id))
 	if err := conn.WriteMessage(websocket.BinaryMessage, welcome); err != nil {
-			log.Println("Error enviando ID de bienvenida:", err)
+		log.Println("Error enviando ID de bienvenida:", err)
 		conn.Close()
 		select {
 		case freeIDs <- id:
@@ -413,7 +413,7 @@ func handleConnection(w http.ResponseWriter, r *http.Request) {
 
 	client := newClient(conn, SendBufPerClient, id)
 	clients.Store(client, id)
-		log.Printf("Cliente conectado: id=%d addr=%s", client.id, client.addr)
+	log.Printf("Cliente conectado: id=%d addr=%s", client.id, client.addr)
 
 	go client.writerLoop(5 * time.Second)
 	go client.pingLoop(10*time.Second, 5*time.Second)
@@ -423,21 +423,35 @@ func handleConnection(w http.ResponseWriter, r *http.Request) {
 		if err != nil {
 			break
 		}
-		if len(msg) < 24 {
+		if len(msg) < 1 {
 			continue
 		}
 
-		start := time.Now()
-		var p Packet
-		p.PlayerID = uint32(client.id)
-		p.PlayerX = int32(binary.LittleEndian.Uint32(msg[4:8]))
-		p.PlayerY = int32(binary.LittleEndian.Uint32(msg[8:12]))
-		p.MapNumber = int32(binary.LittleEndian.Uint32(msg[12:16]))
-		p.MapBank = int32(binary.LittleEndian.Uint32(msg[16:20]))
-		p.IsOverworld = binary.LittleEndian.Uint32(msg[20:24])
+		typeByte := msg[0]
+		payload := msg[1:]
 
-		latestPackets[client.id].Store(&p)
-		recordMetrics(1, 0, time.Since(start))
+		if typeByte == 0x01 { // Game Data
+			if len(payload) < 24 {
+				continue
+			}
+			start := time.Now()
+			var p Packet
+			p.PlayerID = uint32(client.id)
+			p.PlayerX = int32(binary.LittleEndian.Uint32(payload[4:8]))
+			p.PlayerY = int32(binary.LittleEndian.Uint32(payload[8:12]))
+			p.MapNumber = int32(binary.LittleEndian.Uint32(payload[12:16]))
+			p.MapBank = int32(binary.LittleEndian.Uint32(payload[16:20]))
+			p.IsOverworld = binary.LittleEndian.Uint32(payload[20:24])
+
+			latestPackets[client.id].Store(&p)
+			recordMetrics(1, 0, time.Since(start))
+		} else if typeByte == 0x02 { // Chat Message
+			chatMsg := string(payload)
+			log.Printf("[Chat] id=%d msg=%s", client.id, chatMsg)
+
+			// Broadcast chat message immediately
+			broadcastChatMessage(client.id, chatMsg)
+		}
 	}
 
 	client.close()
@@ -473,6 +487,27 @@ func handleServers(w http.ResponseWriter, _ *http.Request) {
 }
 
 // ------------------ BROADCAST ------------------
+
+func broadcastChatMessage(senderID int, msg string) {
+	// Prefix 0x02 + senderID (4 bytes) + msg
+	buf := make([]byte, 1+4+len(msg))
+	buf[0] = 0x02
+	binary.LittleEndian.PutUint32(buf[1:5], uint32(senderID))
+	copy(buf[5:], []byte(msg))
+
+	clients.Range(func(key, value any) bool {
+		c := key.(*Client)
+		if c.id == senderID {
+			return true // Don't send back to sender
+		}
+		select {
+		case c.send <- buf:
+		default:
+			c.close()
+		}
+		return true
+	})
+}
 
 func broadcastLoop() {
 	ticker := time.NewTicker(time.Millisecond * time.Duration(BroadcastMs))
@@ -522,6 +557,8 @@ func processAndBroadcast(accum []Packet) {
 func serializePackets(data []Packet) []byte {
 	buf := bufferPool.Get().(*bytes.Buffer)
 	buf.Reset()
+
+	buf.WriteByte(0x01) // Game Data Prefix
 
 	var tmp [24]byte
 	for _, p := range data {
