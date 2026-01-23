@@ -59,6 +59,7 @@ var linkMatches sync.Map
 type linkWaiter struct {
 	conn *websocket.Conn
 	peer chan *websocket.Conn
+	done chan struct{} // Signal to notify B when bridge finishes
 }
 
 // ------------------ SERVERS LIST ------------------
@@ -314,25 +315,33 @@ func handleLink(w http.ResponseWriter, r *http.Request) {
 	actual, loaded := linkMatches.LoadOrStore(pairKey, &linkWaiter{
 		conn: conn,
 		peer: make(chan *websocket.Conn, 1),
+		done: make(chan struct{}),
 	})
 
 	waiter := actual.(*linkWaiter)
 
 	if loaded {
-		// Somos el segundo. Notificamos al primero.
+		// Somos el segundo (B).
 		select {
 		case waiter.peer <- conn:
-			bridge(conn, waiter.conn)
+			// Entregamos nuestra conexión a A.
+			// Esperamos a que A termine el bridge para salir.
+			<-waiter.done
 		default:
 			// Si el canal estaba lleno o cerrado, limpiamos
 			conn.Close()
 		}
 		linkMatches.Delete(pairKey)
 	} else {
-		// Somos el primero. Esperamos al compañero.
+		// Somos el primero (A).
 		select {
 		case peerConn := <-waiter.peer:
+			// Recibimos la conexión de B.
+			// Ejecutamos el bridge (bloqueante).
 			bridge(conn, peerConn)
+
+			// Al terminar, avisamos a B para que pueda salir
+			close(waiter.done)
 		case <-time.After(45 * time.Second):
 			linkMatches.Delete(pairKey)
 			conn.Close()
