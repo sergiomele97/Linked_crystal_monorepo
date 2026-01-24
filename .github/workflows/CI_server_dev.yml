@@ -1,4 +1,4 @@
-name: backend_tests
+name: CI_server_dev
 
 on:
   push:
