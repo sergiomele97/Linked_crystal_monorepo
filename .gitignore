@@ -11,3 +11,5 @@ __pycache__/
 # Environment variables
 **/.env
 
+# Go binaries
+__debug_bin*
