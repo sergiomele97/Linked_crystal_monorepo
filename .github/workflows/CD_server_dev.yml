@@ -1,12 +1,15 @@
-name: deployServer_development
+name: CD_server_dev
 
 on:
-  push:
-    branches:
-      - main
+  workflow_run:
+    workflows: ["CI_server_dev"]
+    types:
+      - completed
 
 jobs:
   build-and-deploy:
+    # Only run if the test workflow succeeded
+    if: ${{ github.event.workflow_run.conclusion == 'success' }}
     environment: development
     runs-on: self-hosted
     steps:
