@@ -221,9 +221,12 @@ func (c *Client) pingLoop(interval, timeout time.Duration) {
 // ------------------ INITIALIZATION ------------------
 
 func InitGame() {
-	// Cargar .env si existe
+	// Cargar .env: Intentar local y parent directory (para flexibilidad src vs root)
 	if err := godotenv.Load(); err != nil {
-		log.Println("⚠️ No se encontró .env, usando variables de entorno del sistema")
+		// Fallback: Try loading from parent (useful if binary is in bin/ or running from src/ but env is at root)
+		if err := godotenv.Load("../.env"); err != nil {
+			log.Println("⚠️ No se encontró .env, usando variables de entorno del sistema")
+		}
 	}
 
 	envServers := os.Getenv("SERVERS")
