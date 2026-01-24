@@ -26,7 +26,7 @@ func TestStress(t *testing.T) {
 				conn, _, err := websocket.DefaultDialer.Dial(url, nil)
 				if err != nil {
 					// It's acceptable if the server rejects under load, but here we expect it to hold
-					t.Logf("Stress connection failed: %v", err)
+					// t.Logf("Stress connection failed: %v", err)
 					return
 				}
 				// Handshake

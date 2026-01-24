@@ -35,6 +35,6 @@ func TestAuth(t *testing.T) {
 		if id < 0 {
 			t.Error("Expected valid ID")
 		}
-		t.Logf("Connected with ID: %d", id)
+		t.Logf("✅ Connected with ID: %d", id)
 	})
 }

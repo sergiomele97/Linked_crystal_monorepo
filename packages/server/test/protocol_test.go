@@ -61,7 +61,7 @@ func TestProtocol(t *testing.T) {
 				}
 			}
 		}
-		t.Logf("Client %d received broadcast", idB)
+		t.Logf("✅ Client %d received broadcast", idB)
 	})
 
 	// PROTO-04 & 05: Chat

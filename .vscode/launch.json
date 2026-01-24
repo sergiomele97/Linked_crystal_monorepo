@@ -23,6 +23,17 @@
             "request": "launch",
             "mode": "debug",
             "program": "${workspaceFolder}/packages/server/src",
+            "console": "integratedTerminal"
+        },
+        {
+            "name": "Go: test backend",
+            "type": "go",
+            "request": "launch",
+            "mode": "test",
+            "program": "${workspaceFolder}/packages/server/test",
+            "args": [
+                "-test.v"
+            ],
             "cwd": "${workspaceFolder}/packages/server",
             "console": "integratedTerminal"
         }

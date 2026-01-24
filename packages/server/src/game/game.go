@@ -183,7 +183,7 @@ func (c *Client) close() {
 			case freeIDs <- c.id:
 			default:
 			}
-			log.Printf("Cliente desconectado: id=%d addr=%s", c.id, c.addr)
+			//[DEBUG] log.Printf("Cliente desconectado: id=%d addr=%s", c.id, c.addr)
 			c.id = -1
 		}
 		_ = c.conn.Close()
@@ -372,7 +372,7 @@ func HandleConnection(w http.ResponseWriter, r *http.Request) {
 
 	client := newClient(conn, SendBufPerClient, id)
 	clients.Store(client, id)
-	log.Printf("Cliente conectado: id=%d addr=%s", client.id, client.addr)
+	//[DEBUG] log.Printf("Cliente conectado: id=%d addr=%s", client.id, client.addr)
 
 	go client.writerLoop(5 * time.Second)
 	go client.pingLoop(10*time.Second, 5*time.Second)
@@ -406,7 +406,7 @@ func HandleConnection(w http.ResponseWriter, r *http.Request) {
 			recordMetrics(1, 0, time.Since(start))
 		} else if typeByte == 0x02 { // Chat Message
 			chatMsg := string(payload)
-			log.Printf("[Chat] id=%d msg=%s", client.id, chatMsg)
+			//[DEBUG]log.Printf("[Chat] id=%d msg=%s", client.id, chatMsg)
 			broadcastChatMessage(client.id, chatMsg)
 		}
 	}
