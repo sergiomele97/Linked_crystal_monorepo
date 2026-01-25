@@ -52,7 +52,6 @@
             "request": "launch",
             "mode": "auto",
             "noDebug": true,
-            "preLaunchTask": "Wait 2s", // Espera a que el server levante el puerto
             "program": "${workspaceFolder}/packages/server/src/cost/hardware/stress.go", 
             "args": ["-clients=500", "-freq=100ms"],
             "console": "integratedTerminal"
