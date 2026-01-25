@@ -146,6 +146,8 @@ func main() {
 			{"name": "CPU Usage", "value": h.HW.CPUUsage, "unit": "%"},
 			{"name": "Latency", "value": h.Net.LatencyMs, "unit": "ms"},
 			{"name": "RAM per Client", "value": h.HW.MemPerClientKB, "unit": "KB"},
+			{"name": "Failure Count", "value": atomic.LoadInt32(&errors), "unit": "count"},
+			{"name": "Active Players", "value": atomic.LoadInt32(&connected), "unit": "count"},
 		}
 
 		json.NewEncoder(os.Stdout).Encode(results)
