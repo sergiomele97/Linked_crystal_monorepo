@@ -12,7 +12,7 @@ import (
 // ------------------ CONFIG ------------------
 
 const (
-	MaxClients       = 1024
+	MaxClients       = 500
 	BroadcastMs      = 100
 	SendBufPerClient = 32
 	ReadLimit        = 1024

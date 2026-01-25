@@ -38,6 +38,7 @@ func main() {
 	mux.HandleFunc("/servers", hub.HandleServers)
 
 	go hub.BroadcastLoop()
+	go hub.StartHardwareMonitor()
 
 	log.Printf("🚀 Servidor [%s] corriendo en el puerto %s", env, port)
 	log.Fatal(http.ListenAndServe(":"+port, mux))

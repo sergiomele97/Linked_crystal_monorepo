@@ -12,18 +12,27 @@ import (
 
 var upgrader = websocket.Upgrader{
 	CheckOrigin:       func(r *http.Request) bool { return true },
-	ReadBufferSize:    256,
-	WriteBufferSize:   256,
+	ReadBufferSize:    1024, // ✂️ Subido de 256 para evitar fragmentación en stress
+	WriteBufferSize:   1024,
 	EnableCompression: false,
 }
 
-// HandleConnection handles WebSocket requests from clients.
 func HandleConnection(w http.ResponseWriter, r *http.Request) {
 	var id int
 	select {
 	case id = <-freeIDs:
 	default:
 		http.Error(w, "server full", http.StatusServiceUnavailable)
+		return
+	}
+
+	// ✂️ SEGURIDAD: Validar que el ID sea válido para el array latestPackets
+	if id < 0 || id >= len(latestPackets) {
+		log.Printf("⚠️ ID recibido fuera de rango: %d", id)
+		select {
+		case freeIDs <- id:
+		default:
+		}
 		return
 	}
 
@@ -39,7 +48,6 @@ func HandleConnection(w http.ResponseWriter, r *http.Request) {
 	welcome := make([]byte, 4)
 	binary.LittleEndian.PutUint32(welcome, uint32(id))
 	if err := conn.WriteMessage(websocket.BinaryMessage, welcome); err != nil {
-		log.Println("Error enviando ID de bienvenida:", err)
 		conn.Close()
 		select {
 		case freeIDs <- id:
@@ -74,22 +82,32 @@ func HandleConnection(w http.ResponseWriter, r *http.Request) {
 		payload := msg[1:]
 
 		if typeByte == 0x01 { // Game Data
+			// ✂️ SEGURIDAD: Payload debe ser suficiente para los offsets usados
 			if len(payload) < 24 {
 				continue
 			}
+
 			start := time.Now()
 			var p Packet
 			p.PlayerID = uint32(client.id)
+
+			// Usamos offsets consistentes con el payload[1:]
 			p.PlayerX = int32(binary.LittleEndian.Uint32(payload[4:8]))
 			p.PlayerY = int32(binary.LittleEndian.Uint32(payload[8:12]))
 			p.MapNumber = int32(binary.LittleEndian.Uint32(payload[12:16]))
 			p.MapBank = int32(binary.LittleEndian.Uint32(payload[16:20]))
 			p.IsOverworld = binary.LittleEndian.Uint32(payload[20:24])
 
-			latestPackets[client.id].Store(&p)
-			RecordMetrics(1, 0, time.Since(start))
+			// ✂️ El punto del PANIC: Validamos el ID antes de guardar
+			if client.id >= 0 && client.id < len(latestPackets) {
+				latestPackets[client.id].Store(&p)
+				RecordMetrics(1, 0, time.Since(start))
+			}
+
 		} else if typeByte == 0x02 { // Chat Message
-			broadcastChatMessage(client.id, string(payload))
+			if len(payload) > 0 {
+				broadcastChatMessage(client.id, string(payload))
+			}
 		}
 	}
 
@@ -110,34 +128,40 @@ func broadcastChatMessage(senderID int, msg string) {
 		select {
 		case c.send <- buf:
 		default:
+			// Si el canal está lleno, cerramos cliente lento para proteger el server
 			c.Close()
 		}
 		return true
 	})
 }
 
-// HandleHealth returns server health metrics.
 func HandleHealth(w http.ResponseWriter, _ *http.Request) {
-	count := 0
-	clients.Range(func(key, value any) bool {
-		count++
-		return true
-	})
+	clientCount := 0
+	clients.Range(func(_, _ any) bool { clientCount++; return true })
 
-	recvRate, sendRate, latencyMs := GetAverages()
+	recvRate, sendRate, latency := GetAverages()
+	hw := GetHardwareStats()
+
 	resp := map[string]any{
-		"status":     "ok",
-		"clients":    count,
-		"recv_rate":  recvRate,
-		"send_rate":  sendRate,
-		"latency_ms": latencyMs,
-		"timestamp":  time.Now().UTC(),
+		"status": "ok",
+		"net": map[string]any{
+			"clients":    clientCount,
+			"recv_rate":  recvRate,
+			"send_rate":  sendRate,
+			"latency_ms": latency,
+		},
+		"hw": map[string]any{
+			"mem_per_client_kb": hw.MemPerClientKB,
+			"total_rss_mb":      hw.TotalRSS_MB,
+			"cpu_percent":       hw.CPU_Usage,
+		},
+		"uptime_sec": time.Since(startTime).Seconds(),
 	}
+
 	w.Header().Set("Content-Type", "application/json")
 	json.NewEncoder(w).Encode(resp)
 }
 
-// HandleServers returns the list of known servers.
 func HandleServers(w http.ResponseWriter, _ *http.Request) {
 	w.Header().Set("Content-Type", "application/json")
 	json.NewEncoder(w).Encode(Servers)

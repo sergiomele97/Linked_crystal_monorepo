@@ -10,10 +10,12 @@ var (
 	freeIDs       = make(chan int, MaxClients)
 	latestPackets = make([]atomic.Value, MaxClients)
 	clients       sync.Map
+	startTime     time.Time
 )
 
 // InitHub prepares the client registry and ID pool.
 func InitHub() {
+	startTime = time.Now()
 	for i := 0; i < MaxClients; i++ {
 		select {
 		case freeIDs <- i:
