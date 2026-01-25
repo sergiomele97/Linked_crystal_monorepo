@@ -1,0 +1,16 @@
+{
+    "version": "2.0.0",
+    "tasks": [
+        {
+            "label": "Copy Source to Clipboard",
+            "type": "shell",
+            "command": "find ${workspaceFolder}/packages/server/src/cmd/server/main.go ${workspaceFolder}/packages/server/src/internal/hub/*.go -type f -exec printf \"\\n--- FILE: %s ---\\n\" {} \\; -exec cat {} \\; | xclip -selection clipboard -verbose",
+            "presentation": {
+                "reveal": "always",
+                "panel": "shared",
+                "clear": true
+            },
+            "problemMatcher": []
+        }
+    ]
+}

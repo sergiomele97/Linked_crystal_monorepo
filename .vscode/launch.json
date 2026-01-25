@@ -2,7 +2,7 @@
     "version": "0.2.0",
     "configurations": [
         {
-            "name": "Python: cliente",
+            "name": "Run: python client",
             "type": "debugpy",
             "request": "launch",
             "program": "${workspaceFolder}/packages/app/APKbuilder/src/main.py",
@@ -10,7 +10,7 @@
             "console": "integratedTerminal"
         },
         {
-            "name": "Python: cliente-mock",
+            "name": "Run: python client-mock",
             "type": "debugpy",
             "request": "launch",
             "program": "${workspaceFolder}/packages/server/src/client-mock/client_example.py",
@@ -18,7 +18,7 @@
             "console": "integratedTerminal"
         },
         {
-            "name": "Go: server",
+            "name": "Run: Go server",
             "type": "go",
             "request": "launch",
             "mode": "debug",
@@ -26,7 +26,7 @@
             "console": "integratedTerminal"
         },
         {
-            "name": "Go: test backend",
+            "name": "Test: Go server",
             "type": "go",
             "request": "launch",
             "mode": "test",
@@ -36,15 +36,24 @@
             ],
             "cwd": "${workspaceFolder}/packages/server",
             "console": "integratedTerminal"
+        },
+        {
+            "name": "Script: Copy go source",
+            "type": "node",
+            "request": "launch",
+            "runtimeExecutable": "echo",
+            "runtimeArgs": ["Copiado al portapapeles"],
+            "preLaunchTask": "Copy Source to Clipboard",
+            "console": "internalConsole"
         }
     ],
     "compounds": [
         {
-            "name": "Development: Python + Go + Mock-client",
+            "name": "Run: Python + Go + Mock-client",
             "configurations": [
-                "Python: cliente",
-                "Python: cliente-mock",
-                "Go: server"
+                "Run: python client",
+                "Run: python client-mock",
+                "Run: Go server"
             ]
         }
     ]
