@@ -5,11 +5,12 @@ import (
 	"net/http"
 	"os"
 
-	"example.com/hello/src/game"
+	"example.com/hello/internal/hub"
 )
 
 func main() {
-	game.InitGame()
+	hub.InitConfig()
+	hub.InitHub()
 
 	staticToken := os.Getenv("STATIC_TOKEN")
 	if staticToken == "" {
@@ -23,7 +24,7 @@ func main() {
 			http.Error(w, "unauthorized", http.StatusUnauthorized)
 			return
 		}
-		game.HandleConnection(w, r)
+		hub.HandleConnection(w, r)
 	})
 
 	http.HandleFunc("/link", func(w http.ResponseWriter, r *http.Request) {
@@ -31,13 +32,13 @@ func main() {
 			http.Error(w, "unauthorized", http.StatusUnauthorized)
 			return
 		}
-		game.HandleLink(w, r)
+		hub.HandleLink(w, r)
 	})
 
-	http.HandleFunc("/health", game.HandleHealth)
-	http.HandleFunc("/servers", game.HandleServers)
+	http.HandleFunc("/health", hub.HandleHealth)
+	http.HandleFunc("/servers", hub.HandleServers)
 
-	go game.BroadcastLoop()
+	go hub.BroadcastLoop()
 
 	port := os.Getenv("PORT")
 	if port == "" {

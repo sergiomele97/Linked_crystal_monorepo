@@ -28,7 +28,7 @@ jobs:
         uses: actions/setup-go@v4
         with:
           go-version: '1.25'
-          cache-dependency-path: packages/server/go.sum 
+          cache-dependency-path: packages/server/src/go.sum 
 
       # ⚡ 4️⃣ Cache adicional persistente (opcional)
       - name: Cache Go build
@@ -41,9 +41,9 @@ jobs:
 
       # 🧱 5️⃣ Compilar el servidor
       - name: Build Go server
-        working-directory: packages/server
+        working-directory: packages/server/src
         run: |
-          GOMAXPROCS=1 go build -v -x -ldflags="-s -w" -o server ./src
+          GOMAXPROCS=1 go build -v -x -ldflags="-s -w" -o server ./cmd/server
 
       # 🔁 6️⃣ Configurar variables de entorno y reiniciar servicio systemd
       - name: Deploy WebSocket service

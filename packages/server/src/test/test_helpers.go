@@ -9,8 +9,7 @@ import (
 	"sync"
 	"testing"
 
-	"example.com/hello/src/game"
-
+	"example.com/hello/internal/hub"
 	"github.com/gorilla/websocket"
 )
 
@@ -21,8 +20,8 @@ var (
 
 // Helper to start a test server with the Auth middleware
 func startTestServer() *httptest.Server {
-	// Initialize game state
-	game.InitGame()
+	// Initialize hub state
+	hub.InitHub()
 
 	// Ensure token is set for tests
 	os.Setenv("STATIC_TOKEN", "test_token")
@@ -35,19 +34,19 @@ func startTestServer() *httptest.Server {
 			http.Error(w, "unauthorized", http.StatusUnauthorized)
 			return
 		}
-		game.HandleConnection(w, r)
+		hub.HandleConnection(w, r)
 	})
 	mux.HandleFunc("/link", func(w http.ResponseWriter, r *http.Request) {
 		if r.URL.Query().Get("token") != staticToken {
 			http.Error(w, "unauthorized", http.StatusUnauthorized)
 			return
 		}
-		game.HandleLink(w, r)
+		hub.HandleLink(w, r)
 	})
 
 	// Avoid multiple broadcast loops in tests if possible, or just accept one global
 	testOnce.Do(func() {
-		go game.BroadcastLoop()
+		go hub.BroadcastLoop()
 	})
 
 	return httptest.NewServer(mux)
