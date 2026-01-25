@@ -13,21 +13,9 @@
             "problemMatcher": []
         },
         {
-            "label": "Wait 2s",
-            "type": "shell",
-            "command": "sleep 2"
-        },
-        {
-            "label": "Wait 5s",
-            "type": "shell",
-            "command": "sleep 5"
-        },
-        {
             "label": "Pprof Analysis",
             "type": "shell",
             "command": "go tool pprof -top http://localhost:8080/debug/pprof/profile?seconds=10",
-            "dependsOrder": "sequence",
-            "dependsOn": ["Wait 5s"],
             "problemMatcher": []
         }
     ]
