@@ -1,0 +1,28 @@
+<EmulatorScreen>:
+    FloatLayout:
+
+        ControlPad:
+            id: control_pad
+            size_hint: 1, 0.55
+            pos_hint: {"x": 0, "y": 0}
+        
+        ImageButton:
+            id: chatButton
+            source: 'resources/image/chat.png'
+            size_hint: 0.1, 0.1
+            pos_hint: {"x": 0.05, "y": 0.45}
+            on_press: root.onChatPressed()
+
+        ImageButton:
+            id: menuButton
+            source: 'resources/image/menu.png'
+            size_hint: 0.1, 0.1
+            pos_hint: {"x": 0.85, "y": 0.45}
+            on_press: root.onMenuPressed(self)
+
+        VideoDisplay:
+            id: video_display
+            size_hint: 1, 0.45
+            pos_hint: {"x": 0, "top": 1}
+
+

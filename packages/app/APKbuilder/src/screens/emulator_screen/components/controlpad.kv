@@ -1,0 +1,71 @@
+<ControlPad>:
+    canvas.before:
+        Color:
+            rgba: 0.478, 0.788, 0.263, 1  # Verde #7AC943
+        Rectangle:
+            pos: self.pos
+            size: self.size
+
+    ImageButton:
+        id: up
+        source: 'resources/image/up.png'
+        size_hint: 0.15, 0.15
+        pos_hint: {"x": 0.15, "y": 0.55}
+        on_press: root.press("up")
+        on_release: root.release("up")
+
+    ImageButton:
+        id: down
+        source: 'resources/image/down.png'
+        size_hint: 0.15, 0.15
+        pos_hint: {"x": 0.15, "y": 0.25}
+        on_press: root.press("down")
+        on_release: root.release("down")
+
+    ImageButton:
+        id: left
+        source: 'resources/image/left.png'
+        size_hint: 0.15, 0.15
+        pos_hint: {"x": 0.05, "y": 0.40}
+        on_press: root.press("left")
+        on_release: root.release("left")
+
+    ImageButton:
+        id: right
+        source: 'resources/image/right.png'
+        size_hint: 0.15, 0.15
+        pos_hint: {"x": 0.25, "y": 0.40}
+        on_press: root.press("right")
+        on_release: root.release("right")
+
+    ImageButton:
+        id: a
+        source: 'resources/image/a-button.png'
+        size_hint: 0.15, 0.15
+        pos_hint: {"x": 0.8, "y": 0.45}
+        on_press: root.press("a")
+        on_release: root.release("a")
+
+    ImageButton:
+        id: b
+        source: 'resources/image/b-button.png'
+        size_hint: 0.15, 0.15
+        pos_hint: {"x": 0.65, "y": 0.35}
+        on_press: root.press("b")
+        on_release: root.release("b")
+
+    ImageButton:
+        id: start
+        source: 'resources/image/start.png'
+        size_hint: 0.15, 0.1
+        pos_hint: {"x": 0.5, "y": 0.10}
+        on_press: root.press("start")
+        on_release: root.release("start")
+
+    ImageButton:
+        id: select
+        source: 'resources/image/select.png'
+        size_hint: 0.15, 0.1
+        pos_hint: {"x": 0.35, "y": 0.10}
+        on_press: root.press("select")
+        on_release: root.release("select")

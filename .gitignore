@@ -1,0 +1,15 @@
+# Virtual environment
+**/.venv/
+**/venv/
+
+# PyCharm/JetBrains configuration
+.idea/
+
+# Python bytecode cache
+__pycache__/
+ 
+# Environment variables
+**/.env
+
+# Go binaries
+__debug_bin*
