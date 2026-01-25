@@ -2,15 +2,14 @@
 
 This document defines the expected behavior of the WebSocket server. It serves as the source of truth for testing.
 
-## 1. Configuration & Environment
-The server behavior is controlled by the following environment variables:
+## 1. Environment variables
 
+-   `ENV`: Environment mode (e.g., `local`, `production`).
 -   `PORT`: Server port (default: `8080`).
 -   `STATIC_TOKEN`: Shared secret for authentication (default: `demo_token`).
 -   `SERVERS`: Comma-separated list of known server URLs for `/servers` endpoint.
--   `ENV`: Environment mode (e.g., `local`, `production`).
 
-## 2. Limits & Constraints
+## 2. Parameters
 -   **Max Clients**: 1024 simultaneous connections. Returns `503 Service Unavailable` if full.
 -   **Max Packet Size**: 1024 bytes. Exceeding this closes the connection.
 -   **Broadcast Rate**: 10Hz (Every 100ms).
