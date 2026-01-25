@@ -1,3 +1,9 @@
+# Seguimiento automático de rendimiento
+
+La pipeline CH_server.yml ejecuta automáticamente el test de estrés y lo plasma en el dashboard de GitHub pages:
+
+https://sergiomele97.github.io/Linked_crystal_monorepo/dev/bench/
+
 # Guía de cuantificación de rendimiento
 
 ## 1. Medir
