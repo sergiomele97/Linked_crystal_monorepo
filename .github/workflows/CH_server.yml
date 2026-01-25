@@ -1,4 +1,4 @@
-name: Quantify hardware cost
+name: Hardware cost tracker server
 
 on:
   push:
@@ -8,7 +8,7 @@ on:
 
 jobs:
   benchmark:
-    name: Quantify hardware cost
+    name: Hardware cost tracker server
     runs-on: ubuntu-latest
     permissions:
       contents: write
@@ -44,12 +44,13 @@ jobs:
         uses: benchmark-action/github-action-benchmark@v1
         with:
           name: Go Backend Performance
-          tool: 'customGeneric'
+          tool: 'customSmallerIsBetter'
           output-file-path: 'packages/server/src/results.json'
           github-token: ${{ secrets.GITHUB_TOKEN }}
           auto-push: true
           # Los resultados se guardarán en la rama 'gh-pages' para visualización
           gh-pages-branch: gh-pages
+          benchmark-data-dir-path: dev/bench
           # Alerta si hay regresión mayor al 20%
           alert-threshold: '120%'
           comment-on-alert: true
