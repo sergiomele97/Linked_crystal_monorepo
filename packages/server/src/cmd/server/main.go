@@ -3,6 +3,7 @@ package main
 import (
 	"log"
 	"net/http"
+	"net/http/pprof"
 	"os"
 
 	"example.com/hello/internal/hub"
@@ -11,11 +12,22 @@ import (
 func main() {
 	hub.InitConfig()
 	hub.InitHub()
-	
+
+	env := getEnv("ENV", "local")
 	staticToken := getEnv("STATIC_TOKEN", "demo_token")
 	port := getEnv("PORT", "8080")
 
 	mux := http.NewServeMux()
+
+	// --- [CUT] Seguridad: pprof solo disponible en local ---
+	if env == "local" {
+		log.Println("🛠️  Modo local detectado: Habilitando pprof en /debug/pprof/")
+		mux.HandleFunc("/debug/pprof/", pprof.Index)
+		mux.HandleFunc("/debug/pprof/cmdline", pprof.Cmdline)
+		mux.HandleFunc("/debug/pprof/profile", pprof.Profile)
+		mux.HandleFunc("/debug/pprof/symbol", pprof.Symbol)
+		mux.HandleFunc("/debug/pprof/trace", pprof.Trace)
+	}
 
 	// Rutas protegidas
 	mux.HandleFunc("/ws", authMiddleware(hub.HandleConnection, staticToken))
@@ -27,7 +39,7 @@ func main() {
 
 	go hub.BroadcastLoop()
 
-	log.Printf("🚀 Servidor corriendo en el puerto %s", port)
+	log.Printf("🚀 Servidor [%s] corriendo en el puerto %s", env, port)
 	log.Fatal(http.ListenAndServe(":"+port, mux))
 }
 
@@ -35,7 +47,7 @@ func getEnv(key, fallback string) string {
 	if value, ok := os.LookupEnv(key); ok {
 		return value
 	}
-	log.Printf("⚠️ %s no definido, usando default: %s", key, fallback)
+	log.Printf("⚠️  %s no definido, usando default: %s", key, fallback)
 	return fallback
 }
 
