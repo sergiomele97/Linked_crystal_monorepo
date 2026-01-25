@@ -77,6 +77,7 @@ func GetAverages() (recvRate, sendRate, latencyMs float64) {
 	var recvTotal, sendTotal int64
 	var latSumTotal int64
 	var latCountTotal int64
+	var activeBuckets int64
 
 	for i := 0; i < windowSize; i++ {
 		ts := atomic.LoadInt64(&buckets[i].timestamp)
@@ -85,11 +86,15 @@ func GetAverages() (recvRate, sendRate, latencyMs float64) {
 			sendTotal += atomic.LoadInt64(&buckets[i].sendCount)
 			latSumTotal += atomic.LoadInt64(&buckets[i].latSum)
 			latCountTotal += atomic.LoadInt64(&buckets[i].latCount)
+			activeBuckets++
 		}
 	}
 
-	recvRate = float64(recvTotal) / float64(windowSize)
-	sendRate = float64(sendTotal) / float64(windowSize)
+	if activeBuckets > 0 {
+		recvRate = float64(recvTotal) / float64(activeBuckets)
+		sendRate = float64(sendTotal) / float64(activeBuckets)
+	}
+
 	if latCountTotal > 0 {
 		latencyMs = float64(latSumTotal) / float64(latCountTotal) / 1e6
 	}

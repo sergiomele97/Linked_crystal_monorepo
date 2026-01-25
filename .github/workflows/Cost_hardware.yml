@@ -1,0 +1,56 @@
+name: Quantify hardware cost
+
+on:
+  push:
+    branches: [ main, master ]
+  pull_request:
+    branches: [ main, master ]
+
+jobs:
+  benchmark:
+    name: Quantify hardware cost
+    runs-on: ubuntu-latest
+    permissions:
+      contents: write
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Set up Go
+        uses: actions/setup-go@v4
+        with:
+          go-version: '1.21'
+          cache-dependency-path: packages/server/src/go.sum
+
+      - name: Run Server and Execute Stress Test
+        run: |
+          cd packages/server/src
+          # Iniciar servidor en segundo plano
+          go run cmd/server/main.go & 
+          
+          # Esperar a que el servidor esté listo
+          sleep 10
+          
+          # Ejecutar el test de estrés en modo benchmark
+          # -bench activa la salida JSON
+          # -duration 20 define el tiempo de la prueba
+          # -clients 500 define el volumen de carga
+          go run cost/hardware/stress.go -bench -duration 20 -clients 500 > results.json
+          
+          # Mostrar resultados para debug en los logs de la acción
+          cat results.json
+
+      - name: Store benchmark result
+        uses: benchmark-action/github-action-benchmark@v1
+        with:
+          name: Go Backend Performance
+          tool: 'customGeneric'
+          output-file-path: 'packages/server/src/results.json'
+          github-token: ${{ secrets.GITHUB_TOKEN }}
+          auto-push: true
+          # Los resultados se guardarán en la rama 'gh-pages' para visualización
+          gh-pages-branch: gh-pages
+          # Alerta si hay regresión mayor al 20%
+          alert-threshold: '120%'
+          comment-on-alert: true
+          fail-on-alert: false
