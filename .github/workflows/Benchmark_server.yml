@@ -1,10 +1,10 @@
-name: Hardware cost tracker server
+name: Benchmark server
 
 on:
   push:
-    branches: [ main, master ]
+    branches: [ main ]
   pull_request:
-    branches: [ main, master ]
+    branches: [ main ]
   workflow_dispatch:
     inputs:
       clients:

@@ -1,0 +1,56 @@
+name: CD_server_pro
+
+on:
+  workflow_dispatch:
+
+jobs:
+  deploy:
+    environment: production
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Setup Go
+        uses: actions/setup-go@v5
+        with:
+          go-version: '1.25.3'
+          cache-dependency-path: packages/server/src/go.sum
+
+      - name: Build Go binary (to verify build)
+        working-directory: packages/server/src
+        run: |
+          go mod download
+          CGO_ENABLED=0 GOOS=linux go build -v -o ../server-bin ./cmd/server
+
+      - name: Deploy to Server via SSH
+        uses: appleboy/scp-action@v0.1.7
+        with:
+          host: ${{ secrets.SERVER_HOST }}
+          username: ${{ secrets.SERVER_USER }}
+          key: ${{ secrets.SSH_PRIVATE_KEY }}
+          source: "packages/server/Dockerfile,packages/server/docker-compose.yml,packages/server/src"
+          target: "~/linked-crystal-deploy"
+          strip_components: 1
+
+      - name: Execute Remote Docker Compose
+        uses: appleboy/ssh-action@v1.0.3
+        with:
+          host: ${{ secrets.SERVER_HOST }}
+          username: ${{ secrets.SERVER_USER }}
+          key: ${{ secrets.SSH_PRIVATE_KEY }}
+          envs: STATIC_TOKEN,SERVERS,PORT
+          script: |
+            cd ~/linked-crystal-deploy/server
+            
+            # Create/update .env file on the fly
+            echo "STATIC_TOKEN=${{ secrets.STATIC_TOKEN }}" > .env
+            echo "SERVERS=${{ secrets.SERVERS }}" >> .env
+            echo "PORT=${{ secrets.PORT }}" >> .env
+            
+            # Restart container
+            docker compose down || true
+            docker compose up -d --build
+            
+            # Cleanup source (optional)
+            rm -rf ~/linked-crystal-deploy/server/src
