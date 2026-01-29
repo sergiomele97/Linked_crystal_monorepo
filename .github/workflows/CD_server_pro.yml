@@ -45,8 +45,8 @@ jobs:
             
             # Create/update .env file on the fly
             echo "STATIC_TOKEN=${{ secrets.STATIC_TOKEN }}" > .env
-            echo "SERVERS=${{ secrets.SERVERS }}" >> .env
-            echo "PORT=${{ secrets.PORT }}" >> .env
+            echo "SERVERS=${{ vars.SERVERS }}" >> .env
+            echo "PORT=${{ vars.PORT }}" >> .env
             
             # Restart container
             docker compose down || true
