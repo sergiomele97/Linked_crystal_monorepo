@@ -17,40 +17,41 @@ jobs:
           go-version: '1.25.3'
           cache-dependency-path: packages/server/src/go.sum
 
-      - name: Build Go binary (to verify build)
+      - name: Build Go binary
         working-directory: packages/server/src
         run: |
           go mod download
-          CGO_ENABLED=0 GOOS=linux go build -v -o ../server-bin ./cmd/server
+          CGO_ENABLED=0 GOOS=linux go build -v -ldflags="-s -w" -o ../server-bin ./cmd/server
 
-      - name: Deploy to Server via SSH
+      - name: SCP binary to Server
         uses: appleboy/scp-action@v0.1.7
         with:
           host: ${{ secrets.SERVER_HOST }}
           username: ${{ secrets.SERVER_USER }}
           key: ${{ secrets.SSH_PRIVATE_KEY }}
-          source: "packages/server/Dockerfile,packages/server/docker-compose.yml,packages/server/src"
-          target: "~/linked-crystal-deploy"
+          source: "packages/server/server-bin"
+          target: "~/linked-crystal-server"
           strip_components: 1
 
-      - name: Execute Remote Docker Compose
-        uses: appleboy/ssh-action@v1.0.3
+      - name: Deploy and Restart Service via SSH
+        uses: appleboy/ssh-action@v1.2.0
         with:
           host: ${{ secrets.SERVER_HOST }}
           username: ${{ secrets.SERVER_USER }}
           key: ${{ secrets.SSH_PRIVATE_KEY }}
-          envs: STATIC_TOKEN,SERVERS,PORT
           script: |
-            cd ~/linked-crystal-deploy/server
-            
-            # Create/update .env file on the fly
-            echo "STATIC_TOKEN=${{ secrets.STATIC_TOKEN }}" > .env
-            echo "SERVERS=${{ vars.SERVERS }}" >> .env
-            echo "PORT=${{ vars.PORT }}" >> .env
-            
-            # Restart container
-            docker compose down || true
-            docker compose up -d --build
-            
-            # Cleanup source (optional)
-            rm -rf ~/linked-crystal-deploy/server/src
+            # Mover binario a sitio final y dar permisos
+            sudo mv ~/linked-crystal-server/server-bin /usr/local/bin/websocket-server-pro
+            sudo chmod +x /usr/local/bin/websocket-server-pro
+
+            # Configurar variables de entorno (como en dev)
+            sudo tee /etc/default/websocket-server-pro > /dev/null <<EOF
+            STATIC_TOKEN=${{ secrets.STATIC_TOKEN }}
+            SERVERS=${{ vars.SERVERS }}
+            PORT=${{ vars.PORT }}
+            EOF
+
+            # Reiniciar servicio systemd
+            sudo systemctl daemon-reload
+            sudo systemctl restart websocket-server-pro
+            sudo systemctl status websocket-server-pro --no-pager
