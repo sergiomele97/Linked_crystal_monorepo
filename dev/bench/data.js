@@ -1,5 +1,5 @@
 window.BENCHMARK_DATA = {
-  "lastUpdate": 1769804000200,
+  "lastUpdate": 1769805002617,
   "repoUrl": "https://github.com/sergiomele97/Linked_crystal_monorepo",
   "entries": {
     "Go Backend Performance": [
@@ -263,6 +263,55 @@ window.BENCHMARK_DATA = {
           {
             "name": "RAM per Client",
             "value": 68.268515625,
+            "unit": "KB"
+          },
+          {
+            "name": "Failure Count",
+            "value": 0,
+            "unit": "count"
+          },
+          {
+            "name": "Active Players",
+            "value": 500,
+            "unit": "count"
+          }
+        ]
+      },
+      {
+        "commit": {
+          "author": {
+            "email": "sergiomele97@gmail.com",
+            "name": "Sergio Melero",
+            "username": "sergiomele97"
+          },
+          "committer": {
+            "email": "sergiomele97@gmail.com",
+            "name": "Sergio Melero",
+            "username": "sergiomele97"
+          },
+          "distinct": true,
+          "id": "1aab1ad62ca9aef323a72ce6a32256495a95cc9b",
+          "message": "Elimino docker",
+          "timestamp": "2026-01-30T21:29:05+01:00",
+          "tree_id": "2627a2641c792b29282c7189b0c99b3a95e646ab",
+          "url": "https://github.com/sergiomele97/Linked_crystal_monorepo/commit/1aab1ad62ca9aef323a72ce6a32256495a95cc9b"
+        },
+        "date": 1769805002202,
+        "tool": "customSmallerIsBetter",
+        "benches": [
+          {
+            "name": "CPU Usage",
+            "value": 20.000000956000047,
+            "unit": "%"
+          },
+          {
+            "name": "Latency",
+            "value": 0.0003008368415328166,
+            "unit": "ms"
+          },
+          {
+            "name": "RAM per Client",
+            "value": 68.780515625,
             "unit": "KB"
           },
           {
