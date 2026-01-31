@@ -1,5 +1,5 @@
 window.BENCHMARK_DATA = {
-  "lastUpdate": 1769860729946,
+  "lastUpdate": 1769860895259,
   "repoUrl": "https://github.com/sergiomele97/Linked_crystal_monorepo",
   "entries": {
     "Go Backend Performance": [
@@ -459,6 +459,55 @@ window.BENCHMARK_DATA = {
           {
             "name": "RAM per Client",
             "value": 68.268515625,
+            "unit": "KB"
+          },
+          {
+            "name": "Failure Count",
+            "value": 0,
+            "unit": "count"
+          },
+          {
+            "name": "Active Players",
+            "value": 500,
+            "unit": "count"
+          }
+        ]
+      },
+      {
+        "commit": {
+          "author": {
+            "email": "sergiomele97@gmail.com",
+            "name": "Sergio",
+            "username": "sergiomele97"
+          },
+          "committer": {
+            "email": "sergiomele97@gmail.com",
+            "name": "Sergio",
+            "username": "sergiomele97"
+          },
+          "distinct": true,
+          "id": "3509739ced2e063480f0370db321effa8d56a910",
+          "message": "feat: Add `__str__` and `__repr__` methods to RamData for improved logging and update client mock parameters and path.",
+          "timestamp": "2026-01-31T13:00:35+01:00",
+          "tree_id": "83125ede2693c7c5a34a60a8bc84d08f234e9710",
+          "url": "https://github.com/sergiomele97/Linked_crystal_monorepo/commit/3509739ced2e063480f0370db321effa8d56a910"
+        },
+        "date": 1769860894667,
+        "tool": "customSmallerIsBetter",
+        "benches": [
+          {
+            "name": "CPU Usage",
+            "value": 39.99999334400111,
+            "unit": "%"
+          },
+          {
+            "name": "Latency",
+            "value": 0.0002585231004731422,
+            "unit": "ms"
+          },
+          {
+            "name": "RAM per Client",
+            "value": 68.396515625,
             "unit": "KB"
           },
           {
