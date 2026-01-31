@@ -43,6 +43,20 @@ class EmulatorCoreInterface:
             if self.on_text_output:
                 self.on_text_output("Link desconectado")
 
+    def get_link_status(self):
+        if not self.link_client:
+            return {"connected": False, "tx": 0, "rx": 0}
+        
+        connected = (self.link_client.thread is not None and 
+                     self.link_client.thread.is_alive() and 
+                     not self.link_client._stop_event.is_set())
+                     
+        return {
+            "connected": connected,
+            "tx": self.link_client.count_sent,
+            "rx": self.link_client.count_recv
+        }
+
     def _initialize(self):
         solicitar_permisos()
 

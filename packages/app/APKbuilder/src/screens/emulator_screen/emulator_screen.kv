@@ -20,6 +20,43 @@
             pos_hint: {"x": 0.85, "y": 0.45}
             on_press: root.onMenuPressed(self)
 
+        BoxLayout:
+            id: link_stats_panel
+            orientation: 'horizontal'
+            size_hint: 0.6, 0.05
+            pos_hint: {"center_x": 0.5, "y": 0.48}
+            spacing: 10
+            opacity: 0  # Hidden by default until connected
+
+            canvas.before:
+                Color:
+                    rgba: 0, 0, 0, 0.5
+                RoundedRectangle:
+                    pos: self.pos
+                    size: self.size
+                    radius: [10]
+
+            Label:
+                id: link_status_dot
+                text: "Linked!"
+                font_size: 14
+                color: 0, 1, 0, 1  # Green
+                size_hint_x: 0.25
+
+            Label:
+                id: link_tx_label
+                text: "Packets: 0"
+                font_size: 14
+                color: 1, 1, 1, 1
+                size_hint_x: 0.35
+
+            Button:
+                text: "Close"
+                font_size: 12
+                size_hint_x: 0.4
+                background_color: 1, 0.2, 0.2, 1
+                on_release: root.disconnect_link_action()
+
         VideoDisplay:
             id: video_display
             size_hint: 1, 0.45
