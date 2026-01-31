@@ -1,5 +1,5 @@
 window.BENCHMARK_DATA = {
-  "lastUpdate": 1769860895259,
+  "lastUpdate": 1769861070241,
   "repoUrl": "https://github.com/sergiomele97/Linked_crystal_monorepo",
   "entries": {
     "Go Backend Performance": [
@@ -508,6 +508,55 @@ window.BENCHMARK_DATA = {
           {
             "name": "RAM per Client",
             "value": 68.396515625,
+            "unit": "KB"
+          },
+          {
+            "name": "Failure Count",
+            "value": 0,
+            "unit": "count"
+          },
+          {
+            "name": "Active Players",
+            "value": 500,
+            "unit": "count"
+          }
+        ]
+      },
+      {
+        "commit": {
+          "author": {
+            "email": "sergiomele97@gmail.com",
+            "name": "Sergio",
+            "username": "sergiomele97"
+          },
+          "committer": {
+            "email": "sergiomele97@gmail.com",
+            "name": "Sergio",
+            "username": "sergiomele97"
+          },
+          "distinct": true,
+          "id": "8e7c750a7b404e7346f95842b0dd6ef73aac874a",
+          "message": "fix bug andar hacia los lados sprite",
+          "timestamp": "2026-01-31T13:03:31+01:00",
+          "tree_id": "426adbd2fa90445ae1d19151f88dc71da7150e19",
+          "url": "https://github.com/sergiomele97/Linked_crystal_monorepo/commit/8e7c750a7b404e7346f95842b0dd6ef73aac874a"
+        },
+        "date": 1769861069953,
+        "tool": "customSmallerIsBetter",
+        "benches": [
+          {
+            "name": "CPU Usage",
+            "value": 39.99998252800763,
+            "unit": "%"
+          },
+          {
+            "name": "Latency",
+            "value": 0.000312882399145105,
+            "unit": "ms"
+          },
+          {
+            "name": "RAM per Client",
+            "value": 68.268515625,
             "unit": "KB"
           },
           {
