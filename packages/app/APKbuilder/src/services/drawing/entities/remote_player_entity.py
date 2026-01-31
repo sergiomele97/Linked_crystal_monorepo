@@ -24,12 +24,12 @@ class RemotePlayerEntity:
         "left": {
             "idle": 6,
             "step_right": 7,
-            "step_left": 7  
+            "step_left": 6  
         },
         "right": {
             "idle": 8,
             "step_right": 9,
-            "step_left": 9  
+            "step_left": 8  
         }
     }
 
