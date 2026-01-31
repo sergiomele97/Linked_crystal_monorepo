@@ -40,18 +40,37 @@ jobs:
           username: ${{ secrets.SERVER_USER }}
           key: ${{ secrets.SSH_PRIVATE_KEY }}
           script: |
-            # Mover binario a sitio final y dar permisos
-            sudo mv ~/linked-crystal-server/server-bin /usr/local/bin/websocket-server-pro
+            # 1. Crear el archivo de servicio (si no existe)
+            sudo tee /etc/systemd/system/websocket-server-pro.service > /dev/null <<EOF
+            [Unit]
+            Description=Websocket Server Pro
+            After=network.target
+
+            [Service]
+            Type=simple
+            User=${{ secrets.SERVER_USER }}
+            ExecStart=/usr/local/bin/websocket-server-pro
+            Restart=always
+            EnvironmentFile=/etc/default/websocket-server-pro
+
+            [Install]
+            WantedBy=multi-user.target
+            EOF
+
+            # 2. Mover el binario (ajustando la ruta que SCP crea)
+            # Buscamos el binario donde sea que haya quedado y lo movemos
+            sudo mv ~/linked-crystal-server/server/server-bin /usr/local/bin/websocket-server-pro
             sudo chmod +x /usr/local/bin/websocket-server-pro
 
-            # Configurar variables de entorno (como en dev)
+            # 3. Configurar variables de entorno
             sudo tee /etc/default/websocket-server-pro > /dev/null <<EOF
             STATIC_TOKEN=${{ secrets.STATIC_TOKEN }}
             SERVERS=${{ vars.SERVERS }}
             PORT=${{ vars.PORT }}
             EOF
 
-            # Reiniciar servicio systemd
+            # 4. Recargar y Reiniciar
             sudo systemctl daemon-reload
+            sudo systemctl enable websocket-server-pro
             sudo systemctl restart websocket-server-pro
             sudo systemctl status websocket-server-pro --no-pager
