@@ -31,24 +31,24 @@ if ENV != "local":
 async def run_client():
     pkt = Packet()
 
-    pkt.player_x_coord = 5
+    pkt.player_x_coord = 27
     pkt.player_y_coord = 4
-    pkt.map_number = 4
-    pkt.map_bank = 24
+    pkt.map_number = 3
+    pkt.map_bank = 26
     pkt.IsOverworld = True
     pkt.player_id = 0
 
     # Ruta cerrada
     path = [
-        (2, 4),
-        (2, 6),
-        (4, 6),
-        (4, 4),
+        (27, 4),
+        (27, 7),
+        (31, 7),
+        (31, 4),
     ]
 
     current_target = 1
     ticks_per_step = 16
-    tick_duration = 1 / 60  # 60 ticks por segundo
+    tick_duration = 1 / 240# 60 ticks por segundo
     tick_count = 0
 
     backoff = 1
