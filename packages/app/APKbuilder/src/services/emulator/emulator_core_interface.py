@@ -53,6 +53,7 @@ class EmulatorCoreInterface:
                      
         return {
             "connected": connected,
+            "bridged": getattr(self.link_client, 'bridged', False),
             "tx": self.link_client.count_sent,
             "rx": self.link_client.count_recv
         }

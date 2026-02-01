@@ -35,6 +35,7 @@ class LinkClient:
         # --- TELEMETRÍA ---
         self.count_sent = 0
         self.count_recv = 0
+        self.bridged = False
         self.last_log_time = time.time()
 
     def start(self, host, port, my_id, target_id):
@@ -49,6 +50,7 @@ class LinkClient:
         self._stop_event.clear()
         self.count_sent = 0
         self.count_recv = 0
+        self.bridged = False
         self.thread = threading.Thread(target=self._run_loop, daemon=True)
         self.thread.start()
 
@@ -174,6 +176,7 @@ class LinkClient:
             while not self._stop_event.is_set():
                 data = await ws.recv()
                 if isinstance(data, (bytes, bytearray)):
+                    self.bridged = True
                     # Procesamiento masivo para ganar microsegundos
                     for b in data:
                         try:

@@ -203,7 +203,7 @@ class LinkInterface:
             print(f"Error al conectar Link: {e}")
         
         # Opcional: Cerrar el teclado tras conectar
-        # Clock.schedule_once(lambda dt: self.cerrar_teclado(), 2)
+        self.cerrar_teclado()
 
     def cerrar_teclado(self):
         if self.teclado_visible:

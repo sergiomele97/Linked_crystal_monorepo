@@ -69,6 +69,13 @@ class EmulatorScreen(Screen):
             panel.opacity = 1
             panel.disabled = False
             self.ids.link_tx_label.text = f"Packets: {status['tx']}"
+            
+            if status.get("bridged", False):
+                self.ids.link_status_dot.text = "Linked!"
+                self.ids.link_status_dot.color = (0, 1, 0, 1) # Green
+            else:
+                self.ids.link_status_dot.text = "Waiting..."
+                self.ids.link_status_dot.color = (1, 1, 0, 1) # Yellow
         else:
             panel.opacity = 0
             panel.disabled = True
