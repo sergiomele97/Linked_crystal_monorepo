@@ -1,5 +1,5 @@
 window.BENCHMARK_DATA = {
-  "lastUpdate": 1769947854286,
+  "lastUpdate": 1769968572036,
   "repoUrl": "https://github.com/sergiomele97/Linked_crystal_monorepo",
   "entries": {
     "Go Backend Performance": [
@@ -949,6 +949,55 @@ window.BENCHMARK_DATA = {
           {
             "name": "RAM per Client",
             "value": 69.19568976358148,
+            "unit": "KB"
+          },
+          {
+            "name": "Failure Count",
+            "value": 0,
+            "unit": "count"
+          },
+          {
+            "name": "Active Players",
+            "value": 500,
+            "unit": "count"
+          }
+        ]
+      },
+      {
+        "commit": {
+          "author": {
+            "email": "sergiomele97@gmail.com",
+            "name": "Sergio Melero",
+            "username": "sergiomele97"
+          },
+          "committer": {
+            "email": "sergiomele97@gmail.com",
+            "name": "Sergio Melero",
+            "username": "sergiomele97"
+          },
+          "distinct": true,
+          "id": "25834f346f24640da480e278e50a2975c9de5768",
+          "message": "Nuevo sistema de logs",
+          "timestamp": "2026-02-01T18:55:10+01:00",
+          "tree_id": "eccb9e6418609b7939d20af78763c36ff6f75e80",
+          "url": "https://github.com/sergiomele97/Linked_crystal_monorepo/commit/25834f346f24640da480e278e50a2975c9de5768"
+        },
+        "date": 1769968571467,
+        "tool": "customSmallerIsBetter",
+        "benches": [
+          {
+            "name": "CPU Usage",
+            "value": 40.00000328800027,
+            "unit": "%"
+          },
+          {
+            "name": "Latency",
+            "value": 0.00029302702806452955,
+            "unit": "ms"
+          },
+          {
+            "name": "RAM per Client",
+            "value": 69.60456123737374,
             "unit": "KB"
           },
           {
