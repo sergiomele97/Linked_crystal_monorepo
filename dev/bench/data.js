@@ -1,5 +1,5 @@
 window.BENCHMARK_DATA = {
-  "lastUpdate": 1769868060183,
+  "lastUpdate": 1769939900221,
   "repoUrl": "https://github.com/sergiomele97/Linked_crystal_monorepo",
   "entries": {
     "Go Backend Performance": [
@@ -606,6 +606,55 @@ window.BENCHMARK_DATA = {
           {
             "name": "RAM per Client",
             "value": 69.292515625,
+            "unit": "KB"
+          },
+          {
+            "name": "Failure Count",
+            "value": 0,
+            "unit": "count"
+          },
+          {
+            "name": "Active Players",
+            "value": 500,
+            "unit": "count"
+          }
+        ]
+      },
+      {
+        "commit": {
+          "author": {
+            "email": "sergiomele97@gmail.com",
+            "name": "Sergio Melero",
+            "username": "sergiomele97"
+          },
+          "committer": {
+            "email": "sergiomele97@gmail.com",
+            "name": "Sergio Melero",
+            "username": "sergiomele97"
+          },
+          "distinct": true,
+          "id": "b863a83e4c3c4ca269745b94c2151a6833058fe5",
+          "message": "ajusto dimensione schat a android",
+          "timestamp": "2026-02-01T10:57:16+01:00",
+          "tree_id": "b689bc98bb692b08c06874fb0cbedf3534581b81",
+          "url": "https://github.com/sergiomele97/Linked_crystal_monorepo/commit/b863a83e4c3c4ca269745b94c2151a6833058fe5"
+        },
+        "date": 1769939899343,
+        "tool": "customSmallerIsBetter",
+        "benches": [
+          {
+            "name": "CPU Usage",
+            "value": 39.99999760000014,
+            "unit": "%"
+          },
+          {
+            "name": "Latency",
+            "value": 0.0003066794032448203,
+            "unit": "ms"
+          },
+          {
+            "name": "RAM per Client",
+            "value": 68.780515625,
             "unit": "KB"
           },
           {
