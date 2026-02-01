@@ -176,7 +176,6 @@ class LinkClient:
             while not self._stop_event.is_set():
                 data = await ws.recv()
                 if isinstance(data, (bytes, bytearray)):
-                    self.bridged = True
                     # Procesamiento masivo para ganar microsegundos
                     for b in data:
                         try:
@@ -185,6 +184,9 @@ class LinkClient:
                             try: self.recv_queue.get_nowait()
                             except: pass
                             self.recv_queue.put_nowait(b)
+                elif isinstance(data, str):
+                    if data == "bridged":
+                        self.bridged = True
                 # Eliminado sleep(0) para máxima prioridad
         except:
             return

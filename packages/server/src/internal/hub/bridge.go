@@ -71,6 +71,9 @@ func HandleLink(w http.ResponseWriter, r *http.Request) {
 
 func bridge(c1, c2 *websocket.Conn) {
 	log.Println("[Bridge] Iniciando túnel entre dos emuladores")
+	c1.WriteMessage(websocket.TextMessage, []byte("bridged"))
+	c2.WriteMessage(websocket.TextMessage, []byte("bridged"))
+
 	done := make(chan struct{}, 2)
 
 	copyWS := func(dst, src *websocket.Conn) {
