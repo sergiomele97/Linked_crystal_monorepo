@@ -39,20 +39,20 @@
             Label:
                 id: link_status_dot
                 text: "Linked!"
-                font_size: 14
+                font_size: sp(15)
                 color: 0, 1, 0, 1  # Green
                 size_hint_x: 0.25
 
             Label:
                 id: link_tx_label
                 text: "Packets: 0"
-                font_size: 14
+                font_size: sp(15)
                 color: 1, 1, 1, 1
                 size_hint_x: 0.35
 
             Button:
                 text: "Close"
-                font_size: 12
+                font_size: sp(15)
                 size_hint_x: 0.4
                 background_color: 1, 0.2, 0.2, 1
                 on_release: root.disconnect_link_action()
