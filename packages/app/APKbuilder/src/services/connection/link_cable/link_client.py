@@ -20,22 +20,31 @@ class SmartLinkQueue(queue.Queue):
 
     def get(self, block=True, timeout=None):
         """
-        Lógica de bloqueo selectivo:
-        1. Si NO hay bridge -> Devolvemos 0xFF al instante (No bloquea).
-        2. Si HAY bridge -> Bloqueamos hasta que llegue un byte real.
+        Lógica de bloqueo estricto (Hardware Emulation):
+        1. Si NO es bloqueante (cleanup de UI) -> Sacamos lo que haya o devolvemos 0xFF.
+        2. Si SÍ es bloqueante (emulador):
+           - Si 'active' es False -> Devolvemos 0xFF.
+           - Si 'active' es True -> BLOQUEAMOS hasta que llegue algo del peer.
         """
-        if not getattr(self.client, 'bridged', False):
-            return 0xFF
-            
-        try:
-            # Bloqueamos esperando datos reales del peer.
-            # Ponemos un timeout largo (5s) por si la conexión se muere sin avisar,
-            # para que el emulador no se quede colgado para siempre.
-            return super().get(block=True, timeout=5.0)
-        except queue.Empty:
-            # Si después de 5s no hay nada, devolvemos 0xFF para dejar respirar al motor,
-            # aunque esto probablemente signifique lag o desincronización.
-            return 0xFF
+        if not block:
+            try: return super().get(block=False)
+            except queue.Empty: return 0xFF
+
+        # Mientras el usuario quiera esté 'active' (cable conectado físicamente), esperaremos.
+        # Usamos un timeout largo (0.5s) para reducir el churn de hilos si hay lag extremo.
+        while getattr(self.client, 'active', False) and not self.client._stop_event.is_set():
+            if self.client.thread and not self.client.thread.is_alive():
+                break
+            try:
+                # Si llega un byte, salimos del bucle y lo devolvemos
+                # Bajamos el tiempo de espera por iteración para ser más reactivos a inputs
+                return super().get(block=True, timeout=0.05)
+            except queue.Empty:
+                # Un pequeño sleep para que el hilo no sature el núcleo si el compañero no manda nada
+                time.sleep(0.001)
+                continue
+
+        return 0xFF
 
     def get_nowait(self):
         # El comportamiento de get ya es el correcto según el estado del bridge
@@ -68,8 +77,11 @@ class LinkClient:
         # --- TELEMETRÍA ---
         self.count_sent = 0
         self.count_recv = 0
+        self.active = False
         self.bridged = False
         self.last_log_time = time.time()
+        self._send_lock = threading.Lock()
+        self._send_buffer = []
 
     def start(self, host, port, my_id, target_id):
         if self.thread and self.thread.is_alive():
@@ -83,6 +95,7 @@ class LinkClient:
         self._stop_event.clear()
         self.count_sent = 0
         self.count_recv = 0
+        self.active = True
         self.bridged = False
         # Limpiamos cola al empezar
         while not self.recv_queue.empty():
@@ -93,30 +106,62 @@ class LinkClient:
         self.thread.start()
 
     def stop(self):
+        # 1. Marcamos el fin e invalidamos el estado active inmediatamente
         self._stop_event.set()
+        self.active = False
+        self.bridged = False
+        
+        # 2. Despertamos al emulador si estaba esperando datos (unblock get)
+        try:
+            while not self.recv_queue.empty():
+                self.recv_queue.get_nowait()
+            self.recv_queue.put_nowait(0xFF)
+        except:
+            pass
+
+        # 3. Solicitamos parada del loop de red
         if self.loop:
             try:
                 self.loop.call_soon_threadsafe(self.loop.stop)
             except: pass
+            
+        # 4. Esperamos a que el hilo termine para evitar "hilos fantasm" al reconectar rápido
+        if self.thread and self.thread.is_alive():
+            self.thread.join(timeout=1.0)
+            
         self.thread = None
-        self.bridged = False
+        self.loop = None
         print("[LinkClient] Detenido.")
 
     def send_byte(self, b: int):
         """
         PyBoy entrega un byte para el cable.
-        SOLO lo encolamos si el puente está activo para evitar saturar al peer.
+        Los agrupamos para minimizar el churn de hilos de asyncio.
         """
-        if not self.bridged or self._stop_event.is_set() or self.loop is None or self.send_queue_async is None:
+        if not self.active or self._stop_event.is_set() or self.loop is None:
             return
-        try:
-            self.count_sent += 1
-            self.loop.call_soon_threadsafe(
-                self.send_queue_async.put_nowait,
-                bytes([b & 0xFF])
-            )
-        except Exception:
-            pass
+            
+        with self._send_lock:
+            self._send_buffer.append(b & 0xFF)
+            
+        # Programar el envío inmediato si es el primer byte del buffer
+        if len(self._send_buffer) == 1:
+            try:
+                self.loop.call_soon_threadsafe(self._flush_send_buffer)
+            except: pass
+
+    def _flush_send_buffer(self):
+        """Consume el buffer y lo mete en la cola de asyncio."""
+        with self._send_lock:
+            if not self._send_buffer:
+                return
+            payload = bytes(self._send_buffer)
+            self._send_buffer.clear()
+            
+        if self.send_queue_async:
+            try:
+                self.send_queue_async.put_nowait(payload)
+            except: pass
 
     def get_byte(self):
         """
@@ -139,6 +184,10 @@ class LinkClient:
             self.loop.run_until_complete(self._main())
         except Exception as e:
             print(f"[LinkClient] Loop asyncio colapsado: {e}")
+        finally:
+            # Aseguramos que el estado 'active' caiga si el hilo muere
+            self.active = False
+            self.bridged = False
 
     def _stats_logger(self):
         while not self._stop_event.is_set():
@@ -194,46 +243,43 @@ class LinkClient:
     async def send_loop(self, ws):
         try:
             while not self._stop_event.is_set():
-                byte_data = await self.send_queue_async.get()
-                payload = bytearray(byte_data)
+                # Obtenemos un paquete (que ya puede venir agrupado)
+                payload = await self.send_queue_async.get()
                 
+                # Intentamos agrupar más si hay ráfaga pesada
                 count = 0
-                while not self.send_queue_async.empty() and len(payload) < 128 and count < 64:
-                    payload.extend(self.send_queue_async.get_nowait())
+                while not self.send_queue_async.empty() and len(payload) < 256 and count < 10:
+                    payload += self.send_queue_async.get_nowait()
                     count += 1
                 
+                self.count_sent += len(payload)
                 await ws.send(payload)
         except:
             return
 
     async def recv_loop(self, ws):
         try:
-            while not self._stop_event.is_set():
-                data = await ws.recv()
-                if isinstance(data, (bytes, bytearray)):
-                    # Solo procesamos datos si el puente está activo
-                    if self.bridged:
-                        for b in data:
-                            try:
-                                self.recv_queue.put_nowait(b)
-                            except queue.Full:
-                                try: self.recv_queue.get_nowait()
-                                except: pass
-                                self.recv_queue.put_nowait(b)
-                elif isinstance(data, str):
-                    if data == "bridged":
-                        print("[LinkClient] !!! BRIDGE ESTABLECIDO !!!")
-                        # 1. Marcar como activo
-                        self.bridged = True
-                        # 2. LIMPIEZA TOTAL DE BUFFERS para empezar sincronizados
-                        while not self.recv_queue.empty():
+            async for message in ws:
+                if self._stop_event.is_set(): break
+                
+                if isinstance(message, (bytes, bytearray)):
+                    # Telemetría de bytes recibidos
+                    self.count_recv += len(message)
+                    # Entregamos los bytes a la cola del emulador siempre que estemos activos
+                    # (Incluso antes del mensaje 'bridged' por si acaso hay race condition)
+                    for b in message:
+                        try:
+                            self.recv_queue.put_nowait(b)
+                        except queue.Full:
                             try: self.recv_queue.get_nowait()
-                            except: break
-                        
-                        # También limpiamos la cola de envío async
-                        while not self.send_queue_async.empty():
-                            try: self.send_queue_async.get_nowait()
-                            except: break
-        except:
+                            except: pass
+                            self.recv_queue.put_nowait(b)
+                            
+                elif isinstance(message, str):
+                    if message == "bridged":
+                        print("[LinkClient] !!! BRIDGE ESTABLECIDO !!!")
+                        self.bridged = True
+                        # NO limpiamos la cola aquí para no perder bytes iniciales del handshake
+        except Exception as e:
+            print(f"[LinkClient] Error en recv_loop: {e}")
             self.bridged = False
-            return

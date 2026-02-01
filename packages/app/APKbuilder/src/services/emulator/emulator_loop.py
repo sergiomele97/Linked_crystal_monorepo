@@ -64,10 +64,7 @@ class EmulationLoop:
             # Ejecutamos un tick de PyBoy
             if self.pyboy.tick():
                 self.ramScrapper.update_ram_data()
-                
-                # Renderizado directo en el hilo secundario (ahora es seguro)
                 self.drawingManager.update_frame()
-                
                 self.audioManager.update_audio()
                 self.ramHooks.handle_hooks()
             else:
@@ -78,11 +75,19 @@ class EmulationLoop:
                     )
                 break
 
-            # Control de FPS simple
+            # Control de FPS inteligente:
+            # Si un frame tarda más de lo normal (ej. por Link Cable), 
+            # NO intentamos recuperar el tiempo. Simplemente esperamos al siguiente intervalo.
             t_end = time.perf_counter()
-            sleep_time = self.interval - (t_end - t_start)
-            if sleep_time > 0:
-                time.sleep(sleep_time)
+            elapsed = t_end - t_start
+            
+            # Si tardamos menos de 1/60s, dormimos el resto
+            if elapsed < self.interval:
+                time.sleep(self.interval - elapsed)
+            else:
+                # Si tardamos MÁS, no dormimos nada, pero tampoco intentamos "correr" en el siguiente frame.
+                # Dejamos que el sistema respire.
+                pass
 
     def _step(self, dt):
         """Obsoleto: El paso de emulación ahora se maneja en _run."""
