@@ -9,6 +9,38 @@ import time
 
 from env import STATIC_TOKEN, ENV, SSL_URL
 
+class SmartLinkQueue(queue.Queue):
+    """
+    Cola especial que nunca bloquea el hilo de emulación.
+    Si no hay puente o la cola está vacía, devuelve inmediatamente 0xFF (cable desconectado).
+    """
+    def __init__(self, client, *args, **kwargs):
+        super().__init__(*args, **kwargs)
+        self.client = client
+
+    def get(self, block=True, timeout=None):
+        """
+        Lógica de bloqueo selectivo:
+        1. Si NO hay bridge -> Devolvemos 0xFF al instante (No bloquea).
+        2. Si HAY bridge -> Bloqueamos hasta que llegue un byte real.
+        """
+        if not getattr(self.client, 'bridged', False):
+            return 0xFF
+            
+        try:
+            # Bloqueamos esperando datos reales del peer.
+            # Ponemos un timeout largo (5s) por si la conexión se muere sin avisar,
+            # para que el emulador no se quede colgado para siempre.
+            return super().get(block=True, timeout=5.0)
+        except queue.Empty:
+            # Si después de 5s no hay nada, devolvemos 0xFF para dejar respirar al motor,
+            # aunque esto probablemente signifique lag o desincronización.
+            return 0xFF
+
+    def get_nowait(self):
+        # El comportamiento de get ya es el correcto según el estado del bridge
+        return self.get()
+
 class LinkClient:
     def __init__(self):
         self.token = STATIC_TOKEN
@@ -28,7 +60,8 @@ class LinkClient:
         self.thread = None
         self.loop = None
 
-        self.recv_queue = queue.Queue(maxsize=10000)
+        # Usamos nuestra cola inteligente
+        self.recv_queue = SmartLinkQueue(self, maxsize=10000)
         self.send_queue_async = None
         self.target_url = None
 
@@ -51,6 +84,11 @@ class LinkClient:
         self.count_sent = 0
         self.count_recv = 0
         self.bridged = False
+        # Limpiamos cola al empezar
+        while not self.recv_queue.empty():
+            try: self.recv_queue.get_nowait()
+            except: break
+
         self.thread = threading.Thread(target=self._run_loop, daemon=True)
         self.thread.start()
 
@@ -61,10 +99,15 @@ class LinkClient:
                 self.loop.call_soon_threadsafe(self.loop.stop)
             except: pass
         self.thread = None
+        self.bridged = False
         print("[LinkClient] Detenido.")
 
     def send_byte(self, b: int):
-        if self._stop_event.is_set() or self.loop is None or self.send_queue_async is None:
+        """
+        PyBoy entrega un byte para el cable.
+        SOLO lo encolamos si el puente está activo para evitar saturar al peer.
+        """
+        if not self.bridged or self._stop_event.is_set() or self.loop is None or self.send_queue_async is None:
             return
         try:
             self.count_sent += 1
@@ -77,17 +120,12 @@ class LinkClient:
 
     def get_byte(self):
         """
-        MODIFICADO: Si la cola está vacía, esperamos un tiempo mínimo 
-        en lugar de devolver basura (0xFF) inmediatamente.
+        Llamado por el GameBoy para leer un byte del cable.
         """
-        try:
-            # Esperamos hasta 1ms. Si no hay nada, devolvemos 0xFF.
-            # Esto da margen a que el recv_loop rellene la cola.
-            b = self.recv_queue.get(timeout=0.001)
+        b = self.recv_queue.get()
+        if b != 0xFF:
             self.count_recv += 1
-            return b
-        except queue.Empty:
-            return 0xFF
+        return b
 
     def _run_loop(self):
         asyncio.set_event_loop(asyncio.new_event_loop())
@@ -106,7 +144,7 @@ class LinkClient:
         while not self._stop_event.is_set():
             time.sleep(2)
             if self.count_sent > 0 or self.count_recv > 0:
-                print(f"[Link-Stats] TX: {self.count_sent} | RX: {self.count_recv} | Queue: {self.recv_queue.qsize()}")
+                print(f"[Link-Stats] BRIDGED: {self.bridged} | TX: {self.count_sent} | RX: {self.count_recv} | Q: {self.recv_queue.qsize()}")
 
     async def _main(self):
         while not self._stop_event.is_set():
@@ -114,13 +152,11 @@ class LinkClient:
                 await asyncio.sleep(0.5)
                 continue
             try:
-                # 1. Vaciar cola de RECEPCIÓN (hilos)
-                for _ in range(10001):
-                    if self.recv_queue.empty(): break
+                # 1. Vaciar colas
+                while not self.recv_queue.empty():
                     try: self.recv_queue.get_nowait()
-                    except queue.Empty: break
+                    except: break
 
-                # 2. Vaciar cola de ENVÍO (asyncio)
                 while not self.send_queue_async.empty():
                     try: self.send_queue_async.get_nowait()
                     except: break
@@ -135,9 +171,7 @@ class LinkClient:
                     ping_timeout=5,
                     close_timeout=1
                 ) as ws:
-                    self.count_sent = 0
-                    self.count_recv = 0
-                    print(f"[LinkClient] ✔ Conectado y Sincronizado.")
+                    print(f"[LinkClient] ✔ Conectado al relay. Esperando bridge...")
                     
                     send_task = asyncio.create_task(self.send_loop(ws))
                     recv_task = asyncio.create_task(self.recv_loop(ws))
@@ -153,6 +187,7 @@ class LinkClient:
                         except: pass
                         
             except Exception as e:
+                self.bridged = False
                 print(f"[LinkClient] Error/Desconexión: {e}")
                 await asyncio.sleep(2) 
 
@@ -176,17 +211,29 @@ class LinkClient:
             while not self._stop_event.is_set():
                 data = await ws.recv()
                 if isinstance(data, (bytes, bytearray)):
-                    # Procesamiento masivo para ganar microsegundos
-                    for b in data:
-                        try:
-                            self.recv_queue.put_nowait(b)
-                        except queue.Full:
-                            try: self.recv_queue.get_nowait()
-                            except: pass
-                            self.recv_queue.put_nowait(b)
+                    # Solo procesamos datos si el puente está activo
+                    if self.bridged:
+                        for b in data:
+                            try:
+                                self.recv_queue.put_nowait(b)
+                            except queue.Full:
+                                try: self.recv_queue.get_nowait()
+                                except: pass
+                                self.recv_queue.put_nowait(b)
                 elif isinstance(data, str):
                     if data == "bridged":
+                        print("[LinkClient] !!! BRIDGE ESTABLECIDO !!!")
+                        # 1. Marcar como activo
                         self.bridged = True
-                # Eliminado sleep(0) para máxima prioridad
+                        # 2. LIMPIEZA TOTAL DE BUFFERS para empezar sincronizados
+                        while not self.recv_queue.empty():
+                            try: self.recv_queue.get_nowait()
+                            except: break
+                        
+                        # También limpiamos la cola de envío async
+                        while not self.send_queue_async.empty():
+                            try: self.send_queue_async.get_nowait()
+                            except: break
         except:
+            self.bridged = False
             return

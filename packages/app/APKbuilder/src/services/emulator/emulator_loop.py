@@ -1,5 +1,7 @@
 from kivy.clock import Clock
 from kivy.app import App
+import threading
+import time
 
 from models.ramData import RamData
 from models.packet import Packet
@@ -39,37 +41,50 @@ class EmulationLoop:
 
 
     def start(self, fps=60):
-        """Inicia el ciclo de emulación."""
-        if not self.pyboy:
+        """Inicia el ciclo de emulación en un hilo independiente."""
+        if not self.pyboy or self.running:
             return
 
         self.running = True
-        interval = 1 / fps
-        self._clock_event = Clock.schedule_interval(self._step, interval)
+        self.fps = fps
+        self.interval = 1.0 / fps
+        self.thread = threading.Thread(target=self._run, daemon=True)
+        self.thread.start()
 
     def stop(self):
         """Detiene el ciclo de emulación."""
         self.running = False
-        if self._clock_event:
-            self._clock_event.cancel()
-            self._clock_event = None
+        self.thread = None
+
+    def _run(self):
+        """Bucle principal de ejecución en el hilo secundario."""
+        while self.running and self.pyboy:
+            t_start = time.perf_counter()
+            
+            # Ejecutamos un tick de PyBoy
+            if self.pyboy.tick():
+                self.ramScrapper.update_ram_data()
+                
+                # Renderizado directo en el hilo secundario (ahora es seguro)
+                self.drawingManager.update_frame()
+                
+                self.audioManager.update_audio()
+                self.ramHooks.handle_hooks()
+            else:
+                self.running = False
+                if self.on_text_output:
+                    Clock.schedule_once(
+                        lambda dt: self.on_text_output("Emulación finalizada"), 0
+                    )
+                break
+
+            # Control de FPS simple
+            t_end = time.perf_counter()
+            sleep_time = self.interval - (t_end - t_start)
+            if sleep_time > 0:
+                time.sleep(sleep_time)
 
     def _step(self, dt):
-        """Ejecuta un paso de emulación."""
-        if not self.running or not self.pyboy:
-            return False
-
-        if self.pyboy.tick():
-            self.ramScrapper.update_ram_data()
-            self.drawingManager.update_frame()
-            self.audioManager.update_audio()
-            self.ramHooks.handle_hooks()
-            
-        else:
-            self.stop()
-            if self.on_text_output:
-                Clock.schedule_once(
-                    lambda dt: self.on_text_output("Emulación finalizada"), 0
-                )
-            return False
+        """Obsoleto: El paso de emulación ahora se maneja en _run."""
+        pass
 
