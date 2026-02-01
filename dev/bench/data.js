@@ -1,5 +1,5 @@
 window.BENCHMARK_DATA = {
-  "lastUpdate": 1769940621888,
+  "lastUpdate": 1769943154110,
   "repoUrl": "https://github.com/sergiomele97/Linked_crystal_monorepo",
   "entries": {
     "Go Backend Performance": [
@@ -748,6 +748,55 @@ window.BENCHMARK_DATA = {
           {
             "name": "Latency",
             "value": 0.00031275220903448717,
+            "unit": "ms"
+          },
+          {
+            "name": "RAM per Client",
+            "value": 68.780515625,
+            "unit": "KB"
+          },
+          {
+            "name": "Failure Count",
+            "value": 0,
+            "unit": "count"
+          },
+          {
+            "name": "Active Players",
+            "value": 500,
+            "unit": "count"
+          }
+        ]
+      },
+      {
+        "commit": {
+          "author": {
+            "email": "sergiomele97@gmail.com",
+            "name": "Sergio Melero",
+            "username": "sergiomele97"
+          },
+          "committer": {
+            "email": "sergiomele97@gmail.com",
+            "name": "Sergio Melero",
+            "username": "sergiomele97"
+          },
+          "distinct": true,
+          "id": "85e1bb0ddeb941051310a0fccb3b1e978e9fa6b4",
+          "message": "Añado estado bridge cliente",
+          "timestamp": "2026-02-01T11:51:35+01:00",
+          "tree_id": "4622d59550693001df735df62519d090e335eaa8",
+          "url": "https://github.com/sergiomele97/Linked_crystal_monorepo/commit/85e1bb0ddeb941051310a0fccb3b1e978e9fa6b4"
+        },
+        "date": 1769943153687,
+        "tool": "customSmallerIsBetter",
+        "benches": [
+          {
+            "name": "CPU Usage",
+            "value": 40.00002524001592,
+            "unit": "%"
+          },
+          {
+            "name": "Latency",
+            "value": 0.00031817830451863894,
             "unit": "ms"
           },
           {
