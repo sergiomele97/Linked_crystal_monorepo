@@ -1,5 +1,5 @@
 window.BENCHMARK_DATA = {
-  "lastUpdate": 1769947490347,
+  "lastUpdate": 1769947854286,
   "repoUrl": "https://github.com/sergiomele97/Linked_crystal_monorepo",
   "entries": {
     "Go Backend Performance": [
@@ -900,6 +900,55 @@ window.BENCHMARK_DATA = {
           {
             "name": "RAM per Client",
             "value": 69.47526830808081,
+            "unit": "KB"
+          },
+          {
+            "name": "Failure Count",
+            "value": 0,
+            "unit": "count"
+          },
+          {
+            "name": "Active Players",
+            "value": 500,
+            "unit": "count"
+          }
+        ]
+      },
+      {
+        "commit": {
+          "author": {
+            "email": "sergiomele97@gmail.com",
+            "name": "Sergio Melero",
+            "username": "sergiomele97"
+          },
+          "committer": {
+            "email": "sergiomele97@gmail.com",
+            "name": "Sergio Melero",
+            "username": "sergiomele97"
+          },
+          "distinct": true,
+          "id": "c2d39207e355d88a510f447ba270802952edfa40",
+          "message": "modifico pipeline test colores",
+          "timestamp": "2026-02-01T13:09:54+01:00",
+          "tree_id": "ab31f0f6deb1787d98795698cf1b982428f54a85",
+          "url": "https://github.com/sergiomele97/Linked_crystal_monorepo/commit/c2d39207e355d88a510f447ba270802952edfa40"
+        },
+        "date": 1769947853740,
+        "tool": "customSmallerIsBetter",
+        "benches": [
+          {
+            "name": "CPU Usage",
+            "value": 40.00001307200428,
+            "unit": "%"
+          },
+          {
+            "name": "Latency",
+            "value": 0.0002833362067172881,
+            "unit": "ms"
+          },
+          {
+            "name": "RAM per Client",
+            "value": 69.19568976358148,
             "unit": "KB"
           },
           {
