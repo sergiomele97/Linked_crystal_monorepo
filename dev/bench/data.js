@@ -1,5 +1,5 @@
 window.BENCHMARK_DATA = {
-  "lastUpdate": 1769943154110,
+  "lastUpdate": 1769943579218,
   "repoUrl": "https://github.com/sergiomele97/Linked_crystal_monorepo",
   "entries": {
     "Go Backend Performance": [
@@ -802,6 +802,55 @@ window.BENCHMARK_DATA = {
           {
             "name": "RAM per Client",
             "value": 68.780515625,
+            "unit": "KB"
+          },
+          {
+            "name": "Failure Count",
+            "value": 0,
+            "unit": "count"
+          },
+          {
+            "name": "Active Players",
+            "value": 500,
+            "unit": "count"
+          }
+        ]
+      },
+      {
+        "commit": {
+          "author": {
+            "email": "sergiomele97@gmail.com",
+            "name": "Sergio Melero",
+            "username": "sergiomele97"
+          },
+          "committer": {
+            "email": "sergiomele97@gmail.com",
+            "name": "Sergio Melero",
+            "username": "sergiomele97"
+          },
+          "distinct": true,
+          "id": "2cea7807f817f51eb80de9d8a6e14214f4012afe",
+          "message": "añado estado puente",
+          "timestamp": "2026-02-01T11:58:38+01:00",
+          "tree_id": "620105441bdd109efedf33e0b98c51f5a98c9434",
+          "url": "https://github.com/sergiomele97/Linked_crystal_monorepo/commit/2cea7807f817f51eb80de9d8a6e14214f4012afe"
+        },
+        "date": 1769943578368,
+        "tool": "customSmallerIsBetter",
+        "benches": [
+          {
+            "name": "CPU Usage",
+            "value": 39.99999759200015,
+            "unit": "%"
+          },
+          {
+            "name": "Latency",
+            "value": 0.0003118191860669714,
+            "unit": "ms"
+          },
+          {
+            "name": "RAM per Client",
+            "value": 69.94724961577869,
             "unit": "KB"
           },
           {
