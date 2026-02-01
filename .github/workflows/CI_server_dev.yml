@@ -21,5 +21,7 @@ jobs:
 
     - name: Run Tests
       working-directory: packages/server/src
-      # Run tests with verbose output to see our ✅ logs
-      run: go test -v ./test/...
+      # Usamos nuestro script para obtener colores y resumen en los logs de CI
+      run: |
+        chmod +x run_tests.sh
+        ./run_tests.sh
