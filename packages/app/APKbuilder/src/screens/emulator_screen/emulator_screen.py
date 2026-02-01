@@ -8,6 +8,7 @@ from screens.emulator_screen.components.video_display import VideoDisplay
 from screens.emulator_screen.components.chat_interface import ChatInterface
 from services.emulator.emulator_core_interface import EmulatorCoreInterface
 from services.chat.chat_manager import ChatManager
+from services.debug.debug_log_manager import DebugLogManager
 from kivy.app import App
 from kivy.clock import Clock
 
@@ -25,6 +26,9 @@ class EmulatorScreen(Screen):
         
         # Initialize ChatManager locally (hierarchy change)
         self.chat_manager = ChatManager()
+        
+        # Initialize DebugLogManager
+        self.debug_log_manager = DebugLogManager()
         
         # Start link stats loop
         self.link_stats_event = Clock.schedule_interval(self.update_link_stats, 0.5)

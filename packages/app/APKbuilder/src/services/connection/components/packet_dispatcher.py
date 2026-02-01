@@ -1,5 +1,6 @@
 from models.packet import Packet
 from kivy.app import App
+from services.logger import log
 
 class PacketDispatcher:
     PACKET_SIZE = 24
@@ -21,7 +22,7 @@ class PacketDispatcher:
         if len(data) == 4 and self.my_id is None:
             self.my_id = int.from_bytes(data, "little")
             self.app.appData.userID = self.my_id
-            print(f"My ID: {self.my_id}")
+            log(f"My ID: {self.my_id}")
             return
 
         # Multiplexed Data
@@ -50,7 +51,7 @@ class PacketDispatcher:
                     continue
                 self.packet_store.append(p)
             except Exception as e:
-                print(f"Packet Decode Error: {e}")
+                log(f"Packet Decode Error: {e}")
 
     def _handle_chat_data(self, payload):
         if len(payload) < 4:

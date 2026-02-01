@@ -1,5 +1,6 @@
 from kivy.utils import platform
 import os
+from services.logger import log
 
 if platform == 'android':
     from android.storage import app_storage_path
@@ -15,11 +16,11 @@ class DevTools:
 
         try:
             archivos = os.listdir(destino_dir)
-            print(f"[TEST] Contenido de {destino_dir}: {archivos}")
+            log(f"[TEST] Contenido de {destino_dir}: {archivos}")
 
             father_screen.ids.output_label.text = (
                 f"Archivos en storage interno:\n{archivos}"
             )
         except Exception as e:
-            print(f"[ERROR] No se pudo listar: {e}")
+            log(f"[ERROR] No se pudo listar: {e}")
             menu_screen.ids.output_label.text = f"Error al listar: {e}"

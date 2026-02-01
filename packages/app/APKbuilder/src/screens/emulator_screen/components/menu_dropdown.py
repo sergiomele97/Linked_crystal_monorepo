@@ -4,6 +4,8 @@ from kivy.properties import ObjectProperty
 from services.devTools.devTools import DevTools
 
 from screens.emulator_screen.components.link_interface import LinkInterface
+from screens.emulator_screen.components.debug_log_interface import DebugLogInterface
+from env import ENV
 
 
 class MenuDropdown(FloatLayout):
@@ -12,7 +14,7 @@ class MenuDropdown(FloatLayout):
 
     def __init__(self, **kwargs):
         super().__init__(**kwargs)
-        self.size_hint = (0.3, 0.4)
+        self.size_hint = (0.3, 0.5)
         self.pos_hint = {"x": 0.65, "y": 0.05}
         self.build_content()
         self.teclado_visible = False
@@ -31,12 +33,23 @@ class MenuDropdown(FloatLayout):
         btn2 = Button(
             text="Link",
             size_hint=(1, 0.3),
-            pos_hint={"x": 0, "y": 0.4},
+            pos_hint={"x": 0, "y": 0.35},
             background_color=(0.25, 0.55, 0.8, 1),
             color=(1, 1, 1, 1)
         )
         btn2.bind(on_release=self.opcion2)
         self.add_widget(btn2)
+
+        if ENV in ["local", "desarrollo"]:
+            btn3 = Button(
+                text="Debug logs",
+                size_hint=(1, 0.3),
+                pos_hint={"x": 0, "y": 0},
+                background_color=(0.25, 0.55, 0.8, 1),
+                color=(1, 1, 1, 1)
+            )
+            btn3.bind(on_release=self.opcion3)
+            self.add_widget(btn3)
 
     # ---------------- FUNCIONES ---------------- #
 
@@ -52,6 +65,11 @@ class MenuDropdown(FloatLayout):
         self.link_interface = LinkInterface(father_screen=self.father_screen)
         self.link_interface.mostrar_teclado_link()
         self.teclado_visible = True
+
+    def opcion3(self, *args):
+        self.close()
+        self.debug_log_interface = DebugLogInterface(father_screen=self.father_screen)
+        self.debug_log_interface.mostrar_logs()
 
     def cerrar_teclado(self):
         if self.teclado_visible:
