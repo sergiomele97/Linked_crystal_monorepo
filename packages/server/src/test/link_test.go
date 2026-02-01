@@ -29,15 +29,29 @@ func TestLinkSystem(t *testing.T) {
 			}
 			defer conn.Close()
 
-			// Wait for data
+			// Wait for "bridged" signal first
 			conn.SetReadDeadline(time.Now().Add(2 * time.Second))
 			_, msg, err := conn.ReadMessage()
 			if err != nil {
-				t.Error("Client A Read Error:", err)
+				t.Error("Client A Read bridged Error:", err)
+				doneA <- false
+				return
+			}
+			if string(msg) != "bridged" {
+				t.Error("Client A Expected 'bridged', got:", string(msg))
+				doneA <- false
+				return
+			}
+
+			// Wait for actual data
+			_, msg, err = conn.ReadMessage()
+			if err != nil {
+				t.Error("Client A Read data Error:", err)
 				doneA <- false
 				return
 			}
 			if string(msg) != "HelloFromB" {
+				t.Error("Client A Expected 'HelloFromB', got:", string(msg))
 				doneA <- false
 				return
 			}

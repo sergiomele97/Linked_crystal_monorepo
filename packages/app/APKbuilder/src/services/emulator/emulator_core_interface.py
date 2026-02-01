@@ -8,6 +8,7 @@ import os
 from services.environment.environment_manager import solicitar_permisos
 from services.emulator.emulator_loop import EmulationLoop
 from services.connection.link_cable.link_client import LinkClient
+from services.logger import log
 
 
 class EmulatorCoreInterface:
@@ -81,7 +82,7 @@ class EmulatorCoreInterface:
             self.pyboy.set_emulation_speed(1)
         except Exception as e:
             if self.on_text_output:
-                print(f"Error al cargar ROM: {e}")
+                log(f"Error al cargar ROM: {e}")
             return
 
         # Crear y lanzar el loop de emulación
@@ -112,7 +113,7 @@ class EmulatorCoreInterface:
 
             file_size = os.path.getsize(RAMfile)
             self.on_text_output(f"[DEBUG] Ram guardada: {RAMfile} ({file_size} bytes)")
-            print(f"[DEBUG] Ram guardada: {RAMfile} ({file_size} bytes)")
+            log(f"[DEBUG] Ram guardada: {RAMfile} ({file_size} bytes)")
 
         except Exception as e:
             if self.on_text_output:

@@ -4,6 +4,7 @@ import os
 import certifi
 import websockets
 from env import SSL_URL, ENV, STATIC_TOKEN
+from services.logger import log
 
 class SocketClient:
     def __init__(self):
@@ -20,7 +21,7 @@ class SocketClient:
 
     async def connect(self, base_url):
         full_url = f"{base_url}?token={self.token}"
-        print(f"Connecting to: {full_url}")
+        log(f"Connecting to: {full_url}")
         
         return websockets.connect(
             full_url,

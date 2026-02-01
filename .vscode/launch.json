@@ -26,7 +26,7 @@
             "console": "integratedTerminal"
         },
         {
-            "name": "Test: Go server",
+            "name": "Test: Go server (Standard)",
             "type": "go",
             "request": "launch",
             "mode": "test",
@@ -42,7 +42,9 @@
             "type": "node",
             "request": "launch",
             "runtimeExecutable": "echo",
-            "runtimeArgs": ["Copiado al portapapeles"],
+            "runtimeArgs": [
+                "Copiado al portapapeles"
+            ],
             "preLaunchTask": "Copy Source to Clipboard",
             "console": "internalConsole"
         },
@@ -52,8 +54,22 @@
             "request": "launch",
             "mode": "auto",
             "noDebug": true,
-            "program": "${workspaceFolder}/packages/server/src/cost/hardware/stress.go", 
-            "args": ["-clients=500", "-freq=100ms"],
+            "program": "${workspaceFolder}/packages/server/src/cost/hardware/stress.go",
+            "args": [
+                "-clients=500",
+                "-freq=100ms"
+            ],
+            "console": "integratedTerminal"
+        },
+        {
+            "name": "Test: Go server",
+            "type": "node",
+            "request": "launch",
+            "runtimeExecutable": "bash",
+            "runtimeArgs": [
+                "${workspaceFolder}/packages/server/src/run_tests.sh"
+            ],
+            "cwd": "${workspaceFolder}/packages/server/src",
             "console": "integratedTerminal"
         },
         {

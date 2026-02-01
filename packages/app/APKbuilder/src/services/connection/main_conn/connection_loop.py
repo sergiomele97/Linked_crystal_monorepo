@@ -4,6 +4,7 @@ from kivy.app import App
 from kivy.clock import Clock
 from services.connection.components.socket_client import SocketClient
 from services.connection.components.packet_dispatcher import PacketDispatcher
+from services.logger import log
 
 class ConnectionLoop:
     def __init__(self, get_url_callback):
@@ -67,7 +68,7 @@ class ConnectionLoop:
                 pkt_bytes = self.localPacket.to_bytes()
                 await ws.send(b'\x01' + pkt_bytes)
             except Exception as e:
-                print("❌ Send Error:", e)
+                log(f"❌ Send Error: {e}")
                 return
             await asyncio.sleep(0.1)
 
@@ -77,7 +78,7 @@ class ConnectionLoop:
                 data = await ws.recv()
                 self.dispatcher.handle_data(data)
             except Exception as e:
-                print("❌ Recv Error:", e)
+                log(f"❌ Recv Error: {e}")
                 return
 
     async def _main(self):
@@ -93,7 +94,7 @@ class ConnectionLoop:
 
             try:
                 async with await self.client.connect(base_url) as ws:
-                    print("✔ Connected")
+                    log("✔ Connected")
                     if not was_connected:
                         self.on_connected()
                     was_connected = True
@@ -109,11 +110,11 @@ class ConnectionLoop:
                         t.cancel()
 
             except Exception as e:
-                print(f"⚠ WebSocket Error: {e}")
+                log(f"⚠ WebSocket Error: {e}")
                 if was_connected:
                     self.on_disconnected(str(e))
                 was_connected = False
             
-            print(f"Retrying in {backoff}s...")
+            log(f"Retrying in {backoff}s...")
             await asyncio.sleep(backoff)
             backoff = min(backoff * 2, max_backoff)

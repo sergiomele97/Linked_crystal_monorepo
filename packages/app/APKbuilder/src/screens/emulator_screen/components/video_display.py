@@ -1,16 +1,17 @@
 from kivy.uix.floatlayout import FloatLayout
 from kivy.graphics.texture import Texture
 from kivy.clock import Clock
+from services.logger import log
 
 
 class VideoDisplay(FloatLayout):
     def on_kv_post(self, base_widget):
         self.image_widget = self.ids.emu_image
-        self.label = self.ids.label
         self._texture = None  
 
     def display_message(self, message):
-        self.label.text = message
+        # Ahora solo lo mandamos al logger central para que se guarde en la lista
+        log(message)
 
     def update_frame(self, arr):
         """Recibe un numpy.ndarray (h, w, 4) con RGBA"""
