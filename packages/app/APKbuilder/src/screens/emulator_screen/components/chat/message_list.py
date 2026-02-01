@@ -3,6 +3,7 @@ from kivy.uix.scrollview import ScrollView
 from kivy.uix.anchorlayout import AnchorLayout
 from kivy.uix.label import Label
 from kivy.clock import Clock
+from kivy.metrics import sp
 
 class MessageList(ScrollView):
     def __init__(self, **kwargs):
@@ -38,7 +39,8 @@ class MessageList(ScrollView):
             halign="left",
             valign="top",
             color=(1, 1, 1, 1),
-            padding=(10, 5)
+            padding=(10, 5),
+            font_size=sp(18)
         )
         lbl.bind(width=lambda instance, value: setattr(instance, 'text_size', (value, None)))
         lbl.bind(texture_size=lambda instance, value: setattr(instance, 'height', value[1]))

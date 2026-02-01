@@ -11,7 +11,7 @@ class ChatView(ModalView):
     def __init__(self, **kwargs):
         super().__init__(**kwargs)
         self.size_hint = (0.85, 0.5)
-        self.pos_hint = {"center_x": 0.5, "center_y": 0.6}
+        self.pos_hint = {"center_x": 0.5, "center_y": 0.7}
         self.background_color = (0, 0, 0, 0)
         self.auto_dismiss = True
 
