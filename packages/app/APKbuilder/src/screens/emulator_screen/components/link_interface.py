@@ -5,6 +5,7 @@ from kivy.uix.image import Image
 from kivy.graphics import Color, RoundedRectangle
 
 from kivy.app import App
+from kivy.metrics import sp
 
 
 class LinkInterface:
@@ -37,7 +38,7 @@ class LinkInterface:
             pos_hint={"x": 0.05, "y": 0.9},
             halign="left",
             valign="middle",
-            font_size=16,
+            font_size=sp(15),
             color=(0.8, 0.9, 1, 1)
         )
         self.lbl_your_id.bind(size=self.lbl_your_id.setter("text_size"))
@@ -62,7 +63,7 @@ class LinkInterface:
             pos_hint={"x": 0.05, "y": 0.82},
             halign="left",
             valign="middle",
-            font_size=15,
+            font_size=sp(15),
             color=(1, 1, 1, 1)
         )
         self.lbl_msg.bind(size=self.lbl_msg.setter("text_size"))
@@ -75,7 +76,7 @@ class LinkInterface:
             pos_hint={"x": 0.05, "y": 0.68},
             halign="left",
             valign="middle",
-            font_size=28,
+            font_size=sp(15),
             color=(1, 1, 0.8, 1)
         )
         self.display.bind(size=self.display.setter("text_size"))
