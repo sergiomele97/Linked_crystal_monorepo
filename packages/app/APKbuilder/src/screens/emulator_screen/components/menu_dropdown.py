@@ -20,15 +20,16 @@ class MenuDropdown(FloatLayout):
         self.teclado_visible = False
 
     def build_content(self):
-        btn1 = Button(
-            text="Save RAM",
-            size_hint=(1, 0.3),
-            pos_hint={"x": 0, "y": 0.7},
-            background_color=(0.25, 0.55, 0.8, 1),
-            color=(1, 1, 1, 1)
-        )
-        btn1.bind(on_release=self.opcion1)
-        self.add_widget(btn1)
+        if ENV in ["local", "desarrollo"]:
+            btn1 = Button(
+                text="Save RAM",
+                size_hint=(1, 0.3),
+                pos_hint={"x": 0, "y": 0.7},
+                background_color=(0.25, 0.55, 0.8, 1),
+                color=(1, 1, 1, 1)
+            )
+            btn1.bind(on_release=self.opcion1)
+            self.add_widget(btn1)
 
         btn2 = Button(
             text="Link",
