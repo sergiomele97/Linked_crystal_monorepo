@@ -1,5 +1,5 @@
 window.BENCHMARK_DATA = {
-  "lastUpdate": 1769968572036,
+  "lastUpdate": 1769969088507,
   "repoUrl": "https://github.com/sergiomele97/Linked_crystal_monorepo",
   "entries": {
     "Go Backend Performance": [
@@ -998,6 +998,55 @@ window.BENCHMARK_DATA = {
           {
             "name": "RAM per Client",
             "value": 69.60456123737374,
+            "unit": "KB"
+          },
+          {
+            "name": "Failure Count",
+            "value": 0,
+            "unit": "count"
+          },
+          {
+            "name": "Active Players",
+            "value": 500,
+            "unit": "count"
+          }
+        ]
+      },
+      {
+        "commit": {
+          "author": {
+            "email": "sergiomele97@gmail.com",
+            "name": "Sergio Melero",
+            "username": "sergiomele97"
+          },
+          "committer": {
+            "email": "sergiomele97@gmail.com",
+            "name": "Sergio Melero",
+            "username": "sergiomele97"
+          },
+          "distinct": true,
+          "id": "4c04bd365167f515d1a61b329e8b2570fdbba222",
+          "message": "Escondo botones de desarrollo en produccion",
+          "timestamp": "2026-02-01T19:03:46+01:00",
+          "tree_id": "708d96cc072726d546ec106889ee18bdbc268d62",
+          "url": "https://github.com/sergiomele97/Linked_crystal_monorepo/commit/4c04bd365167f515d1a61b329e8b2570fdbba222"
+        },
+        "date": 1769969087956,
+        "tool": "customSmallerIsBetter",
+        "benches": [
+          {
+            "name": "CPU Usage",
+            "value": 40.000002320000135,
+            "unit": "%"
+          },
+          {
+            "name": "Latency",
+            "value": 0.0003519835606665312,
+            "unit": "ms"
+          },
+          {
+            "name": "RAM per Client",
+            "value": 69.04660884268537,
             "unit": "KB"
           },
           {
