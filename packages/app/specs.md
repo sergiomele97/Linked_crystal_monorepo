@@ -23,3 +23,5 @@ el usuario debe poder volver a abrir el chat y ver el mensaje de antes y escribi
 
 Escenario 3: (sincronizacion)
 
+
+Escenario 4: (2 jugadores)
