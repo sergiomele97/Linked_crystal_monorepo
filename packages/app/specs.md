@@ -20,3 +20,6 @@ Escenario 2: (emulator_screen.py)
   El usuario debe poder conectar , debe cerrarse la interfaz y aparecer el mensaje de waiting, con tx 0.
   El usuario debe poder conectar con otra id.
 el usuario debe poder volver a abrir el chat y ver el mensaje de antes y escribir otro.
+
+Escenario 3: (sincronizacion)
+
