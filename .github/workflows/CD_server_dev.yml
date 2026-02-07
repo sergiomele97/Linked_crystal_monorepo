@@ -59,6 +59,29 @@ jobs:
           PORT=${PORT:-8080}
           EOF
 
+          # Actualizar definición del servicio (por si cambia la ruta)
+          # Asumimos que el runner corre en /home/sergio/actions-runner/_work/Linked_crystal_monorepo/Linked_crystal_monorepo
+          # Ajustar rutas según el nombre real del directorio de trabajo del runner
+          WORKDIR="/home/sergio/actions-runner/_work/Linked_crystal_monorepo/Linked_crystal_monorepo/Linked_crystal/server"
+          EXEC_START="$WORKDIR/server"
+
+          sudo tee /etc/systemd/system/websocket-server.service > /dev/null <<SERVICE
+          [Unit]
+          Description=WebSocket Server (Dev)
+          After=network.target
+
+          [Service]
+          Type=simple
+          User=$USER
+          WorkingDirectory=$WORKDIR
+          ExecStart=$EXEC_START
+          Restart=always
+          EnvironmentFile=/etc/default/websocket-server
+
+          [Install]
+          WantedBy=multi-user.target
+          SERVICE
+
           # Recargar y reiniciar servicio systemd
           sudo systemctl daemon-reload
           sudo systemctl restart websocket-server
