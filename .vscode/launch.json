@@ -5,8 +5,8 @@
             "name": "Run: python client",
             "type": "debugpy",
             "request": "launch",
-            "program": "${workspaceFolder}/packages/app/APKbuilder/src/main.py",
-            "cwd": "${workspaceFolder}/packages/app/APKbuilder/src",
+            "program": "${workspaceFolder}/packages/app/src/main.py",
+            "cwd": "${workspaceFolder}/packages/app/src",
             "console": "integratedTerminal"
         },
         {

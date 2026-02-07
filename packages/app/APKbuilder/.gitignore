@@ -5,4 +5,4 @@
 bin/
 
 # Variables de entorno y secretos
-src/config.py
+# (Moved to packages/app/.gitignore)
