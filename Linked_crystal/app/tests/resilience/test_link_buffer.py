@@ -1,46 +1,53 @@
+
 import unittest
 import queue
+import sys
+import os
+
+# Add src to path
+sys.path.insert(0, os.path.abspath(os.path.join(os.path.dirname(__file__), '../../src')))
+
 from services.connection.link_cable.link_client import LinkClient
 
 class TestLinkClient(unittest.TestCase):
     def test_buffer_overflow_logic(self):
         # T-RES-02: Link Buffer Management logic
-        # We simulate the recv_loop's logic for putting bytes into the queue
-        client = LinkClient() # Default maxsize is 10000
+        client = LinkClient()
+        client.active = True # Important for SmartLinkQueue to work
         
-        # To make the test faster/practical, we'll use a smaller queue for this test
-        # but the logic is what matters. However, LinkClient hardcodes 10000.
-        # Let's test with the real limit since it's just 10k integers.
-        
-        # Fill to capacity
+        # Fill to capacity (10000)
         for i in range(10000):
             client.recv_queue.put_nowait(i)
             
         self.assertTrue(client.recv_queue.full())
         
         # Simulation of recv_loop drop logic:
-        # data = [99999]
         new_byte = 255
         try:
             client.recv_queue.put_nowait(new_byte)
         except queue.Full:
-            client.recv_queue.get_nowait() # Drops oldest (0)
+            # We must use super().get_nowait() or ensure SmartLinkQueue doesn't intercept
+            # actually SmartLinkQueue.get_nowait() calls SmartLinkQueue.get()
+            # which returns 0xFF if empty/inactive, but here it's FULL and active.
+            client.recv_queue.get(block=False) # Drops oldest (0)
             client.recv_queue.put_nowait(new_byte)
             
         self.assertEqual(client.recv_queue.qsize(), 10000)
         # Check that the first element is now 1, not 0
-        first = client.recv_queue.get_nowait()
+        client.active = True
+        first = client.recv_queue.get(block=False)
         self.assertEqual(first, 1)
 
     def test_get_byte_timeout(self):
-        # Verify get_byte returns 0xFF on timeout
+        # Verify get_byte returns 0xFF on timeout/empty
         client = LinkClient()
-        # Queue is empty
+        client.active = False # Inactive means always 0xFF
         val = client.get_byte()
         self.assertEqual(val, 0xFF)
 
     def test_get_byte_success(self):
         client = LinkClient()
+        client.active = True
         client.recv_queue.put_nowait(10)
         val = client.get_byte()
         self.assertEqual(val, 10)

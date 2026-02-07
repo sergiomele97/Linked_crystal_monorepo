@@ -7,7 +7,8 @@ import os
 from screens.menu_screen.components.rom_selector import select_rom
 from screens.menu_screen.components.menu_dropdown import MenuDropdown
 
-Builder.load_file("screens/menu_screen/menu_screen.kv")
+kv_path = os.path.join(os.path.dirname(__file__), "menu_screen.kv")
+Builder.load_file(kv_path)
 
 class MenuScreen(Screen):
     rom_cargado = BooleanProperty(False)
