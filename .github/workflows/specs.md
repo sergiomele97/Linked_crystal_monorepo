@@ -8,6 +8,8 @@ Entornos: local, development (dev) rama: main, production (prod) rama: release.
 
 Productos: app, server, wiki.
 
+Las pipelines deberán correr solo cuando sea necesario.
+
 CI:
 - Correr los tests.
 - Ejecuta benchmarks.
