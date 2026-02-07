@@ -2,7 +2,7 @@
     "version": "0.2.0",
     "configurations": [
         {
-            "name": "Run: python client",
+            "name": "Run: app",
             "type": "debugpy",
             "request": "launch",
             "program": "${workspaceFolder}/Linked_crystal/app/src/main.py",
@@ -10,15 +10,7 @@
             "console": "integratedTerminal"
         },
         {
-            "name": "Run: python client-mock",
-            "type": "debugpy",
-            "request": "launch",
-            "program": "${workspaceFolder}/Linked_crystal/server/src/client-mock/client_example.py",
-            "cwd": "${workspaceFolder}/Linked_crystal/server/src/client-mock",
-            "console": "integratedTerminal"
-        },
-        {
-            "name": "Run: Go server",
+            "name": "Run: server",
             "type": "go",
             "request": "launch",
             "mode": "debug",
@@ -26,15 +18,40 @@
             "console": "integratedTerminal"
         },
         {
-            "name": "Test: Go server (Standard)",
-            "type": "go",
+            "name": "Run: client-mock",
+            "type": "debugpy",
             "request": "launch",
-            "mode": "test",
-            "program": "${workspaceFolder}/Linked_crystal/server/src/test",
+            "program": "${workspaceFolder}/Linked_crystal/server/src/client-mock/client_example.py",
+            "cwd": "${workspaceFolder}/Linked_crystal/server/src/client-mock",
+            "console": "integratedTerminal"
+        },
+        {
+            "name": "Test: app",
+            "type": "debugpy",
+            "request": "launch",
+            "module": "unittest",
             "args": [
-                "-test.v"
+                "discover",
+                "-s",
+                "${workspaceFolder}/Linked_crystal/app/tests",
+                "-p",
+                "test_*.py"
             ],
-            "cwd": "${workspaceFolder}/Linked_crystal/server",
+            "cwd": "${workspaceFolder}/Linked_crystal/app",
+            "env": {
+                "PYTHONPATH": "${workspaceFolder}/Linked_crystal/app/src"
+            },
+            "console": "integratedTerminal"
+        },
+        {
+            "name": "Test: server",
+            "type": "node",
+            "request": "launch",
+            "runtimeExecutable": "bash",
+            "runtimeArgs": [
+                "${workspaceFolder}/Linked_crystal/server/src/run_tests.sh"
+            ],
+            "cwd": "${workspaceFolder}/Linked_crystal/server/src",
             "console": "integratedTerminal"
         },
         {
@@ -48,46 +65,14 @@
             "preLaunchTask": "Copy Source to Clipboard",
             "console": "internalConsole"
         },
-        {
-            "name": "Script: Stress Test",
-            "type": "go",
-            "request": "launch",
-            "mode": "auto",
-            "noDebug": true,
-            "program": "${workspaceFolder}/Linked_crystal/server/src/cost/hardware/stress.go",
-            "args": [
-                "-clients=500",
-                "-freq=100ms"
-            ],
-            "console": "integratedTerminal"
-        },
-        {
-            "name": "Test: Go server",
-            "type": "node",
-            "request": "launch",
-            "runtimeExecutable": "bash",
-            "runtimeArgs": [
-                "${workspaceFolder}/Linked_crystal/server/src/run_tests.sh"
-            ],
-            "cwd": "${workspaceFolder}/Linked_crystal/server/src",
-            "console": "integratedTerminal"
-        },
-        {
-            "name": "Script: Pprof Analysis",
-            "type": "node", // Usamos un dummy para disparar la tarea
-            "request": "launch",
-            "runtimeExecutable": "echo",
-            "preLaunchTask": "Pprof Analysis",
-            "console": "internalConsole"
-        }
     ],
     "compounds": [
         {
-            "name": "Run: Python + Go + Mock-client",
+            "name": "Run: app + server + client-mock",
             "configurations": [
-                "Run: python client",
-                "Run: python client-mock",
-                "Run: Go server"
+                "Run: app",
+                "Run: client-mock",
+                "Run: server"
             ]
         }
     ]
