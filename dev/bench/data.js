@@ -1,5 +1,5 @@
 window.BENCHMARK_DATA = {
-  "lastUpdate": 1770482146722,
+  "lastUpdate": 1770483071995,
   "repoUrl": "https://github.com/sergiomele97/Linked_crystal_monorepo",
   "entries": {
     "Go Backend Performance": [
@@ -1635,6 +1635,55 @@ window.BENCHMARK_DATA = {
           {
             "name": "RAM per Client",
             "value": 68.268515625,
+            "unit": "KB"
+          },
+          {
+            "name": "Failure Count",
+            "value": 0,
+            "unit": "count"
+          },
+          {
+            "name": "Active Players",
+            "value": 500,
+            "unit": "count"
+          }
+        ]
+      },
+      {
+        "commit": {
+          "author": {
+            "email": "sergiomele97@gmail.com",
+            "name": "Sergio Melero",
+            "username": "sergiomele97"
+          },
+          "committer": {
+            "email": "sergiomele97@gmail.com",
+            "name": "Sergio Melero",
+            "username": "sergiomele97"
+          },
+          "distinct": true,
+          "id": "c615c8e47a0a0e153f6b3c8c71a62120d12c08e2",
+          "message": "refactor vscode jsons",
+          "timestamp": "2026-02-07T17:49:59+01:00",
+          "tree_id": "6d4c9cff75f746effb0eead3266eb45c65f59a4a",
+          "url": "https://github.com/sergiomele97/Linked_crystal_monorepo/commit/c615c8e47a0a0e153f6b3c8c71a62120d12c08e2"
+        },
+        "date": 1770483071474,
+        "tool": "customSmallerIsBetter",
+        "benches": [
+          {
+            "name": "CPU Usage",
+            "value": 40.00000858400184,
+            "unit": "%"
+          },
+          {
+            "name": "Latency",
+            "value": 0.0003031378138221721,
+            "unit": "ms"
+          },
+          {
+            "name": "RAM per Client",
+            "value": 68.780515625,
             "unit": "KB"
           },
           {
