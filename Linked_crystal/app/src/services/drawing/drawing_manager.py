@@ -31,20 +31,20 @@ class DrawingManager:
 
     def update_frame(self):
         if self.on_frame:
-            frame_array = self.pyboy.screen.ndarray
+            # Capturamos el frame (ndarray crea una vista/copia del buffer de PyBoy)
+            frame_array = self.pyboy.screen.ndarray.copy()
 
             self.remotePlayerManager.updateOnScreenPlayersFromNetwork()
             self.synchronizationManager.updateLocalFineCoords()
 
             for player in self.onScreenPlayers.values():
-
                 player.updateFineCoords()
                 if self.ramData.is_gui_open:
                     continue
                 x_render_coord, y_render_coord = self.synchronizationManager.calculate_render_coords(
                     player.x_fine_coord, player.y_fine_coord
                 )
-                # Render sprite
+                # Render sprite directamente sobre la copia del frame
                 self.spriteRenderer.draw_sprite(
                     frame_array,
                     x_render_coord,
@@ -52,5 +52,6 @@ class DrawingManager:
                     player.current_sprite
                 )
 
+            # Enviamos el frame procesado al hilo de la UI
             Clock.schedule_once(lambda dt: self.on_frame(frame_array), 0)
     
