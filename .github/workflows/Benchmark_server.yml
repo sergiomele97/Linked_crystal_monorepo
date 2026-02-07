@@ -26,11 +26,11 @@ jobs:
         uses: actions/setup-go@v4
         with:
           go-version: '1.21'
-          cache-dependency-path: packages/server/src/go.sum
+          cache-dependency-path: Linked_crystal/server/src/go.sum
 
       - name: Run Server and Execute Stress Test
         run: |
-          cd packages/server/src
+          cd Linked_crystal/server/src
           # Iniciar servidor en segundo plano
           go run cmd/server/main.go & 
           
@@ -51,7 +51,7 @@ jobs:
         with:
           name: Go Backend Performance
           tool: 'customSmallerIsBetter'
-          output-file-path: 'packages/server/src/results.json'
+          output-file-path: 'Linked_crystal/server/src/results.json'
           github-token: ${{ secrets.GITHUB_TOKEN }}
           auto-push: true
           # Los resultados se guardarán en la rama 'gh-pages' para visualización

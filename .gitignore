@@ -13,11 +13,11 @@ __pycache__/
 
 # Environment variables & secrets
 **/.env
-packages/app/src/config.py
+Linked_crystal/app/src/config.py
 
 # Go binaries
 __debug_bin*
 
-# Kivy / Buildozer (packages/app)
+# Kivy / Buildozer (Linked_crystal/app)
 **/.buildozer/
 **/bin/

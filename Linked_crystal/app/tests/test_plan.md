@@ -1,6 +1,6 @@
 # Client Test Plan
 
-This document outlines the test cases for the Linked Crystal client application, derived from the [Functional Specification](file:///home/sergio/work/Linked_crystal_monorepo/packages/app/specs.md).
+This document outlines the test cases for the Linked Crystal client application, derived from the [Functional Specification](file:///home/sergio/work/Linked_crystal_monorepo/Linked_crystal/app/specs.md).
 
 ## 1. Test Strategy
 

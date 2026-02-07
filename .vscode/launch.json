@@ -5,16 +5,16 @@
             "name": "Run: python client",
             "type": "debugpy",
             "request": "launch",
-            "program": "${workspaceFolder}/packages/app/src/main.py",
-            "cwd": "${workspaceFolder}/packages/app/src",
+            "program": "${workspaceFolder}/Linked_crystal/app/src/main.py",
+            "cwd": "${workspaceFolder}/Linked_crystal/app/src",
             "console": "integratedTerminal"
         },
         {
             "name": "Run: python client-mock",
             "type": "debugpy",
             "request": "launch",
-            "program": "${workspaceFolder}/packages/server/src/client-mock/client_example.py",
-            "cwd": "${workspaceFolder}/packages/server/src/client-mock",
+            "program": "${workspaceFolder}/Linked_crystal/server/src/client-mock/client_example.py",
+            "cwd": "${workspaceFolder}/Linked_crystal/server/src/client-mock",
             "console": "integratedTerminal"
         },
         {
@@ -22,7 +22,7 @@
             "type": "go",
             "request": "launch",
             "mode": "debug",
-            "program": "${workspaceFolder}/packages/server/src/cmd/server",
+            "program": "${workspaceFolder}/Linked_crystal/server/src/cmd/server",
             "console": "integratedTerminal"
         },
         {
@@ -30,11 +30,11 @@
             "type": "go",
             "request": "launch",
             "mode": "test",
-            "program": "${workspaceFolder}/packages/server/src/test",
+            "program": "${workspaceFolder}/Linked_crystal/server/src/test",
             "args": [
                 "-test.v"
             ],
-            "cwd": "${workspaceFolder}/packages/server",
+            "cwd": "${workspaceFolder}/Linked_crystal/server",
             "console": "integratedTerminal"
         },
         {
@@ -54,7 +54,7 @@
             "request": "launch",
             "mode": "auto",
             "noDebug": true,
-            "program": "${workspaceFolder}/packages/server/src/cost/hardware/stress.go",
+            "program": "${workspaceFolder}/Linked_crystal/server/src/cost/hardware/stress.go",
             "args": [
                 "-clients=500",
                 "-freq=100ms"
@@ -67,9 +67,9 @@
             "request": "launch",
             "runtimeExecutable": "bash",
             "runtimeArgs": [
-                "${workspaceFolder}/packages/server/src/run_tests.sh"
+                "${workspaceFolder}/Linked_crystal/server/src/run_tests.sh"
             ],
-            "cwd": "${workspaceFolder}/packages/server/src",
+            "cwd": "${workspaceFolder}/Linked_crystal/server/src",
             "console": "integratedTerminal"
         },
         {

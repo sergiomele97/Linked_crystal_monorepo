@@ -15,10 +15,10 @@ jobs:
         uses: actions/setup-go@v5
         with:
           go-version: '1.25.3'
-          cache-dependency-path: packages/server/src/go.sum
+          cache-dependency-path: Linked_crystal/server/src/go.sum
 
       - name: Build Go binary
-        working-directory: packages/server/src
+        working-directory: Linked_crystal/server/src
         run: |
           go mod download
           CGO_ENABLED=0 GOOS=linux go build -v -ldflags="-s -w" -o ../server-bin ./cmd/server
@@ -29,7 +29,7 @@ jobs:
           host: ${{ secrets.SERVER_HOST }}
           username: ${{ secrets.SERVER_USER }}
           key: ${{ secrets.SSH_PRIVATE_KEY }}
-          source: "packages/server/server-bin"
+          source: "Linked_crystal/server/server-bin"
           target: "~/linked-crystal-server"
           strip_components: 1
 

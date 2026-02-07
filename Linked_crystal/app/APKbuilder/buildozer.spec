@@ -43,7 +43,7 @@ requirements = python3,kivy,plyer,setuptools,pillow,cython,pyboy,websockets,cert
 # Sets custom source for any requirements with recipes
 # requirements.source.kivy = ../../kivy
 
-cython_include_dirs = /home/sergio/linked_crystal/packages/app/APKbuilder/.buildozer/android/platform/build-arm64-v8a/build/other_builds/cython/arm64-v8a__ndk_target_21/cython/Cython/Includes/
+cython_include_dirs = /home/sergio/linked_crystal/Linked_crystal/app/APKbuilder/.buildozer/android/platform/build-arm64-v8a/build/other_builds/cython/arm64-v8a__ndk_target_21/cython/Cython/Includes/
 
 
 # (str) Presplash of the application
