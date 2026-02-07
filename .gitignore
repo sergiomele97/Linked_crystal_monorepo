@@ -1,15 +1,23 @@
-# Virtual environment
+# Virtual environments
 **/.venv/
 **/venv/
 
-# PyCharm/JetBrains configuration
+# IDE configuration
 .idea/
 
-# Python bytecode cache
+# Python bytecode & cache
 __pycache__/
- 
-# Environment variables
+*.py[cod]
+*$py.class
+.pytest_cache/
+
+# Environment variables & secrets
 **/.env
+packages/app/src/config.py
 
 # Go binaries
 __debug_bin*
+
+# Kivy / Buildozer (packages/app)
+**/.buildozer/
+**/bin/
