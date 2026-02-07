@@ -1,5 +1,5 @@
 window.BENCHMARK_DATA = {
-  "lastUpdate": 1770392375174,
+  "lastUpdate": 1770459200156,
   "repoUrl": "https://github.com/sergiomele97/Linked_crystal_monorepo",
   "entries": {
     "Go Backend Performance": [
@@ -1194,6 +1194,55 @@ window.BENCHMARK_DATA = {
           {
             "name": "RAM per Client",
             "value": 68.54268637048193,
+            "unit": "KB"
+          },
+          {
+            "name": "Failure Count",
+            "value": 0,
+            "unit": "count"
+          },
+          {
+            "name": "Active Players",
+            "value": 500,
+            "unit": "count"
+          }
+        ]
+      },
+      {
+        "commit": {
+          "author": {
+            "email": "sergiomele97@gmail.com",
+            "name": "Sergio Melero",
+            "username": "sergiomele97"
+          },
+          "committer": {
+            "email": "sergiomele97@gmail.com",
+            "name": "Sergio Melero",
+            "username": "sergiomele97"
+          },
+          "distinct": true,
+          "id": "68bbde46593274d8a4c5f725d895e2c1ac3fb43e",
+          "message": "REFACTOR PELIGROSO",
+          "timestamp": "2026-02-07T11:12:20+01:00",
+          "tree_id": "e02691b5645040643f618bdb1f46c8d7ca731bed",
+          "url": "https://github.com/sergiomele97/Linked_crystal_monorepo/commit/68bbde46593274d8a4c5f725d895e2c1ac3fb43e"
+        },
+        "date": 1770459199716,
+        "tool": "customSmallerIsBetter",
+        "benches": [
+          {
+            "name": "CPU Usage",
+            "value": 40.00001724000743,
+            "unit": "%"
+          },
+          {
+            "name": "Latency",
+            "value": 0.00042108245097364843,
+            "unit": "ms"
+          },
+          {
+            "name": "RAM per Client",
+            "value": 69.05674259538152,
             "unit": "KB"
           },
           {
