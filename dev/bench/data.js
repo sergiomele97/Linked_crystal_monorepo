@@ -1,5 +1,5 @@
 window.BENCHMARK_DATA = {
-  "lastUpdate": 1770477725343,
+  "lastUpdate": 1770478099945,
   "repoUrl": "https://github.com/sergiomele97/Linked_crystal_monorepo",
   "entries": {
     "Go Backend Performance": [
@@ -1483,6 +1483,55 @@ window.BENCHMARK_DATA = {
           {
             "name": "Latency",
             "value": 0.0003358915302657319,
+            "unit": "ms"
+          },
+          {
+            "name": "RAM per Client",
+            "value": 68.780515625,
+            "unit": "KB"
+          },
+          {
+            "name": "Failure Count",
+            "value": 0,
+            "unit": "count"
+          },
+          {
+            "name": "Active Players",
+            "value": 500,
+            "unit": "count"
+          }
+        ]
+      },
+      {
+        "commit": {
+          "author": {
+            "email": "sergiomele97@gmail.com",
+            "name": "Sergio Melero",
+            "username": "sergiomele97"
+          },
+          "committer": {
+            "email": "sergiomele97@gmail.com",
+            "name": "Sergio Melero",
+            "username": "sergiomele97"
+          },
+          "distinct": true,
+          "id": "90a0669625ab0aaac2da89a166bd9ee35394b587",
+          "message": "Merge branch 'link-cable'",
+          "timestamp": "2026-02-07T16:27:21+01:00",
+          "tree_id": "73fd527ee3d9955eceb9d88cc7a75f8b75bc1850",
+          "url": "https://github.com/sergiomele97/Linked_crystal_monorepo/commit/90a0669625ab0aaac2da89a166bd9ee35394b587"
+        },
+        "date": 1770478099581,
+        "tool": "customSmallerIsBetter",
+        "benches": [
+          {
+            "name": "CPU Usage",
+            "value": 39.99996160003686,
+            "unit": "%"
+          },
+          {
+            "name": "Latency",
+            "value": 0.0003361593765647071,
             "unit": "ms"
           },
           {
