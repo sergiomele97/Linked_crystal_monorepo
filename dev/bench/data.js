@@ -1,5 +1,5 @@
 window.BENCHMARK_DATA = {
-  "lastUpdate": 1770548876024,
+  "lastUpdate": 1770555961986,
   "repoUrl": "https://github.com/sergiomele97/Linked_crystal_monorepo",
   "entries": {
     "Go Backend Performance": [
@@ -1831,6 +1831,55 @@ window.BENCHMARK_DATA = {
           {
             "name": "RAM per Client",
             "value": 68.268515625,
+            "unit": "KB"
+          },
+          {
+            "name": "Failure Count",
+            "value": 0,
+            "unit": "count"
+          },
+          {
+            "name": "Active Players",
+            "value": 500,
+            "unit": "count"
+          }
+        ]
+      },
+      {
+        "commit": {
+          "author": {
+            "email": "sergiomele97@gmail.com",
+            "name": "Sergio",
+            "username": "sergiomele97"
+          },
+          "committer": {
+            "email": "sergiomele97@gmail.com",
+            "name": "Sergio",
+            "username": "sergiomele97"
+          },
+          "distinct": true,
+          "id": "6238fa10bd7c6086e2541c5c69ca069d491f8605",
+          "message": "pipeline wiki",
+          "timestamp": "2026-02-08T14:04:59+01:00",
+          "tree_id": "86b3ed2726a6576401940c490df3a1ae66414dd1",
+          "url": "https://github.com/sergiomele97/Linked_crystal_monorepo/commit/6238fa10bd7c6086e2541c5c69ca069d491f8605"
+        },
+        "date": 1770555961447,
+        "tool": "customSmallerIsBetter",
+        "benches": [
+          {
+            "name": "CPU Usage",
+            "value": 40.00000064,
+            "unit": "%"
+          },
+          {
+            "name": "Latency",
+            "value": 0.00030111537452614406,
+            "unit": "ms"
+          },
+          {
+            "name": "RAM per Client",
+            "value": 377.9149210164835,
             "unit": "KB"
           },
           {
