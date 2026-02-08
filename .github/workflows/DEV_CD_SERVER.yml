@@ -1,4 +1,4 @@
-name: CD_server_dev
+name: DEV_CD_SERVER
 
 on:
   workflow_run:

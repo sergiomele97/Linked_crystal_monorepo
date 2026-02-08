@@ -1,4 +1,4 @@
-name: CD_server_pro
+name: PRO_CD_SERVER
 
 on:
   workflow_dispatch:

@@ -1,4 +1,4 @@
-name: CD_apk_dev
+name: DEV_CD_APP
 
 on:
   workflow_dispatch:
