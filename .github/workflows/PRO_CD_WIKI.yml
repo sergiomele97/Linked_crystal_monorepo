@@ -18,50 +18,67 @@ jobs:
       - name: Checkout Source
         uses: actions/checkout@v4
 
-      - name: Upload to GitHub Wiki
+      - name: Sync and Push to Wiki
         run: |
-          # Configure Git
+          # 1. Configuration
           git config --global user.name "github-actions[bot]"
           git config --global user.email "github-actions[bot]@users.noreply.github.com"
           
-          # Root of the workspace
           REPO_DIR=$(pwd)
-          
-          # Create a temp directory to clone the wiki repo
           WIKI_TEMP_DIR=$(mktemp -d)
-          
-          # URL of the wiki repo
           WIKI_URL="https://x-access-token:${{ github.token }}@github.com/${{ github.repository }}.wiki.git"
           
-          echo "Checking if Wiki repository exists..."
+          # 2. Diagnostics
+          echo "### Verifying Wiki accessibility..."
           if ! git ls-remote "$WIKI_URL" &> /dev/null; then
-            echo "::error::GitHub Wiki is not initialized. Please go to the Wiki tab on GitHub.com and create the first page manually."
+            echo "::error::GitHub Wiki is not initialized or not accessible. Create a page at https://github.com/${{ github.repository }}/wiki first."
             exit 1
           fi
 
-          echo "Cloning wiki repository..."
+          # 3. Clone
+          echo "### Cloning wiki..."
           git clone "$WIKI_URL" "$WIKI_TEMP_DIR"
-          
-          echo "Debug: Source directory contents:"
-          ls -R "$REPO_DIR/Linked_crystal/devex/docs"
-          
-          echo "Debug: Wiki directory contents (before sync):"
-          ls -R "$WIKI_TEMP_DIR"
-
-          echo "Syncing documentation..."
-          # Clean existing files in wiki (except .git)
-          find "$WIKI_TEMP_DIR" -maxdepth 1 -not -name '.git' -not -name '.' -exec rm -rf {} +
-          
-          # Copy new files from project docs
-          cp -R "$REPO_DIR/Linked_crystal/devex/docs/." "$WIKI_TEMP_DIR/"
-          
           cd "$WIKI_TEMP_DIR"
           
+          # Detect default branch
+          WIKI_BRANCH=$(git remote show origin | grep 'HEAD branch' | cut -d' ' -f5)
+          echo "### Wiki default branch: $WIKI_BRANCH"
+
+          # 4. Sync files
+          echo "### Contents of wiki BEFORE sync:"
+          ls -F
+          
+          # Preserve Home.md if it exists and we don't have one in source
+          HAS_HOME=false
+          if [ -f "Home.md" ]; then HAS_HOME=true; fi
+          
+          # Clean except .git
+          find . -maxdepth 1 -not -name '.git' -not -name '.' -exec rm -rf {} +
+          
+          # Copy source files
+          cp -R "$REPO_DIR/Linked_crystal/devex/docs/." .
+          
+          # If we had a Home.md and we don't have one now, restore it
+          if [ "$HAS_HOME" = true ] && [ ! -f "Home.md" ]; then
+            echo "Restoring Home.md..."
+            # Note: We deleted it above, so we should have backed it up if we wanted to keep it.
+            # Actually, let's just use 00_Introduction.md as Home.md if it exists.
+            if [ -f "00_Introduction.md" ]; then
+                cp "00_Introduction.md" "Home.md"
+                echo "00_Introduction.md promoted to Home.md"
+            fi
+          fi
+
+          echo "### Contents of wiki AFTER sync:"
+          ls -F
+          
+          # 5. Commit and Push
+          git add .
           if [[ -n "$(git status --porcelain)" ]]; then
-            echo "Changes detected. Pushing to Wiki..."
-            git add .
-            git commit -m "Update Wiki from main: ${GITHUB_SHA::7}"
-            git push "$WIKI_URL" HEAD:master || git push "$WIKI_URL" HEAD:main
+            echo "### Changes detected. Committing..."
+            git commit -m "Automated Wiki Update: ${GITHUB_SHA::7}"
+            echo "### Pushing to $WIKI_BRANCH..."
+            git push origin "$WIKI_BRANCH"
           else
-            echo "No changes in Wiki content."
+            echo "### No changes to commit."
           fi
