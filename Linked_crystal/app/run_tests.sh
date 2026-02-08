@@ -16,6 +16,12 @@ SCRIPT_DIR="$( cd "$( dirname "${BASH_SOURCE[0]}" )" && pwd )"
 PYTHONPATH="$SCRIPT_DIR/src"
 PYTHON_BIN="$SCRIPT_DIR/../../.venv/bin/python3"
 
+# Si no existe el venv, usamos el python del sistema (vålido para CI)
+if [ ! -f "$PYTHON_BIN" ]; then
+    PYTHON_BIN="python3"
+fi
+
+
 # Ejecutamos unittest verbose y procesamos con awk
 # Redirigimos stderr a stdout porque unittest escribe ahí los resultados por defecto
 $PYTHON_BIN -m unittest discover -v -s "$SCRIPT_DIR/tests" 2>&1 | awk -v green="$GREEN" -v red="$RED" -v yellow="$YELLOW" -v nc="$NC" '
