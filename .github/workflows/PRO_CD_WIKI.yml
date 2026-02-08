@@ -9,28 +9,48 @@ on:
   workflow_dispatch:
 
 permissions:
-  contents: read
-  pages: write
-  id-token: write
+  contents: write
 
 jobs:
-  deploy:
-    environment:
-      name: github-pages
-      url: ${{ steps.deployment.outputs.page_url }}
+  deploy-wiki:
     runs-on: ubuntu-latest
     steps:
-      - name: Checkout
+      - name: Checkout Source
         uses: actions/checkout@v4
 
-      - name: Setup Pages
-        uses: actions/configure-pages@v4
-
-      - name: Upload artifact
-        uses: actions/upload-pages-artifact@v3
-        with:
-          path: 'Linked_crystal/devex/docs'
-
-      - name: Deploy to GitHub Pages
-        id: deployment
-        uses: actions/deploy-pages@v4
+      - name: Upload to GitHub Wiki
+        run: |
+          # Configure Git
+          git config --global user.name "github-actions[bot]"
+          git config --global user.email "github-actions[bot]@users.noreply.github.com"
+          
+          # Root of the workspace
+          REPO_DIR=$(pwd)
+          
+          # Create a temp directory to clone the wiki repo
+          WIKI_TEMP_DIR=$(mktemp -d)
+          
+          # URL of the wiki repo
+          # format: https://x-access-token:${{ secrets.GITHUB_TOKEN }}@github.com/${{ github.repository }}.wiki.git
+          WIKI_URL="https://x-access-token:${{ github.token }}@github.com/${{ github.repository }}.wiki.git"
+          
+          echo "Cloning wiki repository..."
+          git clone "$WIKI_URL" "$WIKI_TEMP_DIR"
+          
+          echo "Syncing documentation..."
+          # Clean existing files in wiki (except .git)
+          find "$WIKI_TEMP_DIR" -maxdepth 1 -not -name '.git' -not -name '.' -exec rm -rf {} +
+          
+          # Copy new files from project docs
+          cp -R "$REPO_DIR/Linked_crystal/devex/docs/." "$WIKI_TEMP_DIR/"
+          
+          cd "$WIKI_TEMP_DIR"
+          
+          if [[ -n "$(git status --porcelain)" ]]; then
+            echo "Changes detected. Pushing to Wiki..."
+            git add .
+            git commit -m "Update Wiki from main: ${GITHUB_SHA::7}"
+            git push origin master || git push origin main
+          else
+            echo "No changes in Wiki content."
+          fi
