@@ -31,12 +31,23 @@ jobs:
           WIKI_TEMP_DIR=$(mktemp -d)
           
           # URL of the wiki repo
-          # format: https://x-access-token:${{ secrets.GITHUB_TOKEN }}@github.com/${{ github.repository }}.wiki.git
           WIKI_URL="https://x-access-token:${{ github.token }}@github.com/${{ github.repository }}.wiki.git"
           
+          echo "Checking if Wiki repository exists..."
+          if ! git ls-remote "$WIKI_URL" &> /dev/null; then
+            echo "::error::GitHub Wiki is not initialized. Please go to the Wiki tab on GitHub.com and create the first page manually."
+            exit 1
+          fi
+
           echo "Cloning wiki repository..."
           git clone "$WIKI_URL" "$WIKI_TEMP_DIR"
           
+          echo "Debug: Source directory contents:"
+          ls -R "$REPO_DIR/Linked_crystal/devex/docs"
+          
+          echo "Debug: Wiki directory contents (before sync):"
+          ls -R "$WIKI_TEMP_DIR"
+
           echo "Syncing documentation..."
           # Clean existing files in wiki (except .git)
           find "$WIKI_TEMP_DIR" -maxdepth 1 -not -name '.git' -not -name '.' -exec rm -rf {} +
@@ -50,7 +61,7 @@ jobs:
             echo "Changes detected. Pushing to Wiki..."
             git add .
             git commit -m "Update Wiki from main: ${GITHUB_SHA::7}"
-            git push origin master || git push origin main
+            git push "$WIKI_URL" HEAD:master || git push "$WIKI_URL" HEAD:main
           else
             echo "No changes in Wiki content."
           fi
