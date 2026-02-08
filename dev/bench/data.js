@@ -1,5 +1,5 @@
 window.BENCHMARK_DATA = {
-  "lastUpdate": 1770483071995,
+  "lastUpdate": 1770545322707,
   "repoUrl": "https://github.com/sergiomele97/Linked_crystal_monorepo",
   "entries": {
     "Go Backend Performance": [
@@ -1679,6 +1679,55 @@ window.BENCHMARK_DATA = {
           {
             "name": "Latency",
             "value": 0.0003031378138221721,
+            "unit": "ms"
+          },
+          {
+            "name": "RAM per Client",
+            "value": 68.780515625,
+            "unit": "KB"
+          },
+          {
+            "name": "Failure Count",
+            "value": 0,
+            "unit": "count"
+          },
+          {
+            "name": "Active Players",
+            "value": 500,
+            "unit": "count"
+          }
+        ]
+      },
+      {
+        "commit": {
+          "author": {
+            "email": "sergiomele97@gmail.com",
+            "name": "Sergio",
+            "username": "sergiomele97"
+          },
+          "committer": {
+            "email": "sergiomele97@gmail.com",
+            "name": "Sergio",
+            "username": "sergiomele97"
+          },
+          "distinct": true,
+          "id": "5f0330889f418873a48e13bd4c7416fbd570c964",
+          "message": "poner test front en verde",
+          "timestamp": "2026-02-08T11:07:37+01:00",
+          "tree_id": "b1e1c0515cf85eeb772a040f1f33808bbf212ccd",
+          "url": "https://github.com/sergiomele97/Linked_crystal_monorepo/commit/5f0330889f418873a48e13bd4c7416fbd570c964"
+        },
+        "date": 1770545321967,
+        "tool": "customSmallerIsBetter",
+        "benches": [
+          {
+            "name": "CPU Usage",
+            "value": 60.00000409200028,
+            "unit": "%"
+          },
+          {
+            "name": "Latency",
+            "value": 0.0002938695613226863,
             "unit": "ms"
           },
           {
