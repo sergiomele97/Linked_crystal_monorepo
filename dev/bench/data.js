@@ -1,5 +1,5 @@
 window.BENCHMARK_DATA = {
-  "lastUpdate": 1770545322707,
+  "lastUpdate": 1770547510096,
   "repoUrl": "https://github.com/sergiomele97/Linked_crystal_monorepo",
   "entries": {
     "Go Backend Performance": [
@@ -1733,6 +1733,55 @@ window.BENCHMARK_DATA = {
           {
             "name": "RAM per Client",
             "value": 68.780515625,
+            "unit": "KB"
+          },
+          {
+            "name": "Failure Count",
+            "value": 0,
+            "unit": "count"
+          },
+          {
+            "name": "Active Players",
+            "value": 500,
+            "unit": "count"
+          }
+        ]
+      },
+      {
+        "commit": {
+          "author": {
+            "email": "sergiomele97@gmail.com",
+            "name": "Sergio",
+            "username": "sergiomele97"
+          },
+          "committer": {
+            "email": "sergiomele97@gmail.com",
+            "name": "Sergio",
+            "username": "sergiomele97"
+          },
+          "distinct": true,
+          "id": "607ad8b0fe5559e46b66e2e095809706f63f4250",
+          "message": "nueva pipeline y refactor",
+          "timestamp": "2026-02-08T11:44:05+01:00",
+          "tree_id": "1588b1e0693c551c8e09537b4bfade540e1c2969",
+          "url": "https://github.com/sergiomele97/Linked_crystal_monorepo/commit/607ad8b0fe5559e46b66e2e095809706f63f4250"
+        },
+        "date": 1770547508744,
+        "tool": "customSmallerIsBetter",
+        "benches": [
+          {
+            "name": "CPU Usage",
+            "value": 40.00002957602187,
+            "unit": "%"
+          },
+          {
+            "name": "Latency",
+            "value": 0.0003115538837576103,
+            "unit": "ms"
+          },
+          {
+            "name": "RAM per Client",
+            "value": 68.268515625,
             "unit": "KB"
           },
           {
