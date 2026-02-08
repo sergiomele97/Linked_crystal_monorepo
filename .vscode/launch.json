@@ -27,21 +27,10 @@
         },
         {
             "name": "Test: app",
-            "type": "debugpy",
+            "type": "node-terminal",
             "request": "launch",
-            "module": "unittest",
-            "args": [
-                "discover",
-                "-s",
-                "${workspaceFolder}/Linked_crystal/app/tests",
-                "-p",
-                "test_*.py"
-            ],
-            "cwd": "${workspaceFolder}/Linked_crystal/app",
-            "env": {
-                "PYTHONPATH": "${workspaceFolder}/Linked_crystal/app/src"
-            },
-            "console": "integratedTerminal"
+            "command": "./run_tests.sh",
+            "cwd": "${workspaceFolder}/Linked_crystal/app"
         },
         {
             "name": "Test: server",

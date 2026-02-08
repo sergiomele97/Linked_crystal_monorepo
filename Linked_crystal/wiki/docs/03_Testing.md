@@ -19,13 +19,20 @@ You must have the virtual environment installed in the root of the repository:
 
 ### Running All Tests
 
-To run all tests for the app, use the following command from the root of the repository:
+To run all tests for the app with colored output and summary:
+
+```bash
+cd Linked_crystal/app
+./run_tests.sh
+```
+
+Or using the standard command from the root of the repository:
 
 ```bash
 PYTHONPATH=Linked_crystal/app/src .venv/bin/python3 -m unittest discover -s Linked_crystal/app/tests
 ```
 
-Or if you are inside `Linked_crystal/app`:
+Or if you are inside `Linked_crystal/app` (standard command):
 
 ```bash
 PYTHONPATH=src ../../.venv/bin/python3 -m unittest discover -s tests
