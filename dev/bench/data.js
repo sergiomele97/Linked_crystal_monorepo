@@ -1,5 +1,5 @@
 window.BENCHMARK_DATA = {
-  "lastUpdate": 1770547510096,
+  "lastUpdate": 1770548876024,
   "repoUrl": "https://github.com/sergiomele97/Linked_crystal_monorepo",
   "entries": {
     "Go Backend Performance": [
@@ -1777,6 +1777,55 @@ window.BENCHMARK_DATA = {
           {
             "name": "Latency",
             "value": 0.0003115538837576103,
+            "unit": "ms"
+          },
+          {
+            "name": "RAM per Client",
+            "value": 68.268515625,
+            "unit": "KB"
+          },
+          {
+            "name": "Failure Count",
+            "value": 0,
+            "unit": "count"
+          },
+          {
+            "name": "Active Players",
+            "value": 500,
+            "unit": "count"
+          }
+        ]
+      },
+      {
+        "commit": {
+          "author": {
+            "email": "sergiomele97@gmail.com",
+            "name": "Sergio",
+            "username": "sergiomele97"
+          },
+          "committer": {
+            "email": "sergiomele97@gmail.com",
+            "name": "Sergio",
+            "username": "sergiomele97"
+          },
+          "distinct": true,
+          "id": "25fcc34a2fae28f7621320b31b31a14d3ab2584f",
+          "message": "refactor: Reorganize documentation and specifications into new `devex/docs` and `infra/` directories.",
+          "timestamp": "2026-02-08T12:06:48+01:00",
+          "tree_id": "a0fdb8fe4316abcb7bfdc78b46687bb68dbee587",
+          "url": "https://github.com/sergiomele97/Linked_crystal_monorepo/commit/25fcc34a2fae28f7621320b31b31a14d3ab2584f"
+        },
+        "date": 1770548875020,
+        "tool": "customSmallerIsBetter",
+        "benches": [
+          {
+            "name": "CPU Usage",
+            "value": 39.99994808006739,
+            "unit": "%"
+          },
+          {
+            "name": "Latency",
+            "value": 0.0003555606880479343,
             "unit": "ms"
           },
           {
