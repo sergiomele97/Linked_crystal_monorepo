@@ -1,4 +1,4 @@
-name: CI_app_dev
+name: DEV_CI_APP
 
 on:
   push:

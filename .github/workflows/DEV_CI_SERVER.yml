@@ -1,10 +1,16 @@
-name: CI_server_dev
+name: DEV_CI_SERVER
 
 on:
   push:
     branches: [ "main" ]
+    paths:
+      - 'Linked_crystal/server/**'
+      - '.github/workflows/DEV_CI_SERVER.yml'
   pull_request:
     branches: [ "main" ]
+    paths:
+      - 'Linked_crystal/server/**'
+      - '.github/workflows/DEV_CI_SERVER.yml'
   workflow_dispatch:
     inputs:
       clients:
