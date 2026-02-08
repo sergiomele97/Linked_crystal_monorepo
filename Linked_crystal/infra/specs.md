@@ -19,4 +19,4 @@ CD:
 
 Nomenclatura:
 
-"CD/CI_product_environment.yml"
+"ENVIRONMENT_CD/CI_PRODUCT.yml"
