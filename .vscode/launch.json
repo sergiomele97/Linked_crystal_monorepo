@@ -7,53 +7,44 @@
             "request": "launch",
             "program": "${workspaceFolder}/Linked_crystal/app/src/main.py",
             "cwd": "${workspaceFolder}/Linked_crystal/app/src",
-            "console": "integratedTerminal"
+            "console": "integratedTerminal",
+            "python": "${workspaceFolder}/.venv/bin/python"
         },
         {
             "name": "Run: server",
-            "type": "go",
+            "type": "node-terminal",
             "request": "launch",
-            "mode": "debug",
-            "program": "${workspaceFolder}/Linked_crystal/server/src/cmd/server",
-            "console": "integratedTerminal"
+            "command": "make run-server",
+            "cwd": "${workspaceFolder}"
         },
         {
             "name": "Run: client-mock",
-            "type": "debugpy",
+            "type": "node-terminal",
             "request": "launch",
-            "program": "${workspaceFolder}/Linked_crystal/server/src/client-mock/client_example.py",
-            "cwd": "${workspaceFolder}/Linked_crystal/server/src/client-mock",
-            "console": "integratedTerminal"
+            "command": "make run-client-mock",
+            "cwd": "${workspaceFolder}"
         },
         {
             "name": "Test: app",
             "type": "node-terminal",
             "request": "launch",
-            "command": "./run_tests.sh",
-            "cwd": "${workspaceFolder}/Linked_crystal/app"
+            "command": "make test-app",
+            "cwd": "${workspaceFolder}"
         },
         {
             "name": "Test: server",
-            "type": "node",
+            "type": "node-terminal",
             "request": "launch",
-            "runtimeExecutable": "bash",
-            "runtimeArgs": [
-                "${workspaceFolder}/Linked_crystal/server/src/run_tests.sh"
-            ],
-            "cwd": "${workspaceFolder}/Linked_crystal/server/src",
-            "console": "integratedTerminal"
+            "command": "make test-server",
+            "cwd": "${workspaceFolder}"
         },
         {
             "name": "Script: Copy go source",
-            "type": "node",
+            "type": "node-terminal",
             "request": "launch",
-            "runtimeExecutable": "echo",
-            "runtimeArgs": [
-                "Copiado al portapapeles"
-            ],
-            "preLaunchTask": "Copy Source to Clipboard",
-            "console": "internalConsole"
-        },
+            "command": "make copy-source",
+            "cwd": "${workspaceFolder}"
+        }
     ],
     "compounds": [
         {
