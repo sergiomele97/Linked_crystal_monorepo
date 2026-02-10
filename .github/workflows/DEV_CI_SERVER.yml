@@ -35,8 +35,8 @@ jobs:
       working-directory: Linked_crystal/server/src
       # Usamos nuestro script para obtener colores y resumen en los logs de CI
       run: |
-        chmod +x run_tests.sh
-        ./run_tests.sh
+        chmod +x test/run_tests.sh
+        ./test/run_tests.sh
 
   benchmark:
     name: Hardware cost tracker server
