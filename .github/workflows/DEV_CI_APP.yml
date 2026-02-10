@@ -54,4 +54,4 @@ jobs:
       working-directory: Linked_crystal/app
       run: |
         chmod +x run_tests.sh
-        xvfb-run --auto-servernum ./run_tests.sh
+        xvfb-run --auto-servernum ./tests/run_tests.sh
