@@ -32,11 +32,7 @@ jobs:
         cache-dependency-path: Linked_crystal/server/src/go.sum
 
     - name: Run Tests
-      working-directory: Linked_crystal/server/src
-      # Usamos nuestro script para obtener colores y resumen en los logs de CI
-      run: |
-        chmod +x test/run_tests.sh
-        ./test/run_tests.sh
+      run: make test-server
 
   benchmark:
     name: Hardware cost tracker server

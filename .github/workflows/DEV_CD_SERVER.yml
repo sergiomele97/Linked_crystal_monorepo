@@ -8,7 +8,6 @@ on:
 
 jobs:
   build-and-deploy:
-    # Only run if the test workflow succeeded
     if: ${{ github.event.workflow_run.conclusion == 'success' }}
     environment: development
     runs-on: self-hosted
@@ -41,9 +40,8 @@ jobs:
 
       # 🧱 5️⃣ Compilar el servidor
       - name: Build Go server
-        working-directory: Linked_crystal/server/src
         run: |
-          GOMAXPROCS=1 go build -v -x -ldflags="-s -w" -o ../server ./cmd/server
+          GOMAXPROCS=1 make build-server
 
       # 🔁 6️⃣ Configurar variables de entorno y reiniciar servicio systemd
       - name: Deploy WebSocket service

@@ -45,13 +45,10 @@ jobs:
           libportaudio2 \
           xvfb
 
-    - name: Install Python dependencies
+    - name: Install dependencies
       run: |
         pip install --upgrade pip
         pip install -r Linked_crystal/app/requirements.txt
 
     - name: Run Tests
-      working-directory: Linked_crystal/app
-      run: |
-        chmod +x tests/run_tests.sh
-        xvfb-run --auto-servernum ./tests/run_tests.sh
+      run: xvfb-run --auto-servernum make test-app

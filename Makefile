@@ -13,6 +13,7 @@ help:
 	@echo "  make run-client-mock  - Start the Python mock client"
 	@echo "  make test-server      - Run server tests"
 	@echo "  make test-app         - Run app tests"
+	@echo "  make build-server     - Build the Go server binary"
 	@echo "  make apk-setup        - Install dependencies for Android build"
 	@echo "  make build-apk        - Build the Android APK using Buildozer"
 	@echo "  make clean            - Remove artifacts and temporary files"
@@ -49,10 +50,15 @@ run-client-mock:
 	cd Linked_crystal/server/src && ../../../.venv/bin/python3 client-mock/client_example.py
 
 test-server:
-	cd Linked_crystal/server/src/test && ./run_tests.sh
+	@chmod +x Linked_crystal/server/src/test/run_tests.sh
+	cd Linked_crystal/server/src && ./test/run_tests.sh
 
 test-app:
-	cd Linked_crystal/app/tests && ./run_tests.sh
+	@chmod +x Linked_crystal/app/tests/run_tests.sh
+	cd Linked_crystal/app && ./tests/run_tests.sh
+
+build-server:
+	cd Linked_crystal/server/src && go build -v -o ../server ./cmd/server
 
 build-apk:
 	cd Linked_crystal/app/APKbuilder && ../../../.venv/bin/buildozer android debug

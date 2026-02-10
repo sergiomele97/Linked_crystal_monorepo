@@ -18,10 +18,10 @@ jobs:
           cache-dependency-path: Linked_crystal/server/src/go.sum
 
       - name: Build Go binary
-        working-directory: Linked_crystal/server/src
         run: |
           go mod download
-          CGO_ENABLED=0 GOOS=linux go build -v -ldflags="-s -w" -o ../server-bin ./cmd/server
+          CGO_ENABLED=0 GOOS=linux make build-server
+          mv Linked_crystal/server/server Linked_crystal/server/server-bin
 
       - name: SCP binary to Server
         uses: appleboy/scp-action@v0.1.7
