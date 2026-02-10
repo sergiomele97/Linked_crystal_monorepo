@@ -25,6 +25,13 @@
             "cwd": "${workspaceFolder}"
         },
         {
+            "name": "Build: apk",
+            "type": "node-terminal",
+            "request": "launch",
+            "command": "make build-apk",
+            "cwd": "${workspaceFolder}"
+        },
+        {
             "name": "Test: app",
             "type": "node-terminal",
             "request": "launch",
