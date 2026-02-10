@@ -1,5 +1,5 @@
 window.BENCHMARK_DATA = {
-  "lastUpdate": 1770744456559,
+  "lastUpdate": 1770746414089,
   "repoUrl": "https://github.com/sergiomele97/Linked_crystal_monorepo",
   "entries": {
     "Go Backend Performance": [
@@ -1929,6 +1929,55 @@ window.BENCHMARK_DATA = {
           {
             "name": "RAM per Client",
             "value": 73.32677571961621,
+            "unit": "KB"
+          },
+          {
+            "name": "Failure Count",
+            "value": 0,
+            "unit": "count"
+          },
+          {
+            "name": "Active Players",
+            "value": 500,
+            "unit": "count"
+          }
+        ]
+      },
+      {
+        "commit": {
+          "author": {
+            "email": "sergiomele97@gmail.com",
+            "name": "Sergio Melero",
+            "username": "sergiomele97"
+          },
+          "committer": {
+            "email": "sergiomele97@gmail.com",
+            "name": "Sergio Melero",
+            "username": "sergiomele97"
+          },
+          "distinct": true,
+          "id": "a4cc5873db02d985645c1a8a251e3186f0ef588e",
+          "message": "prueba centralizar pipelines con makefile",
+          "timestamp": "2026-02-10T18:58:53+01:00",
+          "tree_id": "d14751fb4ff646a824c5c5b73657ea1e3b1eb594",
+          "url": "https://github.com/sergiomele97/Linked_crystal_monorepo/commit/a4cc5873db02d985645c1a8a251e3186f0ef588e"
+        },
+        "date": 1770746412539,
+        "tool": "customSmallerIsBetter",
+        "benches": [
+          {
+            "name": "CPU Usage",
+            "value": 59.99996394002167,
+            "unit": "%"
+          },
+          {
+            "name": "Latency",
+            "value": 0.0003828065706566338,
+            "unit": "ms"
+          },
+          {
+            "name": "RAM per Client",
+            "value": 68.268515625,
             "unit": "KB"
           },
           {
