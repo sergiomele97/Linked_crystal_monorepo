@@ -15,7 +15,7 @@ echo ""
 EXIT_CODE_FILE=$(mktemp)
 echo 0 > "$EXIT_CODE_FILE"
 
-go test -v ./test/... | awk -v green="$GREEN" -v red="$RED" -v yellow="$YELLOW" -v nc="$NC" -v exit_file="$EXIT_CODE_FILE" '
+go test -v ./... | awk -v green="$GREEN" -v red="$RED" -v yellow="$YELLOW" -v nc="$NC" -v exit_file="$EXIT_CODE_FILE" '
 BEGIN { passed=0; total=0; failed=0 }
 /=== RUN/ { 
     total++

@@ -49,10 +49,10 @@ run-client-mock:
 	cd Linked_crystal/server/src && ../../../.venv/bin/python3 client-mock/client_example.py
 
 test-server:
-	cd Linked_crystal/server/src && ./run_tests.sh
+	cd Linked_crystal/server/src/test && ./run_tests.sh
 
 test-app:
-	cd Linked_crystal/app && ./run_tests.sh
+	cd Linked_crystal/app/tests && ./run_tests.sh
 
 build-apk:
 	cd Linked_crystal/app/APKbuilder && ../../../.venv/bin/buildozer android debug
