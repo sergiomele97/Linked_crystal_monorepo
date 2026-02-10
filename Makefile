@@ -1,43 +1,56 @@
-.PHONY: setup run-server run-app run-client-mock test-server test-app build-apk apk-setup copy-source clean help apt-install
+.PHONY: setup setup-app setup-build-apk run-server run-app run-client-mock test-server test-app build-server build-apk apk-setup copy-source clean help apt-install apt-install-app
 
-# NOTE: This Makefile is optimized for Linux (Debian/Ubuntu).
-# For other OSs, you may need to install system dependencies manually.
+# Dependencias del sistema agrupadas para evitar redundancia
+DEPS_SYS_CORE  := build-essential python3-pip python3-venv golang-go
+DEPS_SYS_KIVY  := libsdl2-dev libsdl2-image-dev libsdl2-mixer-dev libsdl2-ttf-dev \
+                  libportmidi-dev libswscale-dev libavformat-dev libavcodec-dev zlib1g-dev
+DEPS_SYS_GSTR  := libgstreamer1.0-dev gstreamer1.0-plugins-base gstreamer1.0-plugins-good
+DEPS_SYS_EXTRA := libjpeg-dev libfreetype6-dev libportaudio2 xvfb
 
-# Default target
+
 help:
-	@echo "Linked Crystal - Development Environment"
+	@echo "Linked Crystal - Development"
 	@echo ""
 	@echo "Usage:"
-	@echo "  make setup            - Install system and local dependencies"
-	@echo "  make run-server       - Start the Go server"
-	@echo "  make run-client-mock  - Start the Python mock client"
-	@echo "  make test-server      - Run server tests"
-	@echo "  make test-app         - Run app tests"
-	@echo "  make build-server     - Build the Go server binary"
-	@echo "  make apk-setup        - Install dependencies for Android build"
-	@echo "  make build-apk        - Build the Android APK using Buildozer"
-	@echo "  make clean            - Remove artifacts and temporary files"
+	@echo "  make setup            - Prepara TODO el entorno (Sistema + Python + Go)"
+	@echo "  make run-server       - Lanza el servidor Go"
+	@echo "  make run-app          - Lanza la aplicación Kivy"
+	@echo "  make test-server      - Ejecuta tests de servidor"
+	@echo "  make test-app         - Ejecuta tests de la aplicación"
+	@echo "  make build-server     - Compila el binario del servidor"
+	@echo "  make clean            - Limpia el entorno y archivos temporales"
+	@echo ""
+	@echo "Comandos adicionales:"
+	@echo "  make build-apk        - Compila el APK para Android"
+	@echo "  make run-client-mock  - Lanza un cliente Python de prueba"
 
-apt-install:
-	@echo "Instalando dependencias del sistema (requiere sudo)..."
-	sudo apt-get update && sudo apt-get install -y \
-		build-essential python3-pip python3-venv golang-go \
-		libsdl2-dev libsdl2-image-dev libsdl2-mixer-dev libsdl2-ttf-dev \
-		libportmidi-dev libswscale-dev libavformat-dev libavcodec-dev \
-		zlib1g-dev libgstreamer1.0-dev gstreamer1.0-plugins-base \
-		gstreamer1.0-plugins-good
+# --- INTERNAL / CI COMMANDS ---
 
-apk-setup:
-	@echo "Instalando dependencias adicionales para Android/Buildozer..."
-	sudo apt-get update && sudo apt-get install -y \
-		openjdk-17-jdk-headless zip unzip autoconf libtool \
-		libffi-dev libssl-dev cmake
+apt-install-app:
+	@echo "Instalando dependencias mínimas para CI..."
+	sudo apt-get update && sudo apt-get install -y --no-install-recommends \
+		$(DEPS_SYS_KIVY) $(DEPS_SYS_EXTRA)
 
-setup:
-	@if [ -f /etc/debian_version ]; then $(MAKE) apt-install; fi
+setup-app:
 	@if [ ! -d ".venv" ]; then python3.10 -m venv .venv; fi
 	.venv/bin/pip install --upgrade pip
 	.venv/bin/pip install -r Linked_crystal/app/requirements.txt
+
+setup-build-apk:
+	@if [ ! -d ".venv" ]; then python3.10 -m venv .venv; fi
+	.venv/bin/pip install --upgrade pip
+	.venv/bin/pip install buildozer cython
+
+# --- PUBLIC TARGETS ---
+
+apt-install:
+	@echo "Instalando dependencias del sistema..."
+	sudo apt-get update && sudo apt-get install -y \
+		$(DEPS_SYS_CORE) $(DEPS_SYS_KIVY) $(DEPS_SYS_GSTR) $(DEPS_SYS_EXTRA)
+
+setup:
+	@if [ -f /etc/debian_version ]; then $(MAKE) apt-install; fi
+	$(MAKE) setup-app
 	cd Linked_crystal/server/src && go mod download
 
 run-server:

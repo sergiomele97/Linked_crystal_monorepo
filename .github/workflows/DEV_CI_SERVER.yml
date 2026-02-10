@@ -26,7 +26,7 @@ jobs:
     - uses: actions/checkout@v4
 
     - name: Set up Go
-      uses: actions/setup-go@v4
+      uses: actions/setup-go@v5
       with:
         go-version: '1.25'
         cache-dependency-path: Linked_crystal/server/src/go.sum
@@ -45,7 +45,7 @@ jobs:
         uses: actions/checkout@v4
 
       - name: Set up Go
-        uses: actions/setup-go@v4
+        uses: actions/setup-go@v5
         with:
           go-version: '1.25'
           cache-dependency-path: Linked_crystal/server/src/go.sum
@@ -53,19 +53,9 @@ jobs:
       - name: Run Server and Execute Stress Test
         run: |
           cd Linked_crystal/server/src
-          # Iniciar servidor en segundo plano
           go run cmd/server/main.go & 
-          
-          # Esperar a que el servidor esté listo
           sleep 10
-          
-          # Ejecutar el test de estrés en modo benchmark
-          # -bench activa la salida JSON
-          # -duration 20 define el tiempo de la prueba
-          # -clients permite elegir el volumen de carga
           go run cost/hardware/stress.go -bench -duration 20 -clients ${{ github.event.inputs.clients || 500 }} > results.json
-          
-          # Mostrar resultados para debug en los logs de la acción
           cat results.json
 
       - name: Store benchmark result
@@ -76,10 +66,5 @@ jobs:
           output-file-path: 'Linked_crystal/server/src/results.json'
           github-token: ${{ secrets.GITHUB_TOKEN }}
           auto-push: true
-          # Los resultados se guardarán en la rama 'gh-pages' para visualización
           gh-pages-branch: gh-pages
           benchmark-data-dir-path: dev/bench
-          # Alerta si hay regresión mayor al 20%
-          alert-threshold: '120%'
-          comment-on-alert: true
-          fail-on-alert: false

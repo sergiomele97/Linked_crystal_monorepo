@@ -12,54 +12,36 @@ jobs:
     environment: development
     runs-on: self-hosted
     steps:
-      # 1️⃣ Limpiar permisos del workspace
       - name: Fix permissions
         run: |
           sudo chown -R $USER:$USER /home/sergio/actions-runner/_work || true
           sudo chmod -R u+rw /home/sergio/actions-runner/_work || true
 
-      # 📦 2️⃣ Clonar el repositorio
       - name: Checkout repository
         uses: actions/checkout@v4
 
-      # 🏗️ 3️⃣ Instalar Go y habilitar caché
       - name: Setup Go
-        uses: actions/setup-go@v4
+        uses: actions/setup-go@v5
         with:
           go-version: '1.25'
           cache-dependency-path: Linked_crystal/server/src/go.sum 
 
-      # ⚡ 4️⃣ Cache adicional persistente (opcional)
-      - name: Cache Go build
-        uses: actions/cache@v3
-        with:
-          path: |
-            ~/.cache/go-build
-            ~/.local/share/go
-          key: ${{ runner.os }}-go-${{ hashFiles('**/go.sum') }}
-
-      # 🧱 5️⃣ Compilar el servidor
       - name: Build Go server
         run: |
           GOMAXPROCS=1 make build-server
 
-      # 🔁 6️⃣ Configurar variables de entorno y reiniciar servicio systemd
       - name: Deploy WebSocket service
         env:
           STATIC_TOKEN: ${{ secrets.STATIC_TOKEN }}
-          SERVERS: ${{ vars.SERVERS }}        # opcional
-          PORT: ${{ vars.PORT }}              # opcional
+          SERVERS: ${{ vars.SERVERS }}
+          PORT: ${{ vars.PORT }}
         run: |
-          # Crear/actualizar archivo de entorno para systemd
           sudo tee /etc/default/websocket-server > /dev/null <<EOF
           STATIC_TOKEN=${STATIC_TOKEN}
           SERVERS=${SERVERS:-ws://localhost:8080/ws}
           PORT=${PORT:-8080}
           EOF
 
-          # Actualizar definición del servicio (por si cambia la ruta)
-          # Asumimos que el runner corre en /home/sergio/actions-runner/_work/Linked_crystal_monorepo/Linked_crystal_monorepo
-          # Ajustar rutas según el nombre real del directorio de trabajo del runner
           WORKDIR="/home/sergio/actions-runner/_work/Linked_crystal_monorepo/Linked_crystal_monorepo/Linked_crystal/server"
           EXEC_START="$WORKDIR/server"
 
@@ -80,7 +62,6 @@ jobs:
           WantedBy=multi-user.target
           SERVICE
 
-          # Recargar y reiniciar servicio systemd
           sudo systemctl daemon-reload
           sudo systemctl restart websocket-server
           sudo systemctl status websocket-server --no-pager

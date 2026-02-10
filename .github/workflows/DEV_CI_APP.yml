@@ -27,28 +27,19 @@ jobs:
         cache: 'pip'
         cache-dependency-path: Linked_crystal/app/requirements.txt
 
-    - name: Install system dependencies
-      run: |
-        sudo apt-get update
-        sudo apt-get install -y \
-          libsdl2-dev \
-          libsdl2-image-dev \
-          libsdl2-mixer-dev \
-          libsdl2-ttf-dev \
-          libportmidi-dev \
-          libswscale-dev \
-          libavformat-dev \
-          libavcodec-dev \
-          zlib1g-dev \
-          libjpeg-dev \
-          libfreetype6-dev \
-          libportaudio2 \
-          xvfb
+    - name: Cache Python virtualenv
+      id: cache-venv
+      uses: actions/cache@v4
+      with:
+        path: .venv
+        key: ${{ runner.os }}-venv-${{ hashFiles('Linked_crystal/app/requirements.txt') }}
 
-    - name: Install dependencies
-      run: |
-        pip install --upgrade pip
-        pip install -r Linked_crystal/app/requirements.txt
+    - name: Install system dependencies
+      run: make apt-install-app
+
+    - name: Install Python dependencies
+      if: steps.cache-venv.outputs.cache-hit != 'true'
+      run: make setup-app
 
     - name: Run Tests
       run: xvfb-run --auto-servernum make test-app

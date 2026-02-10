@@ -19,7 +19,6 @@ jobs:
 
       - name: Build Go binary
         run: |
-          go mod download
           CGO_ENABLED=0 GOOS=linux make build-server
           mv Linked_crystal/server/server Linked_crystal/server/server-bin
 
@@ -40,7 +39,6 @@ jobs:
           username: ${{ secrets.SERVER_USER }}
           key: ${{ secrets.SSH_PRIVATE_KEY }}
           script: |
-            # 1. Crear el archivo de servicio systemd si no existe
             sudo tee /etc/systemd/system/websocket-server-pro.service > /dev/null <<EOF
             [Unit]
             Description=Websocket Server Pro
@@ -57,12 +55,8 @@ jobs:
             WantedBy=multi-user.target
             EOF
 
-            # 2. Mover el binario a su ruta final
-            # Explicación ruta: target (~/linked-crystal-server) + carpeta restante tras strip (server/)
             sudo mv ~/linked-crystal-server/server/server-bin /usr/local/bin/websocket-server-pro
             sudo chmod +x /usr/local/bin/websocket-server-pro
-
-            # 3. Configurar variables de entorno (Añadido ENV=production)
             sudo tee /etc/default/websocket-server-pro > /dev/null <<EOF
             ENV=production
             STATIC_TOKEN=${{ secrets.STATIC_TOKEN }}
@@ -70,10 +64,7 @@ jobs:
             PORT=${{ vars.PORT }}
             EOF
 
-            # 4. Recargar, habilitar y reiniciar
             sudo systemctl daemon-reload
             sudo systemctl enable websocket-server-pro
             sudo systemctl restart websocket-server-pro
-            
-            # Verificamos que esté corriendo
             sudo systemctl status websocket-server-pro --no-pager
