@@ -65,3 +65,17 @@ jobs:
           sudo systemctl daemon-reload
           sudo systemctl restart websocket-server
           sudo systemctl status websocket-server --no-pager
+
+      - name: Verify Health (Dev)
+        run: |
+          echo "Checking health on http://localhost:${PORT:-8080}/health..."
+          for i in {1..5}; do
+            if curl -s http://localhost:${PORT:-8080}/health | grep -q '"status":"ok"'; then
+              echo "✅ Health check passed!"
+              exit 0
+            fi
+            echo "⚠️ Health check failed (attempt $i/5). Retrying in 2s..."
+            sleep 2
+          done
+          echo "❌ Health check failed after 5 attempts."
+          exit 1
