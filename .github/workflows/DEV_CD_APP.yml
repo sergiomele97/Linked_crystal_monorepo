@@ -17,8 +17,6 @@ jobs:
       uses: actions/setup-python@v5
       with:
         python-version: "3.10"
-        cache: 'pip'
-        cache-dependency-path: Linked_crystal/app/requirements.txt
 
     - name: Install system dependencies
       run: |
@@ -43,7 +41,9 @@ jobs:
           ${{ runner.os }}-buildozer-
 
     - name: Install buildozer and dependencies
-      run: make setup-build-apk
+      run: |
+        pip install --upgrade pip
+        pip install buildozer cython
 
     - name: Preinstall Android SDK build-tools
       run: |
