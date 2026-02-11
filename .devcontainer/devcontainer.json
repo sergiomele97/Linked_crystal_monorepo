@@ -1,0 +1,26 @@
+{
+    "name": "Linked Crystal Devex",
+    "build": {
+        "dockerfile": "Dockerfile"
+    },
+    "features": {
+        "ghcr.io/devcontainers/features/docker-in-docker:2": {}
+    },
+    "customizations": {
+        "vscode": {
+            "extensions": [
+                "ms-python.python",
+                "golang.go",
+                "ms-azuretools.vscode-docker",
+                "eamodio.gitlens"
+            ],
+            "settings": {
+                "terminal.integrated.shell.linux": "/bin/bash"
+            }
+        }
+    },
+    "remoteUser": "developer",
+    "mounts": [
+        "source=buildozer-cache,target=/home/developer/.buildozer,type=volume"
+    ]
+}

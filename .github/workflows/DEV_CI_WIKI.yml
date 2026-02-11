@@ -1,4 +1,4 @@
-name: PRO_CD_WIKI
+name: DEV_CI_WIKI
 
 on:
   push:

@@ -32,14 +32,23 @@ apt-install-app:
 		$(DEPS_SYS_KIVY) $(DEPS_SYS_EXTRA)
 
 setup-app:
-	@if [ ! -d ".venv" ]; then python3.10 -m venv .venv; fi
-	.venv/bin/pip install --upgrade pip
-	.venv/bin/pip install -r Linked_crystal/app/requirements.txt
+	@if [ ! -d ".venv" ]; then \
+		echo "Creando entorno virtual con Python 3.10 (requerido para dependencias críticas)..."; \
+		if command -v python3.10 >/dev/null; then \
+			python3.10 -m venv .venv || exit 1; \
+		else \
+			echo "ERROR: python3.10 es obligatorio para cumplir con numpy==1.21.6."; \
+			echo "Por favor, instala python3.10 o usa el DevContainer."; \
+			exit 1; \
+		fi \
+	fi
+	@./.venv/bin/python -m pip install --upgrade pip
+	@./.venv/bin/python -m pip install -r Linked_crystal/app/requirements.txt
 
 setup-build-apk:
-	@if [ ! -d ".venv" ]; then python3.10 -m venv .venv; fi
-	.venv/bin/pip install --upgrade pip
-	.venv/bin/pip install buildozer cython
+	@if [ ! -d ".venv" ]; then python3 -m venv .venv; fi
+	./.venv/bin/pip install --upgrade pip
+	./.venv/bin/pip install buildozer cython
 
 # --- PUBLIC TARGETS ---
 
@@ -74,7 +83,12 @@ build-server:
 	cd Linked_crystal/server/src && go build -v -o ../server ./cmd/server
 
 build-apk:
-	cd Linked_crystal/app/APKbuilder && ../../../.venv/bin/buildozer android debug
+	@echo "Construyendo APK (limpiando y forzando rutas de Docker)..."
+	cd Linked_crystal/app/APKbuilder && \
+	sed -i 's|^#\?android.sdk_path =.*|android.sdk_path = /home/developer/android-sdk|' buildozer.spec && \
+	sed -i 's|^#\?android.ndk_path =.*|android.ndk_path = /home/developer/android-ndk-r25b|' buildozer.spec && \
+	sed -i 's|^android.ant_path =.*|#android.ant_path =|' buildozer.spec && \
+	env -u VIRTUAL_ENV APP_ACCEPT_SDK_LICENSE=1 buildozer android debug
 
 copy-source:
 	@echo "Copiando archivos de Go al portapapeles..."
@@ -83,4 +97,20 @@ copy-source:
 
 clean:
 	rm -rf .venv
+	rm -rf Linked_crystal/app/APKbuilder/.buildozer
+	rm -rf Linked_crystal/app/APKbuilder/bin
 	find . -type d -name "__pycache__" -exec rm -rf {} +
+
+deep-clean: clean
+	@echo "Limpieza profunda: eliminando cualquier rastro de buildozer y temporales..."
+	rm -rf ~/.buildozer
+	rm -rf Linked_crystal/app/APKbuilder/.buildozer
+
+# --- INTEGRITY TEST ---
+test-devex:
+	@echo "### STARTING DEVEX INTEGRITY TEST ###"
+	$(MAKE) setup
+	$(MAKE) test-server
+	$(MAKE) test-app
+	$(MAKE) build-apk
+	@echo "### DEVEX INTEGRITY TEST PASSED ###"
