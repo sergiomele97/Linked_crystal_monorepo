@@ -1,5 +1,5 @@
 window.BENCHMARK_DATA = {
-  "lastUpdate": 1770749217040,
+  "lastUpdate": 1770835316658,
   "repoUrl": "https://github.com/sergiomele97/Linked_crystal_monorepo",
   "entries": {
     "Go Backend Performance": [
@@ -2027,6 +2027,53 @@ window.BENCHMARK_DATA = {
           {
             "name": "RAM per Client",
             "value": 68.908515625,
+            "unit": "KB"
+          },
+          {
+            "name": "Failure Count",
+            "value": 0,
+            "unit": "count"
+          },
+          {
+            "name": "Active Players",
+            "value": 500,
+            "unit": "count"
+          }
+        ]
+      },
+      {
+        "commit": {
+          "author": {
+            "name": "Sergio Melero",
+            "username": "sergiomele97",
+            "email": "sergiomele97@gmail.com"
+          },
+          "committer": {
+            "name": "Sergio Melero",
+            "username": "sergiomele97",
+            "email": "sergiomele97@gmail.com"
+          },
+          "id": "36d83295b46cb645c685608b96535ee3fcb4129c",
+          "message": "refactor tfs infra",
+          "timestamp": "2026-02-10T18:58:27Z",
+          "url": "https://github.com/sergiomele97/Linked_crystal_monorepo/commit/36d83295b46cb645c685608b96535ee3fcb4129c"
+        },
+        "date": 1770835316175,
+        "tool": "customSmallerIsBetter",
+        "benches": [
+          {
+            "name": "CPU Usage",
+            "value": 39.99999014400243,
+            "unit": "%"
+          },
+          {
+            "name": "Latency",
+            "value": 0.000306635196222395,
+            "unit": "ms"
+          },
+          {
+            "name": "RAM per Client",
+            "value": 68.268515625,
             "unit": "KB"
           },
           {
