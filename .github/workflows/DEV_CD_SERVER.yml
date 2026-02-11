@@ -2,7 +2,7 @@ name: DEV_CD_SERVER
 
 on:
   workflow_run:
-    workflows: ["CI_server_dev"]
+    workflows: ["DEV_CI_SERVER"]
     types:
       - completed
 
