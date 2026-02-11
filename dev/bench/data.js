@@ -1,5 +1,5 @@
 window.BENCHMARK_DATA = {
-  "lastUpdate": 1770835495034,
+  "lastUpdate": 1770847396716,
   "repoUrl": "https://github.com/sergiomele97/Linked_crystal_monorepo",
   "entries": {
     "Go Backend Performance": [
@@ -2121,6 +2121,55 @@ window.BENCHMARK_DATA = {
           {
             "name": "RAM per Client",
             "value": 91.19535416666666,
+            "unit": "KB"
+          },
+          {
+            "name": "Failure Count",
+            "value": 0,
+            "unit": "count"
+          },
+          {
+            "name": "Active Players",
+            "value": 500,
+            "unit": "count"
+          }
+        ]
+      },
+      {
+        "commit": {
+          "author": {
+            "email": "sergiomele97@gmail.com",
+            "name": "Sergio",
+            "username": "sergiomele97"
+          },
+          "committer": {
+            "email": "sergiomele97@gmail.com",
+            "name": "Sergio",
+            "username": "sergiomele97"
+          },
+          "distinct": true,
+          "id": "a74be76b08dbde0a84438a325e0a9b9482775453",
+          "message": "falta que funcione cd apk",
+          "timestamp": "2026-02-11T23:02:10+01:00",
+          "tree_id": "d6e96d783d4f767f112aa2f59d9b66b366976d69",
+          "url": "https://github.com/sergiomele97/Linked_crystal_monorepo/commit/a74be76b08dbde0a84438a325e0a9b9482775453"
+        },
+        "date": 1770847395658,
+        "tool": "customSmallerIsBetter",
+        "benches": [
+          {
+            "name": "CPU Usage",
+            "value": 40.000004488000506,
+            "unit": "%"
+          },
+          {
+            "name": "Latency",
+            "value": 0.0002524772439737116,
+            "unit": "ms"
+          },
+          {
+            "name": "RAM per Client",
+            "value": 68.780515625,
             "unit": "KB"
           },
           {
