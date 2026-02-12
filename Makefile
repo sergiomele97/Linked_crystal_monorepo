@@ -16,23 +16,30 @@ help:
 	@echo "  make build-apk        - Compila el APK para Android"
 	@echo "  make run-client-mock  - Lanza un cliente Python de prueba"
 
+
+
+
 #------- Dev environment -------
-#------- Dev environment -------
+SHELL := /bin/bash
+
 setup:
-	@echo "Instalando dependencias del sistema..."
+	@echo "Instalando dependencias del sistema y Python 3.10..."
 	sudo apt-get update -y
 	sudo apt-get install -y \
+		python3.10 python3.10-venv python3.10-dev \
 		python3-pip python3-setuptools git zip openjdk-17-jdk \
 		libffi-dev libssl-dev libsqlite3-dev zlib1g-dev \
 		libjpeg-dev libfreetype6-dev wget unzip \
 		autoconf automake libltdl-dev libtool m4 pkg-config
 	
-	@echo "Configurando entorno virtual de Python..."
-	python3 -m venv .venv
+	@echo "Configurando entorno virtual con Python 3.10..."
+	rm -rf .venv
+	python3.10 -m venv .venv
 	.venv/bin/pip install --upgrade pip
 	.venv/bin/pip install buildozer cython kivy
+	.venv/bin/pip install -r Linked_crystal/app/requirements.txt
 	
-	@echo "Preinstalando Android SDK build-tools (Paso de la pipeline)..."
+	@echo "Preinstalando Android SDK build-tools..."
 	mkdir -p ~/.buildozer/android/platform
 	cd ~/.buildozer/android/platform && \
 	if [ ! -d "android-sdk" ]; then \
@@ -46,7 +53,7 @@ setup:
 		yes | cmdline-tools/latest/bin/sdkmanager "platform-tools" "build-tools;34.0.0" "platforms;android-34"; \
 	fi
 
-	@echo "Fix sdkmanager path for Buildozer..."
+	@echo "Fix sdkmanager path..."
 	mkdir -p ~/.buildozer/android/platform/android-sdk/tools/bin
 	ln -sf ~/.buildozer/android/platform/android-sdk/cmdline-tools/latest/bin/sdkmanager ~/.buildozer/android/platform/android-sdk/tools/bin/sdkmanager
 
@@ -54,6 +61,10 @@ setup:
 	if [ ! -d "$$HOME/.buildozer/android/platform/python-for-android" ]; then \
 		git clone --depth=1 --branch release-2024.01.21 https://github.com/kivy/python-for-android $$HOME/.buildozer/android/platform/python-for-android; \
 	fi
+	
+	@echo "--- SETUP FINALIZADO ---"
+	@echo "Entrando en el entorno virtual (escribe 'exit' para salir):"
+	bash --rcfile <(echo "source ~/.bashrc; source .venv/bin/activate")
 
 clean:
 	@echo "Limpiando archivos temporales y entornos..."
