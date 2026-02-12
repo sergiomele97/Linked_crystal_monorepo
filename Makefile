@@ -17,16 +17,54 @@ help:
 	@echo "  make run-client-mock  - Lanza un cliente Python de prueba"
 
 #------- Dev environment -------
+#------- Dev environment -------
 setup:
-	@if [ -f /etc/debian_version ]; then $(MAKE) apt-install; fi
-	$(MAKE) setup-app
-	cd Linked_crystal/server/src && go mod download
+	@echo "Instalando dependencias del sistema..."
+	sudo apt-get update -y
+	sudo apt-get install -y \
+		python3-pip python3-setuptools git zip openjdk-17-jdk \
+		libffi-dev libssl-dev libsqlite3-dev zlib1g-dev \
+		libjpeg-dev libfreetype6-dev wget unzip \
+		autoconf automake libltdl-dev libtool m4 pkg-config
+	
+	@echo "Configurando entorno virtual de Python..."
+	python3 -m venv .venv
+	.venv/bin/pip install --upgrade pip
+	.venv/bin/pip install buildozer cython kivy
+	
+	@echo "Preinstalando Android SDK build-tools (Paso de la pipeline)..."
+	mkdir -p ~/.buildozer/android/platform
+	cd ~/.buildozer/android/platform && \
+	if [ ! -d "android-sdk" ]; then \
+		mkdir -p android-sdk && cd android-sdk && \
+		wget https://dl.google.com/android/repository/commandlinetools-linux-9477386_latest.zip -O cmdtools.zip && \
+		unzip -q cmdtools.zip -d cmdline-tools && \
+		rm cmdtools.zip && \
+		mkdir -p cmdline-tools/latest && \
+		mv cmdline-tools/cmdline-tools/* cmdline-tools/latest/ || true && \
+		yes | cmdline-tools/latest/bin/sdkmanager --licenses && \
+		yes | cmdline-tools/latest/bin/sdkmanager "platform-tools" "build-tools;34.0.0" "platforms;android-34"; \
+	fi
+
+	@echo "Fix sdkmanager path for Buildozer..."
+	mkdir -p ~/.buildozer/android/platform/android-sdk/tools/bin
+	ln -sf ~/.buildozer/android/platform/android-sdk/cmdline-tools/latest/bin/sdkmanager ~/.buildozer/android/platform/android-sdk/tools/bin/sdkmanager
+
+	@echo "Configurando python-for-android release-2024.01.21..."
+	if [ ! -d "$$HOME/.buildozer/android/platform/python-for-android" ]; then \
+		git clone --depth=1 --branch release-2024.01.21 https://github.com/kivy/python-for-android $$HOME/.buildozer/android/platform/python-for-android; \
+	fi
 
 clean:
+	@echo "Limpiando archivos temporales y entornos..."
 	rm -rf .venv
 	rm -rf Linked_crystal/app/APKbuilder/.buildozer
 	rm -rf Linked_crystal/app/APKbuilder/bin
+	rm -rf Linked_crystal/app/src/config.py
+	# Mantengo el borrado de .buildozer para limpieza profunda como pediste
+	rm -rf ~/.buildozer
 	find . -type d -name "__pycache__" -exec rm -rf {} +
+	find . -type f -name "*.pyc" -delete
 
 #------- Run code -------
 run-server:
@@ -52,12 +90,12 @@ build-server:
 	cd Linked_crystal/server/src && go build -v -o ../server ./cmd/server
 
 build-apk:
-	@echo "Construyendo APK (limpiando y forzando rutas de Docker)..."
+	@echo "Construyendo APK (Debug)..."
 	cd Linked_crystal/app/APKbuilder && \
-	sed -i 's|^#\?android.sdk_path =.*|android.sdk_path = /home/developer/android-sdk|' buildozer.spec && \
-	sed -i 's|^#\?android.ndk_path =.*|android.ndk_path = /home/developer/android-ndk-r25b|' buildozer.spec && \
-	sed -i 's|^android.ant_path =.*|#android.ant_path =|' buildozer.spec && \
-	env -u VIRTUAL_ENV APP_ACCEPT_SDK_LICENSE=1 buildozer android debug
+	ANDROIDSDK=$$HOME/.buildozer/android/platform/android-sdk \
+	ANDROIDNDK=$$HOME/.buildozer/android/platform/android-ndk-r25b \
+	JAVA_HOME=/usr/lib/jvm/java-17-openjdk-amd64 \
+	../../../.venv/bin/buildozer android debug
 
 #------- Utilities -------
 copy-source:
