@@ -17,10 +17,10 @@ help:
 	@echo "  make run-app          - Lanza la aplicación Kivy"
 	@echo "  make test-server      - Ejecuta tests de servidor"
 	@echo "  make test-app         - Ejecuta tests de la aplicación"
-	@echo "  make build-server     - Compila el binario del servidor"
 	@echo "  make clean            - Limpia el entorno y archivos temporales"
 	@echo ""
 	@echo "Comandos adicionales:"
+	@echo "  make build-server     - Compila el binario del servidor"
 	@echo "  make build-apk        - Compila el APK para Android"
 	@echo "  make run-client-mock  - Lanza un cliente Python de prueba"
 
