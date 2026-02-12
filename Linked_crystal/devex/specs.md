@@ -13,13 +13,13 @@ La wiki y sus páginas se definen en el directorio docs y se actualizan automát
 Contienen comandos fáciles de lanzar para cada paso del flujo del desarrollo:
 
 - make setup            - Install system and local dependencies
+- make clean            - Resets environment
+- make run-app          - Start the Python Desktop app
 - make run-server       - Start the Go server
 - make run-client-mock  - Start the Python mock client
-- make test-server      - Run server tests
 - make test-app         - Run app tests
-- make apk-setup        - Install dependencies for Android build
+- make test-server      - Run server tests
 - make build-apk        - Build the Android APK using Buildozer
-- make clean            - Remove artifacts and temporary files
 
 ## 3. Settings.json
 
