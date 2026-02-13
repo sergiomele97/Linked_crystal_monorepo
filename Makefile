@@ -78,6 +78,10 @@ setup:
 	if [ ! -d "$$HOME/.buildozer/android/platform/python-for-android" ]; then \
 		git clone --depth=1 --branch release-2024.01.21 https://github.com/kivy/python-for-android $$HOME/.buildozer/android/platform/python-for-android; \
 	fi
+
+	@echo "8. Instalando extensiones de python y go para vs code"
+	code --install-extension ms-python.python
+	code --install-extension golang.go
 	
 	@echo "--- SETUP FINALIZADO ---"
 	@echo "Entrando en el entorno virtual (escribe 'exit' para salir):"
