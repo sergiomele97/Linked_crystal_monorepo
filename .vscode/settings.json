@@ -1,15 +1,15 @@
  {
-//     "go.diagnostic.vulncheck": "Imports",
-//     "python.defaultInterpreterPath": "${workspaceFolder}/.venv/bin/python",
-//     "editor.formatOnSave": true,
-//     "files.exclude": {
-//         "**/.venv": true,
-//         "**/__pycache__": true,
-//         "**/.buildozer": true
-//     }
+    "go.diagnostic.vulncheck": "Imports",
+    "editor.formatOnSave": true,
+    "files.exclude": {
+        "**/.venv": true,
+        "**/__pycache__": true,
+        "**/.buildozer": true
+    },
     "python.defaultInterpreterPath": "${workspaceFolder}/.venv/bin/python",
     "python.terminal.activateEnvInSelectedTerminal": true,
-    "python.analysis.extraPaths": [
-        "${workspaceFolder}/Linked_crystal/app/src"
-    ]
+    "terminal.integrated.env.windows": {
+        "PYTHONPATH": "${workspaceFolder}"
+    },
+    "python.terminal.activateEnvironment": true
 }
