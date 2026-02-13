@@ -46,13 +46,15 @@ setup:
 	.venv/bin/pip install buildozer cython kivy
 	.venv/bin/pip install -r Linked_crystal/app/requirements.txt
 
-	@echo "Configurando entorno de Go..."
-	# Instalamos golang-go si no está presente
-	@if ! command -v go >/dev/null; then \
-		sudo apt-get install -y golang-go; \
-	fi
-	cd Linked_crystal/server/src && go mod tidy
-	cd Linked_crystal/server/src && go mod download
+	@echo "4. Configurando Go..."
+	sed -i 's/go 1.2[0-9]/go 1.18/g' Linked_crystal/server/src/go.mod
+	@cd Linked_crystal/server/src && GOTOOLCHAIN=local go mod tidy || ( \
+		echo "Sistema no compatible. Descargando Go 1.23 binario..." && \
+		mkdir -p ../../../.go_dist && \
+		wget -qO- https://go.dev/dl/go1.23.0.linux-amd64.tar.gz | tar -C ../../../.go_dist -xz && \
+		export PATH="$$(pwd)/../../../.go_dist/go/bin:$$PATH" && \
+		go mod tidy \
+	)
 
 	@echo "5. Preinstalando Android SDK build-tools..."
 	mkdir -p ~/.buildozer/android/platform
@@ -87,7 +89,7 @@ clean:
 	rm -rf Linked_crystal/app/APKbuilder/.buildozer
 	rm -rf Linked_crystal/app/APKbuilder/bin
 	rm -rf Linked_crystal/app/src/config.py
-	# Mantengo el borrado de .buildozer para limpieza profunda como pediste
+	# Borrado de .buildozer para limpieza profunda
 	rm -rf ~/.buildozer
 	find . -type d -name "__pycache__" -exec rm -rf {} +
 	find . -type f -name "*.pyc" -delete
