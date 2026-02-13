@@ -1,5 +1,5 @@
 window.BENCHMARK_DATA = {
-  "lastUpdate": 1770965595966,
+  "lastUpdate": 1770969931986,
   "repoUrl": "https://github.com/sergiomele97/Linked_crystal_monorepo",
   "entries": {
     "Go Backend Performance": [
@@ -2261,6 +2261,55 @@ window.BENCHMARK_DATA = {
           {
             "name": "Latency",
             "value": 0.00045672173410848493,
+            "unit": "ms"
+          },
+          {
+            "name": "RAM per Client",
+            "value": 68.268515625,
+            "unit": "KB"
+          },
+          {
+            "name": "Failure Count",
+            "value": 0,
+            "unit": "count"
+          },
+          {
+            "name": "Active Players",
+            "value": 500,
+            "unit": "count"
+          }
+        ]
+      },
+      {
+        "commit": {
+          "author": {
+            "email": "58886569+sergiomele97@users.noreply.github.com",
+            "name": "Sergio Melero Royo",
+            "username": "sergiomele97"
+          },
+          "committer": {
+            "email": "noreply@github.com",
+            "name": "GitHub",
+            "username": "web-flow"
+          },
+          "distinct": true,
+          "id": "564b86ae347b96dee40e6d2d4f573517edcddf69",
+          "message": "Downgrade Go version from 1.25 to 1.23",
+          "timestamp": "2026-02-13T09:04:26+01:00",
+          "tree_id": "40fbe7e2d3ca146761d00cc0baf715a3fe72324c",
+          "url": "https://github.com/sergiomele97/Linked_crystal_monorepo/commit/564b86ae347b96dee40e6d2d4f573517edcddf69"
+        },
+        "date": 1770969931231,
+        "tool": "customSmallerIsBetter",
+        "benches": [
+          {
+            "name": "CPU Usage",
+            "value": 60.00000036000001,
+            "unit": "%"
+          },
+          {
+            "name": "Latency",
+            "value": 0.0003151532411317568,
             "unit": "ms"
           },
           {
