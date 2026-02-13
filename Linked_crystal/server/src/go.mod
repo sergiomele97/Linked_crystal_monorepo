@@ -1,6 +1,6 @@
 module example.com/hello
 
-go 1.25
+go 1.23
 
 require (
 	github.com/gorilla/websocket v1.5.3
