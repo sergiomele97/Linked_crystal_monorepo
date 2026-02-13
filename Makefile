@@ -30,7 +30,7 @@ setup:
 		python3-pip python3-setuptools git zip openjdk-17-jdk \
 		libffi-dev libssl-dev libsqlite3-dev zlib1g-dev \
 		libjpeg-dev libfreetype6-dev wget unzip \
-		autoconf automake libltdl-dev libtool m4 pkg-config
+		autoconf automake libltdl-dev libtool m4 pkg-config xclip
 	
 	@echo "Configurando entorno virtual con Python 3.10..."
 	rm -rf .venv
@@ -38,6 +38,15 @@ setup:
 	.venv/bin/pip install --upgrade pip
 	.venv/bin/pip install buildozer cython kivy
 	.venv/bin/pip install -r Linked_crystal/app/requirements.txt
+
+	@echo "Configurando entorno de Go..."
+	# Instalamos golang-go si no está presente
+	@if ! command -v go >/dev/null; then \
+		sudo apt-get install -y golang-go; \
+	fi
+	# Descarga y limpia módulos
+	cd Linked_crystal/server/src && go mod tidy
+	cd Linked_crystal/server/src && go mod download
 	
 	@echo "Preinstalando Android SDK build-tools..."
 	mkdir -p ~/.buildozer/android/platform
@@ -76,6 +85,12 @@ clean:
 	rm -rf ~/.buildozer
 	find . -type d -name "__pycache__" -exec rm -rf {} +
 	find . -type f -name "*.pyc" -delete
+
+	@echo "Limpiando binarios y caché de Go..."
+	# Borra el binario generado por build-server
+	rm -f Linked_crystal/server/server
+	# Limpia la caché de tests y de construcción de Go
+	go clean -cache -testcache
 
 #------- Run code -------
 run-server:
