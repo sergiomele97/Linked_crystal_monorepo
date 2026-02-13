@@ -1,5 +1,5 @@
 window.BENCHMARK_DATA = {
-  "lastUpdate": 1770848531510,
+  "lastUpdate": 1770965595966,
   "repoUrl": "https://github.com/sergiomele97/Linked_crystal_monorepo",
   "entries": {
     "Go Backend Performance": [
@@ -2217,6 +2217,55 @@ window.BENCHMARK_DATA = {
           {
             "name": "RAM per Client",
             "value": 0,
+            "unit": "KB"
+          },
+          {
+            "name": "Failure Count",
+            "value": 0,
+            "unit": "count"
+          },
+          {
+            "name": "Active Players",
+            "value": 500,
+            "unit": "count"
+          }
+        ]
+      },
+      {
+        "commit": {
+          "author": {
+            "email": "58886569+sergiomele97@users.noreply.github.com",
+            "name": "Sergio Melero Royo",
+            "username": "sergiomele97"
+          },
+          "committer": {
+            "email": "58886569+sergiomele97@users.noreply.github.com",
+            "name": "Sergio Melero Royo",
+            "username": "sergiomele97"
+          },
+          "distinct": true,
+          "id": "9af03735cbc3c0c390f9de39d5e5324ae74de515",
+          "message": "añado settings vscode",
+          "timestamp": "2026-02-13T06:51:56Z",
+          "tree_id": "c4ea99894ec2cdca4e3625db2c2a3f737625c11f",
+          "url": "https://github.com/sergiomele97/Linked_crystal_monorepo/commit/9af03735cbc3c0c390f9de39d5e5324ae74de515"
+        },
+        "date": 1770965595435,
+        "tool": "customSmallerIsBetter",
+        "benches": [
+          {
+            "name": "CPU Usage",
+            "value": 39.99999635200033,
+            "unit": "%"
+          },
+          {
+            "name": "Latency",
+            "value": 0.00045672173410848493,
+            "unit": "ms"
+          },
+          {
+            "name": "RAM per Client",
+            "value": 68.268515625,
             "unit": "KB"
           },
           {
