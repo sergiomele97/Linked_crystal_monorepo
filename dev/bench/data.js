@@ -1,5 +1,5 @@
 window.BENCHMARK_DATA = {
-  "lastUpdate": 1770969931986,
+  "lastUpdate": 1770999828325,
   "repoUrl": "https://github.com/sergiomele97/Linked_crystal_monorepo",
   "entries": {
     "Go Backend Performance": [
@@ -2315,6 +2315,55 @@ window.BENCHMARK_DATA = {
           {
             "name": "RAM per Client",
             "value": 68.268515625,
+            "unit": "KB"
+          },
+          {
+            "name": "Failure Count",
+            "value": 0,
+            "unit": "count"
+          },
+          {
+            "name": "Active Players",
+            "value": 500,
+            "unit": "count"
+          }
+        ]
+      },
+      {
+        "commit": {
+          "author": {
+            "email": "58886569+sergiomele97@users.noreply.github.com",
+            "name": "Sergio Melero Royo",
+            "username": "sergiomele97"
+          },
+          "committer": {
+            "email": "58886569+sergiomele97@users.noreply.github.com",
+            "name": "Sergio Melero Royo",
+            "username": "sergiomele97"
+          },
+          "distinct": true,
+          "id": "5f8077c91fa7c9933d7e3b357ac7faf30be3c3fd",
+          "message": "Configuración go automática",
+          "timestamp": "2026-02-13T16:22:43Z",
+          "tree_id": "59f0639d93f41a8edaaeb4bbf851c8bfd144dd3a",
+          "url": "https://github.com/sergiomele97/Linked_crystal_monorepo/commit/5f8077c91fa7c9933d7e3b357ac7faf30be3c3fd"
+        },
+        "date": 1770999827492,
+        "tool": "customSmallerIsBetter",
+        "benches": [
+          {
+            "name": "CPU Usage",
+            "value": 60.000214596767535,
+            "unit": "%"
+          },
+          {
+            "name": "Latency",
+            "value": 0.0003889245032540598,
+            "unit": "ms"
+          },
+          {
+            "name": "RAM per Client",
+            "value": 68.780515625,
             "unit": "KB"
           },
           {
