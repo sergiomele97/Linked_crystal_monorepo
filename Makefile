@@ -31,14 +31,13 @@ setup:
 	sudo add-apt-repository -y ppa:deadsnakes/ppa
 	sudo apt-get update -y
 
-	@echo "2. Instalando dependencias del sistema (incluyendo Python 3.10 y Go)..."
+	@echo "2. Instalando dependencias del sistema (incluyendo Python 3.10)..."
 	sudo apt-get install -y \
 		python3.10 python3.10-venv python3.10-dev \
 		python3-pip python3-setuptools git zip openjdk-17-jdk \
 		libffi-dev libssl-dev libsqlite3-dev zlib1g-dev \
 		libjpeg-dev libfreetype-dev wget unzip \
-		autoconf automake libltdl-dev libtool m4 pkg-config xclip \
-		golang-go
+		autoconf automake libltdl-dev libtool m4 pkg-config xclip 
 
 	@echo "3. Configurando entorno virtual con Python 3.10..."
 	rm -rf .venv
@@ -47,8 +46,11 @@ setup:
 	.venv/bin/pip install buildozer cython kivy
 	.venv/bin/pip install -r Linked_crystal/app/requirements.txt
 
-	@echo "4. Configurando entorno de Go..."
-	# Descarga y limpia módulos
+	@echo "Configurando entorno de Go..."
+	# Instalamos golang-go si no está presente
+	@if ! command -v go >/dev/null; then \
+		sudo apt-get install -y golang-go; \
+	fi
 	cd Linked_crystal/server/src && go mod tidy
 	cd Linked_crystal/server/src && go mod download
 
