@@ -37,7 +37,8 @@ setup:
 		python3-pip python3-setuptools git zip openjdk-17-jdk \
 		libffi-dev libssl-dev libsqlite3-dev zlib1g-dev \
 		libjpeg-dev libfreetype-dev wget unzip \
-		autoconf automake libltdl-dev libtool m4 pkg-config xclip 
+		autoconf automake libltdl-dev libtool m4 pkg-config xclip \
+		libportaudio2 portaudio19-dev 
 
 	@echo "3. Configurando entorno virtual con Python 3.10..."
 	rm -rf .venv
