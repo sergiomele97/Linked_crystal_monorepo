@@ -23,32 +23,36 @@ help:
 SHELL := /bin/bash
 
 setup:
-	@echo "Instalando dependencias del sistema y Python 3.10..."
+	@echo "1. Limpiando repositorios y añadiendo PPA para Python 3.10..."
+	# Eliminamos el repo de Yarn que da error de llaves y añadimos el de Python antiguo
+	sudo rm -f /etc/apt/sources.list.d/yarn.list
+	sudo apt-get update -y || true
+	sudo apt-get install -y software-properties-common
+	sudo add-apt-repository -y ppa:deadsnakes/ppa
 	sudo apt-get update -y
+
+	@echo "2. Instalando dependencias del sistema (incluyendo Python 3.10 y Go)..."
 	sudo apt-get install -y \
 		python3.10 python3.10-venv python3.10-dev \
 		python3-pip python3-setuptools git zip openjdk-17-jdk \
 		libffi-dev libssl-dev libsqlite3-dev zlib1g-dev \
-		libjpeg-dev libfreetype6-dev wget unzip \
-		autoconf automake libltdl-dev libtool m4 pkg-config xclip
-	
-	@echo "Configurando entorno virtual con Python 3.10..."
+		libjpeg-dev libfreetype-dev wget unzip \
+		autoconf automake libltdl-dev libtool m4 pkg-config xclip \
+		golang-go
+
+	@echo "3. Configurando entorno virtual con Python 3.10..."
 	rm -rf .venv
 	python3.10 -m venv .venv
 	.venv/bin/pip install --upgrade pip
 	.venv/bin/pip install buildozer cython kivy
 	.venv/bin/pip install -r Linked_crystal/app/requirements.txt
 
-	@echo "Configurando entorno de Go..."
-	# Instalamos golang-go si no está presente
-	@if ! command -v go >/dev/null; then \
-		sudo apt-get install -y golang-go; \
-	fi
+	@echo "4. Configurando entorno de Go..."
 	# Descarga y limpia módulos
 	cd Linked_crystal/server/src && go mod tidy
 	cd Linked_crystal/server/src && go mod download
-	
-	@echo "Preinstalando Android SDK build-tools..."
+
+	@echo "5. Preinstalando Android SDK build-tools..."
 	mkdir -p ~/.buildozer/android/platform
 	cd ~/.buildozer/android/platform && \
 	if [ ! -d "android-sdk" ]; then \
@@ -62,11 +66,11 @@ setup:
 		yes | cmdline-tools/latest/bin/sdkmanager "platform-tools" "build-tools;34.0.0" "platforms;android-34"; \
 	fi
 
-	@echo "Fix sdkmanager path..."
+	@echo "6. Fix sdkmanager path..."
 	mkdir -p ~/.buildozer/android/platform/android-sdk/tools/bin
 	ln -sf ~/.buildozer/android/platform/android-sdk/cmdline-tools/latest/bin/sdkmanager ~/.buildozer/android/platform/android-sdk/tools/bin/sdkmanager
 
-	@echo "Configurando python-for-android release-2024.01.21..."
+	@echo "7. Configurando python-for-android release-2024.01.21..."
 	if [ ! -d "$$HOME/.buildozer/android/platform/python-for-android" ]; then \
 		git clone --depth=1 --branch release-2024.01.21 https://github.com/kivy/python-for-android $$HOME/.buildozer/android/platform/python-for-android; \
 	fi
