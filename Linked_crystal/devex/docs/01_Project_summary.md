@@ -1,4 +1,5 @@
-**Objective:** Create an open source android emulator which lets you play pokemon crystal like a massive multiplayer online.  
+<h1 align="center">💎 Linked Crystal</h1>
+<p align="center"><em>Turning Pokémon Crystal into an MMO experience</em></p>
 
 
 **Architecture:**
@@ -91,10 +92,6 @@
 
 
 **Methodology:** 
-
-Simple stupid methodology
-
-## Bulk / Cut
 
 ### 📦 1. Bulk (Construction)
 
