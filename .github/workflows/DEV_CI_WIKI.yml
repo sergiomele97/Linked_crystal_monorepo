@@ -3,7 +3,7 @@ on:
     branches: ["main"]
     paths:
       - '.github/devex/docs/**'
-      - '.github/workflows/PRO_CD_WIKI.yml'
+      - '.github/workflows/DEV_CI_WIKI.yml'
   workflow_dispatch:
 
 permissions:
