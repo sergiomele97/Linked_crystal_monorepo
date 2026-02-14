@@ -1,11 +1,7 @@
-### 🚀 Empezando
-* [[Home]]
-* [[01-Instalacion]]
+[[00_Welcome]]
 
-### 💻 Desarrollo
-* [[02-Arquitectura]]
-* [[03-Configuracion-Server]]
-* [[03_Testing]]
+[[01_Project_summary]]
 
-### 📂 Gestión
-* [Ir al Roadmap](../pm/roadmap.md)
+[[02_Methodology]]
+
+[Project Roadmap](../pm/roadmap.md)
