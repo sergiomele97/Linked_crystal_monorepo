@@ -4,6 +4,11 @@ Setting up a development environment for the first time can be so frustrating. Y
 
 Here we've made an effort to **automate everything**, so you don't have to go through that... but exceptions may always happen.
 
+### Prerequisites
+
+This guide is optimized for **linux** + **visual studio code**.
+>You can develop on other OS's but the infrastructure to compile an android APK (buildozer) is not available on Windows.
+
 ---
 
 ### 🚀 Getting Started
