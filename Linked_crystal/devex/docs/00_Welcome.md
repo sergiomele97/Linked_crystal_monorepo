@@ -1,4 +1,4 @@
-# 🚀 Welcome to the Project Wiki!
+# :rocket: Welcome to the Project Wiki!
 
 Setting up a development environment for the first time can be so frustrating. You may spend 1 entire day without building any code.
 
