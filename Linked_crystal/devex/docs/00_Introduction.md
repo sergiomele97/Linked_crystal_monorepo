@@ -15,7 +15,10 @@ cd Linked_crystal_monorepo
 make setup
 ```
 
->While you're computer is working, you can continue reading!
+> [!TIP]
+> If you find any errors, just know they should be easy to fix by giving this context and the makefile contents to an **LLM (Gemini/ChatGPT)**.
+
+>While you're computer is working, you can continue reading:
 
 ---
 
@@ -25,10 +28,7 @@ The `makefile` at the root of the repo is just a definition of commands you can 
 * **The Visual Studio graphical interface** (Run and Debug)
 
 You can check the commands available and what they do in the makefile.
->For example, you might clean reset your environment by executing 'make clean', you might run/debug the app by executing make run-app, or you might test the server by typing make test-server...
-
-> [!TIP]
-> If you find any errors, just know they should be easy to fix by giving this context and the makefile contents to an **LLM (Gemini/ChatGPT)**.
+>For example, you might clean reset your environment by executing `make clean`, you might run/debug the app by executing `make run-app`, or you might test the server by typing `make test-server`...
 
 ---
 
