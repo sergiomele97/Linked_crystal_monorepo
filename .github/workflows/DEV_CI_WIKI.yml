@@ -1,10 +1,8 @@
-name: DEV_CI_WIKI
-
 on:
   push:
-    branches: [ "main" ]
+    branches: ["main"]
     paths:
-      - 'Linked_crystal/devex/docs/**'
+      - '.github/devex/docs/**'
       - '.github/workflows/PRO_CD_WIKI.yml'
   workflow_dispatch:
 
@@ -15,70 +13,27 @@ jobs:
   deploy-wiki:
     runs-on: ubuntu-latest
     steps:
-      - name: Checkout Source
+      - name: Checkout
         uses: actions/checkout@v4
 
-      - name: Sync and Push to Wiki
+      - name: Sync Wiki
         run: |
-          # 1. Configuration
           git config --global user.name "github-actions[bot]"
           git config --global user.email "github-actions[bot]@users.noreply.github.com"
           
-          REPO_DIR=$(pwd)
           WIKI_TEMP_DIR=$(mktemp -d)
           WIKI_URL="https://x-access-token:${{ github.token }}@github.com/${{ github.repository }}.wiki.git"
           
-          # 2. Diagnostics
-          echo "### Verifying Wiki accessibility..."
-          if ! git ls-remote "$WIKI_URL" &> /dev/null; then
-            echo "::error::GitHub Wiki is not initialized or not accessible. Create a page at https://github.com/${{ github.repository }}/wiki first."
-            exit 1
-          fi
-
-          # 3. Clone
-          echo "### Cloning wiki..."
           git clone "$WIKI_URL" "$WIKI_TEMP_DIR"
+          
+          # Limpiar wiki actual y copiar nuevos docs
+          find "$WIKI_TEMP_DIR" -maxdepth 1 -not -name '.git' -not -name '.' -exec rm -rf {} +
+          cp -R .github/devex/docs/. "$WIKI_TEMP_DIR/"
+          
           cd "$WIKI_TEMP_DIR"
           
-          # Detect default branch
-          WIKI_BRANCH=$(git remote show origin | grep 'HEAD branch' | cut -d' ' -f5)
-          echo "### Wiki default branch: $WIKI_BRANCH"
-
-          # 4. Sync files
-          echo "### Contents of wiki BEFORE sync:"
-          ls -F
-          
-          # Preserve Home.md if it exists and we don't have one in source
-          HAS_HOME=false
-          if [ -f "Home.md" ]; then HAS_HOME=true; fi
-          
-          # Clean except .git
-          find . -maxdepth 1 -not -name '.git' -not -name '.' -exec rm -rf {} +
-          
-          # Copy source files
-          cp -R "$REPO_DIR/Linked_crystal/devex/docs/." .
-          
-          # If we had a Home.md and we don't have one now, restore it
-          if [ "$HAS_HOME" = true ] && [ ! -f "Home.md" ]; then
-            echo "Restoring Home.md..."
-            # Note: We deleted it above, so we should have backed it up if we wanted to keep it.
-            # Actually, let's just use 00_Introduction.md as Home.md if it exists.
-            if [ -f "00_Introduction.md" ]; then
-                cp "00_Introduction.md" "Home.md"
-                echo "00_Introduction.md promoted to Home.md"
-            fi
-          fi
-
-          echo "### Contents of wiki AFTER sync:"
-          ls -F
-          
-          # 5. Commit and Push
           git add .
-          if [[ -n "$(git status --porcelain)" ]]; then
-            echo "### Changes detected. Committing..."
-            git commit -m "Automated Wiki Update: ${GITHUB_SHA::7}"
-            echo "### Pushing to $WIKI_BRANCH..."
-            git push origin "$WIKI_BRANCH"
-          else
-            echo "### No changes to commit."
+          if [ -n "$(git status --porcelain)" ]; then
+            git commit -m "Wiki update: ${GITHUB_SHA::7}"
+            git push origin $(git rev-parse --abbrev-ref HEAD)
           fi
