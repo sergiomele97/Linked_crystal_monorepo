@@ -90,10 +90,9 @@
 </table>
 
 
-* **Methodology:** Simple stupid methodology
-  * Repository: https://github.com/sergiomele97/Linked_crystal_monorepo
-  * Backlog: https://github.com/users/sergiomele97/projects/4
-  * Workflow: 
+**Methodology:** 
+
+Simple stupid methodology
 
 ## Bulk / Cut
 
