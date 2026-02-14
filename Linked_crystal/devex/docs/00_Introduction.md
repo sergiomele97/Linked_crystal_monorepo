@@ -6,6 +6,16 @@ Here we've made an effort to **automate everything**, so you don't have to go th
 
 ---
 
+### 🚀 Getting Started
+Run this:
+
+```bash
+git clone https://github.com/sergiomele97/Linked_crystal_monorepo
+cd Linked_crystal_monorepo
+make setup
+```
+---
+
 ### 🛠️ Using the Makefile
 The `makefile` at the root of the repo is just a definition of commands you can launch, either in:
 * **The terminal** (Example: `make setup`)
@@ -22,13 +32,3 @@ The `makefile` at the root of the repo is just a definition of commands you can 
 
 ⚠️ **Important:** You should not try to change the dependencies or you will go crazy.
 
----
-
-### 🚀 Getting Started
-Run this:
-
-```bash
-git clone https://github.com/sergiomele97/Linked_crystal_monorepo
-cd Linked_crystal_monorepo
-make setup
-```
