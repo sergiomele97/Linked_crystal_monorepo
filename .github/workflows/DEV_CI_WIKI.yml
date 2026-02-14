@@ -21,19 +21,14 @@ jobs:
           git config --global user.name "github-actions[bot]"
           git config --global user.email "github-actions[bot]@users.noreply.github.com"
           
-          WIKI_TEMP_DIR=$(mktemp -d)
-          WIKI_URL="https://x-access-token:${{ github.token }}@github.com/${{ github.repository }}.wiki.git"
+          git clone "https://x-access-token:${{ github.token }}@github.com/${{ github.repository }}.wiki.git" wiki_repo
           
-          git clone "$WIKI_URL" "$WIKI_TEMP_DIR"
+          find wiki_repo -maxdepth 1 -not -name '.git' -not -name 'wiki_repo' -not -name '.' -exec rm -rf {} +
+          cp -rv .github/devex/docs/. wiki_repo/
           
-          # Limpiar wiki actual y copiar nuevos docs
-          find "$WIKI_TEMP_DIR" -maxdepth 1 -not -name '.git' -not -name '.' -exec rm -rf {} +
-          cp -R .github/devex/docs/. "$WIKI_TEMP_DIR/"
-          
-          cd "$WIKI_TEMP_DIR"
-          
+          cd wiki_repo
           git add .
           if [ -n "$(git status --porcelain)" ]; then
-            git commit -m "Wiki update: ${GITHUB_SHA::7}"
-            git push origin $(git rev-parse --abbrev-ref HEAD)
+            git commit -m "Wiki update: $GITHUB_SHA"
+            git push origin HEAD
           fi
