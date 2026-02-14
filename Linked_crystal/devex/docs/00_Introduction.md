@@ -15,7 +15,8 @@ cd Linked_crystal_monorepo
 make setup
 ```
 
-While you're computer is working, you can continue reading!
+>While you're computer is working, you can continue reading!
+
 ---
 
 ### 🛠️ Using the Makefile
