@@ -11,7 +11,7 @@ class RamScrapper:
     all the information we need from the GBC RAM
     '''
     def update_ram_data(self):
-        print(self.ramData)
+        #print(self.ramData)
         self.ramData.wram_bank = self.pyboy.memory[0xFF70] & 0x07
         self.ramData.is_saving = self.pyboy.memory[0xD151]
         self.update_tiles()
