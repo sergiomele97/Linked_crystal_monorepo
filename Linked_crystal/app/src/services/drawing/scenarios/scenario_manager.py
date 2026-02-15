@@ -7,9 +7,9 @@ class ScenarioManager:
         
         self.scenarios = {
                 "overworld": (0, 0, 160, 144),
-                "textbox": (0, 0, 160, 144),
-                "menu": (0, 0, 160, 144),
-                "full_screen_menu": (0, 0, 160, 144)
+                "textbox": (0, 0, 160, 96),
+                "menu": (0, 0, 80, 104),
+                "full_screen_menu": (0, 0, 0, 0)
         }
 
 
@@ -25,6 +25,8 @@ class ScenarioManager:
     
     def isFullScreenMenu(self):
         if self.ramData.tiles["sup_left"] in FULL_SCREEN_CASES:
+            return True
+        elif self.ramData.tiles["sup_center"] == Tiles.SAVING_MENU_SUP_CENTER:
             return True
         return False
     

@@ -36,11 +36,16 @@ class DrawingManager:
                 x_render_coord, y_render_coord = self.synchronizationManager.calculate_render_coords(
                     player.x_fine_coord, player.y_fine_coord
                 )
+                scenario = self.scenarioManager.scenarios.get(
+                    self.scenarioManager.current_scenario, 
+                    (0, 0, 160, 144)
+                )
                 self.spriteRenderer.draw_sprite(
                     frame_array,
                     x_render_coord,
                     y_render_coord,
-                    player.current_sprite
+                    player.current_sprite,
+                    scenario
                 )
 
             Clock.schedule_once(lambda dt: self.on_frame(frame_array), 0)
