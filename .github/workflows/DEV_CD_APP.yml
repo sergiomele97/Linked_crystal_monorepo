@@ -88,19 +88,28 @@ jobs:
         URL: ${{ vars.URL }}
         SSL_URL: ${{ vars.SSL_URL }}
 
-    - name: Build debug APK
+    # PASO NUEVO: Decodificar la keystore antes de compilar
+    - name: Decode Keystore
+      working-directory: Linked_crystal/app/APKbuilder
+      run: echo "${{ secrets.GA_KEYSTORE_BASE64 }}" | base64 --decode > my-release.keystore
+
+    - name: Build release APK
       working-directory: Linked_crystal/app/APKbuilder
       run: |
-        buildozer android debug
+        buildozer android release
       env:
         ANDROIDSDK: $HOME/.buildozer/android/platform/android-sdk
         ANDROIDNDK: $HOME/.buildozer/android/platform/android-ndk-r25b
         JAVA_HOME: /usr/lib/jvm/java-17-openjdk-amd64
+        P4A_RELEASE_KEYSTORE: my-release.keystore
+        P4A_RELEASE_KEYSTORE_PASSWD: ${{ secrets.GA_KEYSTORE_PASSWORD }}
+        P4A_RELEASE_KEYALIAS_PASSWD: ${{ secrets.GA_KEY_PASSWORD }}
+        P4A_RELEASE_KEYALIAS: ${{ secrets.GA_KEY_ALIAS }}
 
-    - name: Upload generated APK (debug)
+    - name: Upload generated APK (release)
       uses: actions/upload-artifact@v4
       with:
-        name: app-debug-apk
+        name: app-release-apk
         path: Linked_crystal/app/APKbuilder/bin/*.apk
         retention-days: 5
         overwrite: true
