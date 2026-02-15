@@ -28,7 +28,6 @@ class DebugLogView(ModalView):
         layout.bind(pos=self._update_rect, size=self._update_rect)
 
         self.msg_list = MessageList()
-        # Ensure scroll to bottom on logs
         self.msg_list.scroll_to_bottom = True
 
         layout.add_widget(self.msg_list)

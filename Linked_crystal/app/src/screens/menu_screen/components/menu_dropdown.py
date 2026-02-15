@@ -8,8 +8,6 @@ class MenuDropdown(FloatLayout):
     father_screen = ObjectProperty(None)
     devTools = DevTools()
 
-    # Inicialización del dropdown
-
     def __init__(self, **kwargs):
         super().__init__(**kwargs)
         self.size_hint = (0.3, 0.4)
@@ -25,8 +23,6 @@ class MenuDropdown(FloatLayout):
         btn2.bind(on_release=self.opcion2)
         self.add_widget(btn2)
 
-    # Funciones
-
     def opcion1(self, *args):
         self.devTools.listInternalStorageContent(self.father_screen)
         self.close()
@@ -34,8 +30,6 @@ class MenuDropdown(FloatLayout):
     def opcion2(self, *args):
         print("Opción 2 seleccionada")
         self.close()
-
-    # Funciones base
 
     def open(self, caller=None):
         if not self.parent: 

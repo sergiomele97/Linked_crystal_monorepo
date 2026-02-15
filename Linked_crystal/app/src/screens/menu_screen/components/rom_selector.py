@@ -77,10 +77,10 @@ else:
         callback("/ruta/de/rom_de_prueba.gbc")
 
     def copiar_desde_uri(uri, destino_path):
-        pass  # No necesario en desktop
+        pass  
 
     def copiar_rom_a_storage_interno(uri):
-        return uri  # El path ya es usable directamente
+        return uri  
 
     def abrir_explorador_desktop(screen_instance):
         from kivy.uix.filechooser import FileChooserListView

@@ -10,7 +10,6 @@ class VideoDisplay(FloatLayout):
         self._texture = None  
 
     def display_message(self, message):
-        # Ahora solo lo mandamos al logger central para que se guarde en la lista
         log(message)
 
     def update_frame(self, arr):

@@ -11,7 +11,6 @@ if platform == 'android':
         ])
 else:
     def solicitar_permisos():
-        # No se necesitan permisos en escritorio
         pass
 
 def inicializar_entorno():

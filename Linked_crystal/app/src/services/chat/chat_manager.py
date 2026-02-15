@@ -19,10 +19,8 @@ class ChatManager(EventDispatcher):
         if not text:
             return
 
-        # 1. Add to local history immediately
         self.add_message(text, sender="Tú")
 
-        # 2. Send via network
         app = App.get_running_app()
         if hasattr(app, "connection_manager"):
             app.connection_manager.connectionLoop.send_chat(text)
