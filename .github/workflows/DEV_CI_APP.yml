@@ -51,7 +51,7 @@ jobs:
         pip install -r Linked_crystal/app/requirements.txt
 
     - name: Run Tests
-      working-directory: Linked_crystal/app
+      working-directory: Linked_crystal/app/tests
       run: |
         chmod +x run_tests.sh
         xvfb-run --auto-servernum ./run_tests.sh
