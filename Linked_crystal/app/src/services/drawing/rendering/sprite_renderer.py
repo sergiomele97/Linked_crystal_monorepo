@@ -8,22 +8,35 @@ class SpriteRenderer:
     Usa alpha binario (0 = transparente, 255 = opaco).
     """
 
-    def draw(self, frame, sprite_array, x, y):
+    def draw(self, frame, sprite_array, x, y, scenario_tuple=None):
         """
         Dibuja un sprite RGBA sobre el framebuffer en (x, y).
-        Maneja recortes si el sprite está fuera de pantalla.
+        Maneja recortes si el sprite está fuera de pantalla o del escenario.
+        scenario_tuple: (sx, sy, sw, sh) define la región permitida.
         """
         H, W, _ = frame.shape
         h, w, _ = sprite_array.shape
 
-        # Coordenadas destino en el framebuffer
-        x0 = max(x, 0)
-        y0 = max(y, 0)
-        x1 = min(x + w, W)
-        y1 = min(y + h, H)
+        # Límites del escenario
+        if scenario_tuple:
+            sx, sy, sw, sh = scenario_tuple
+            # Intersección entre pantalla y escenario
+            min_x = max(0, sx)
+            min_y = max(0, sy)
+            max_x = min(W, sx + sw)
+            max_y = min(H, sy + sh)
+        else:
+            min_x, min_y = 0, 0
+            max_x, max_y = W, H
+
+        # Coordenadas destino en el framebuffer (recortadas por pantalla y escenario)
+        x0 = max(x, min_x)
+        y0 = max(y, min_y)
+        x1 = min(x + w, max_x)
+        y1 = min(y + h, max_y)
 
         if x0 >= x1 or y0 >= y1:
-            return  # completamente fuera de pantalla
+            return  # completamente fuera de la región permitida
 
         # Coordenadas origen en el sprite (recorte)
         sx0 = max(0, -x)
@@ -62,7 +75,7 @@ class SpriteRenderer:
         self.sprite_frames = frames
         return frames
 
-    def draw_sprite(self, frame, x, y, current_sprite):
+    def draw_sprite(self, frame, x, y, current_sprite, scenario_tuple=None):
         """
         Dibuja el frame indicado por current_sprite.
         """
@@ -73,4 +86,4 @@ class SpriteRenderer:
             raise IndexError(f"Frame inválido: {current_sprite}")
 
         sprite = self.sprite_frames[current_sprite]
-        self.draw(frame, sprite, x, y)
+        self.draw(frame, sprite, x, y, scenario_tuple)

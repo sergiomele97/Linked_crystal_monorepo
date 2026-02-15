@@ -1,15 +1,5 @@
-import os
 from services.environment.environment_manager import inicializar_entorno
 inicializar_entorno()
-
-import certifi
-os.environ['SSL_CERT_FILE'] = certifi.where()
-
-import logging
-logging.getLogger("websockets").setLevel(logging.CRITICAL)
-logging.getLogger("websockets.protocol").setLevel(logging.CRITICAL)
-logging.getLogger("websockets.client").setLevel(logging.CRITICAL)
-logging.getLogger("websockets.server").setLevel(logging.CRITICAL)
 
 from kivy.app import App
 from kivy.core.window import Window

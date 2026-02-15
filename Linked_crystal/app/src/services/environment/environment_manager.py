@@ -1,3 +1,4 @@
+import os
 from kivy.utils import platform
 
 
@@ -11,10 +12,19 @@ if platform == 'android':
         ])
 else:
     def solicitar_permisos():
-        # No se necesitan permisos en escritorio
         pass
 
 def inicializar_entorno():
+    import logging
+    logging.getLogger("websockets").setLevel(logging.CRITICAL)
+    logging.getLogger("websockets.protocol").setLevel(logging.CRITICAL)
+    logging.getLogger("websockets.client").setLevel(logging.CRITICAL)
+    logging.getLogger("websockets.server").setLevel(logging.CRITICAL)
+
+    import os
+    import certifi
+    os.environ['SSL_CERT_FILE'] = certifi.where()
+
     if platform != 'android':
         from kivy.config import Config
         Config.set('graphics', 'width', '360')

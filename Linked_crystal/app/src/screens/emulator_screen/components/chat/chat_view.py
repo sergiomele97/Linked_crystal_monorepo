@@ -45,8 +45,7 @@ class ChatView(ModalView):
 
     def _on_open(self, *args):
         if self.chat_manager:
-            # Initial load
-            self.msg_list.clear() # Optimizable
+            self.msg_list.clear() 
             for msg in self.chat_manager.messages:
                 self.msg_list.add_message(msg['text'], msg['sender'])
             

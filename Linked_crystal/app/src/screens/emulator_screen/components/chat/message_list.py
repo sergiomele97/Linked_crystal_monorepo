@@ -23,7 +23,6 @@ class MessageList(ScrollView):
         self.anchor.add_widget(self.layout)
         self.add_widget(self.anchor)
 
-        # Bind heights
         self.bind(height=self._update_anchor_height)
         self.layout.bind(height=self._update_anchor_height)
 

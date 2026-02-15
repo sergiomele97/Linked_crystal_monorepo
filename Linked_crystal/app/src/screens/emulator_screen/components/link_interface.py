@@ -21,7 +21,6 @@ class LinkInterface:
             pos_hint={"x": 0, "y": 0}
         )
 
-        # Fondo
         with self.teclado.canvas.before:
             Color(0.12, 0.12, 0.18, 0.97)
             self.rect_fondo = RoundedRectangle(
@@ -31,7 +30,6 @@ class LinkInterface:
             )
         self.teclado.bind(pos=self._update_rect, size=self._update_rect)
 
-        # ---- YOUR ID ----
         self.lbl_your_id = Label(
             text=f"Your ID: {App.get_running_app().appData.userID}",
             size_hint=(1, 0.1),
@@ -44,7 +42,6 @@ class LinkInterface:
         self.lbl_your_id.bind(size=self.lbl_your_id.setter("text_size"))
         self.teclado.add_widget(self.lbl_your_id)
 
-        # ---- SPINNER ----
         self.spinner = Image(
             source="resources/image/spinner.zip",
             size_hint=(0.12, 0.12),
@@ -56,7 +53,6 @@ class LinkInterface:
         )
         self.teclado.add_widget(self.spinner)
 
-        # ---- ENTER OTHER ID ----
         self.lbl_msg = Label(
             text="Enter the other player's ID:",
             size_hint=(1, 0.08),
@@ -69,7 +65,6 @@ class LinkInterface:
         self.lbl_msg.bind(size=self.lbl_msg.setter("text_size"))
         self.teclado.add_widget(self.lbl_msg)
 
-        # ---- DISPLAY ----
         self.display = Label(
             text="",
             size_hint=(1, 0.12),
@@ -82,7 +77,6 @@ class LinkInterface:
         self.display.bind(size=self.display.setter("text_size"))
         self.teclado.add_widget(self.display)
 
-        # ---- BOTONES ----
         btn_w = 0.28
         btn_h = 0.12
 
@@ -103,7 +97,6 @@ class LinkInterface:
             btn.bind(on_release=self.pulsar_numero)
             self.teclado.add_widget(btn)
 
-        # Fila inferior
         btn_clear = Button(
             text="CLEAR",
             size_hint=(btn_w, btn_h),
@@ -137,7 +130,6 @@ class LinkInterface:
         self.father_screen.bind(on_touch_down=self._cerrar_si_fuera)
         self.father_screen.add_widget(self.teclado)
 
-    # ---------------- LOGICA ---------------- #
 
     def _update_rect(self, *args):
         self.rect_fondo.pos = self.teclado.pos
@@ -152,7 +144,6 @@ class LinkInterface:
         self.numero_actual = self.numero_actual[:-1]
         self.display.text = self.numero_actual
 
-    # ---------------- LOGICA ---------------- #
 
     def confirmar_numero(self, *args):
         if not self.numero_actual:
@@ -161,15 +152,11 @@ class LinkInterface:
         print(f"Connect pressed. Other ID: {self.numero_actual}")
         self.spinner.opacity = 1
         
-        # 1. Obtenemos la App y el ID propio
         app = App.get_running_app()
         my_id = app.appData.userID
         target_id = int(self.numero_actual)
 
-        # 2. Accedemos a la URL a través del manager de conexión
-        # Asumiendo que en tu App tienes algo como: self.connection_manager = ConnectionManager()
         try:
-            # Intentamos obtener la URL del loop de conexión
             manager = app.connection_manager 
             full_url = manager.connectionLoop.get_url_callback() 
             
@@ -177,8 +164,6 @@ class LinkInterface:
                 print("Error: No hay un servidor seleccionado")
                 return
 
-            # Limpiamos la URL (ej: "ws://192.168.1.15:8080/ws" -> "192.168.1.15", 8080)
-            # Quitamos protocolo y el path final (/ws)
             clean_address = full_url.replace("ws://", "").replace("wss://", "").split("/")[0]
             
             if ":" in clean_address:
@@ -186,10 +171,8 @@ class LinkInterface:
                 port = int(port)
             else:
                 host = clean_address
-                port = 8080 # Puerto por defecto si no viene en la URL
+                port = 8080 
 
-            # 3. Ordenamos al emulador conectar
-            # father_screen es EmulatorScreen -> tiene el objeto emulator
             self.father_screen.emulator.connect_link(
                 my_id=my_id,
                 target_id=target_id,
@@ -202,7 +185,6 @@ class LinkInterface:
         except Exception as e:
             print(f"Error al conectar Link: {e}")
         
-        # Opcional: Cerrar el teclado tras conectar
         self.cerrar_teclado()
 
     def cerrar_teclado(self):

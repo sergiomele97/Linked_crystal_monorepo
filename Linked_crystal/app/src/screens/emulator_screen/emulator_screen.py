@@ -1,6 +1,9 @@
+import os
 from kivy.uix.screenmanager import Screen
 from kivy.properties import StringProperty
 from kivy.lang import Builder
+from kivy.app import App
+from kivy.clock import Clock
 
 from screens.emulator_screen.components.controlpad import ControlPad
 from screens.emulator_screen.components.menu_dropdown import MenuDropdown
@@ -9,9 +12,8 @@ from screens.emulator_screen.components.chat_interface import ChatInterface
 from services.emulator.emulator_core_interface import EmulatorCoreInterface
 from services.chat.chat_manager import ChatManager
 from services.debug.debug_log_manager import DebugLogManager
-import os
-from kivy.app import App
-from kivy.clock import Clock
+
+
 base_dir = os.path.dirname(__file__)
 Builder.load_file(os.path.join(base_dir, "emulator_screen.kv"))
 Builder.load_file(os.path.join(base_dir, "components/controlpad.kv"))
@@ -24,18 +26,11 @@ class EmulatorScreen(Screen):
         if hasattr(self, '_initialized'):
             return
         self._initialized = True
-        
-        # Initialize ChatManager locally (hierarchy change)
         self.chat_manager = ChatManager()
-        
-        # Initialize DebugLogManager
         self.debug_log_manager = DebugLogManager()
-        
-        # Start link stats loop
         self.link_stats_event = Clock.schedule_interval(self.update_link_stats, 0.5)
-        
-        # Inject ChatManager into global connection manager (dependency injection)
         app = App.get_running_app()
+        
         if hasattr(app, "connection_manager"):
             app.connection_manager.set_chat_manager(self.chat_manager)
 
