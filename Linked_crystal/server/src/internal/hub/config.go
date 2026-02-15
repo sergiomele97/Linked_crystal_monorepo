@@ -17,6 +17,7 @@ const (
 	SendBufPerClient = 32
 	ReadLimit        = 1024
 	IdleReadDeadline = 30 * time.Second
+	ServerVersion    = "0.2"
 )
 
 var (

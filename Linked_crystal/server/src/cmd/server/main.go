@@ -36,6 +36,7 @@ func main() {
 	// Rutas públicas
 	mux.HandleFunc("/health", hub.HandleHealth)
 	mux.HandleFunc("/servers", hub.HandleServers)
+	mux.HandleFunc("/version", hub.HandleVersion)
 
 	go hub.BroadcastLoop()
 	go hub.StartHardwareMonitor()

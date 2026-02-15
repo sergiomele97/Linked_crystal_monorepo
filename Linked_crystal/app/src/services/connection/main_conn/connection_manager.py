@@ -30,11 +30,48 @@ class ConnectionManager:
         return self.selected_server
 
     def getServerListAndSelect(self, parent_screen):
-        url = f"{self.base_url}/servers"
+        # 1. Primero verificamos la versión
+        self._check_version(parent_screen)
 
+    def _check_version(self, parent_screen):
+        url = f"{self.base_url}/version"
+        
         parent_screen.loading = True
-        parent_screen.ids.label_servidor.text = "Cargando servidores..."
+        parent_screen.ids.label_servidor.text = "Verificando versión..."
         parent_screen.ids.loading_spinner.anim_delay = 0.05
+
+        def _success(req, result):
+            try:
+                server_version = result.get("version", "0.0")
+                from version import __version__ as client_version
+                
+                if server_version > client_version:
+                     self._show_update_popup(f"Versión del servidor ({server_version}) es mayor a la tuya ({client_version}). Actualiza la app.")
+                     parent_screen.loading = False
+                     parent_screen.ids.loading_spinner.anim_delay = -1
+                     return
+
+                self._fetch_servers(parent_screen)
+
+            except Exception as e:
+                parent_screen.ids.label_servidor.text = f"Error version: {e}"
+                parent_screen.loading = False
+                parent_screen.ids.loading_spinner.anim_delay = -1
+
+        def _error(req, error):
+            self._fetch_servers(parent_screen)
+
+        UrlRequest(
+            url,
+            on_success=_success,
+            on_error=_error,
+            req_headers={'Accept': 'application/json'},
+            decode=True
+        )
+
+    def _fetch_servers(self, parent_screen):
+        url = f"{self.base_url}/servers"
+        parent_screen.ids.label_servidor.text = "Cargando servidores..."
 
         def _success(req, result):
             try:
@@ -63,6 +100,25 @@ class ConnectionManager:
             req_headers={'Accept': 'application/json'},
             decode=True
         )
+
+    def _show_update_popup(self, msg):
+        content = GridLayout(cols=1, padding=dp(20), spacing=dp(20))
+        
+        from kivy.uix.label import Label
+        label = Label(text=msg, 
+                      text_size=(Window.width * 0.7, None),
+                      halign='center', 
+                      valign='middle',
+                      color=(1, 1, 1, 1)) # Explicit white text
+        
+        content.add_widget(label)
+        
+        # No dismiss button, forcing update (or restart)
+        popup = Popup(title="Actualización Requerida",
+                      content=content,
+                      size_hint=(0.8, 0.4),
+                      auto_dismiss=False)
+        popup.open()
 
     def _show_server_modal(self, parent_screen):
         scroll = ScrollView(size_hint=(1, 1))
