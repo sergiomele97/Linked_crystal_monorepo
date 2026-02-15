@@ -1,9 +1,5 @@
-import os
 from services.environment.environment_manager import inicializar_entorno
 inicializar_entorno()
-
-import certifi
-os.environ['SSL_CERT_FILE'] = certifi.where()
 
 from kivy.app import App
 from kivy.core.window import Window
