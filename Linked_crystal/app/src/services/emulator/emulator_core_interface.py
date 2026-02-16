@@ -115,9 +115,41 @@ class EmulatorCoreInterface:
             self.on_text_output(f"[DEBUG] Ram guardada: {RAMfile} ({file_size} bytes)")
             log(f"[DEBUG] Ram guardada: {RAMfile} ({file_size} bytes)")
 
+            # Sincronización externa
+            self.sync_ram_to_external(RAMfile)
+
         except Exception as e:
             if self.on_text_output:
                 Clock.schedule_once(
                     lambda dt, err=e: self.on_text_output(f"Error guardando RAM: {err}"), 0
                 )
+
+    def sync_ram_to_external(self, local_ram_path):
+        app_data = App.get_running_app().appData
+        if platform == 'android' and app_data.romFolderUri:
+            try:
+                from jnius import autoclass, cast
+                Uri = autoclass('android.net.Uri')
+                PythonActivity = autoclass('org.kivy.android.PythonActivity')
+                
+                # Intentamos construir la URI del .ram
+                rom_uri_str = app_data.romFolderUri
+                ram_uri_str = rom_uri_str.replace(".gbc", ".ram").replace(".GBC", ".ram")
+                ram_uri = Uri.parse(ram_uri_str)
+                
+                content_resolver = PythonActivity.mActivity.getContentResolver()
+                # Abrir stream de salida (sobrescribir)
+                output_stream = content_resolver.openOutputStream(ram_uri, "wt")
+                
+                with open(local_ram_path, "rb") as f:
+                    output_stream.write(f.read())
+                
+                output_stream.close()
+                log(f"[INFO] Sincronización externa completada: {ram_uri_str}")
+            except Exception as e:
+                log(f"[ERROR] Error en sincronización externa: {e}")
+        elif platform != 'android':
+            # En desktop, si el romPath es distinto al rom_seleccionada local, podríamos copiarlo
+            # Pero en desktop romPath ya suele ser la ruta original.
+            pass
                 
