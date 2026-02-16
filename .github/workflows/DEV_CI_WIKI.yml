@@ -1,3 +1,5 @@
+name: DEV_CI_WIKI
+
 on:
   push:
     branches: ["main"]
