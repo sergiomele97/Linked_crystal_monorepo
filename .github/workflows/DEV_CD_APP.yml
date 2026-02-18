@@ -2,6 +2,11 @@ name: DEV_CD_APP
 
 on:
   workflow_dispatch:
+    inputs:
+      commit_sha:
+        description: 'SHA del commit o nombre de la rama (dejar vacío para usar default)'
+        required: false
+        default: ''
 
 jobs:
   build:
@@ -12,7 +17,9 @@ jobs:
     steps:
     - name: Checkout repository
       uses: actions/checkout@v4
-
+      with:
+        ref: ${{ github.event.inputs.commit_sha || github.ref }}
+        
     - name: Set up Python
       uses: actions/setup-python@v5
       with:
