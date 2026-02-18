@@ -39,32 +39,22 @@ class AudioManagerKivy:
         self._peak_attack = 0.8  # Qué tan rápido sube (más alto = más reactivo)
 
         self._running = True
-        
-        # Parámetros de estabilidad
-        self._prefill_count = 3  # Chunks mínimos antes de empezar a sonar
-        self._prefilling = True
 
     # -------------------------
     # API compatible
     # -------------------------
     def update_audio(self):
-        """
-        Lee audio de PyBoy y encola para reproducción de forma segura (Atómica).
-        """
+        """Lee audio de PyBoy y encola para reproducción."""
         try:
             audio_len = getattr(self.pyboy.sound, "raw_buffer_head", 0)
             if audio_len <= 0:
                 return
-            
-            # CRITICAL: Hacemos un .copy() inmediato para que el emulador 
-            # no pise estos datos en el siguiente tick mientras los procesamos.
-            audio_buffer = np.copy(self.pyboy.sound.ndarray[:audio_len])
-            
+            audio_buffer = self.pyboy.sound.ndarray[:audio_len]
             sample_rate = getattr(self.pyboy.sound, "sample_rate", None)
             if sample_rate:
                 self.play_audio_buffer(audio_buffer, sample_rate)
         except Exception:
-            pass
+            pass  # nunca rompe el loop
 
     def play_audio_buffer(self, audio_array, sample_rate):
         """Encola audio; normaliza solo si no es int16."""
@@ -133,9 +123,7 @@ class AudioManagerKivy:
             channels=channels,
             dtype='int16',
             callback=self._desktop_callback,
-            # Quitamos latency='low' para tener un buffer más resiliente
-            # ante los bloqueos intermitentes del Link Cable.
-            blocksize=1024
+            latency='low'
         )
         self.audio_stream.start()
 
@@ -143,16 +131,6 @@ class AudioManagerKivy:
         out = np.zeros((frames, self._channels), dtype=np.int16)
         needed = frames
         with self._buffer_lock:
-            # Lógica de pre-fill: Si estamos vacíos, esperamos a tener unos chunks
-            # antes de empezar a entregar datos al callback de audio.
-            if self._prefilling:
-                if len(self._playback_buffer) >= self._prefill_count:
-                    self._prefilling = False
-                else:
-                    # Entregamos silencio mientras llenamos
-                    outdata[:] = 0
-                    return
-
             dst = 0
             while needed > 0 and self._playback_buffer:
                 chunk = self._playback_buffer[0]
@@ -165,10 +143,6 @@ class AudioManagerKivy:
                     self._playback_buffer[0] = chunk[take:]
                 dst += take
                 needed -= take
-            
-            # Si nos hemos quedado vacíos durante el callback, volvemos a modo prefilling
-            if not self._playback_buffer:
-                self._prefilling = True
         if out.shape[1] != self._channels:
             if out.shape[1] == 1: out = np.repeat(out, 2, axis=1)
             else:
