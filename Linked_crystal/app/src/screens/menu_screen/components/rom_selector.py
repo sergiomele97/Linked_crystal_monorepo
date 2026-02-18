@@ -27,24 +27,13 @@ if platform == 'android':
             if requestCode == 1:
                 activity.unbind(on_activity_result=on_activity_result)
                 if resultCode == -1 and intent_data is not None:
-                    uri = intent_data.getData()
-                    # Persistir permisos
-                    try:
-                        content_resolver = PythonActivity.mActivity.getContentResolver()
-                        takeFlags = (Intent.FLAG_GRANT_READ_URI_PERMISSION | 
-                                     Intent.FLAG_GRANT_WRITE_URI_PERMISSION)
-                        content_resolver.takePersistableUriPermission(uri, takeFlags)
-                    except Exception as e:
-                        print(f"[DEBUG] No se pudo persistir permiso: {e}")
-                    
-                    App.get_running_app().appData.romFolderUri = uri.toString()
-                    callback(uri)
+                    callback(intent_data.getData())
                 else:
                     callback(None)
         activity.bind(on_activity_result=on_activity_result)
-        intent = Intent(Intent.ACTION_OPEN_DOCUMENT)
-        intent.addCategory(Intent.CATEGORY_OPENABLE)
+        intent = Intent(Intent.ACTION_GET_CONTENT)
         intent.setType("*/*")
+        intent.addCategory(Intent.CATEGORY_OPENABLE)
         currentActivity = cast('android.app.Activity', PythonActivity.mActivity)
         currentActivity.startActivityForResult(intent, 1)
 
@@ -62,28 +51,6 @@ if platform == 'android':
         finally:
             input_stream.close()
 
-    def buscar_y_copiar_ram_externa(rom_uri_str):
-        if not rom_uri_str: return
-        
-        try:
-            # En Android, intentar encontrar el .ram al lado del .gbc es complejo con solo el URI del archivo.
-            # Sin embargo, si el usuario seleccionó vía ACTION_OPEN_DOCUMENT, podemos intentar 
-            # construir la URI del .ram si el proveedor lo permite (común en Files).
-            
-            rom_uri = Uri.parse(rom_uri_str)
-            ram_uri_str = rom_uri_str.replace(".gbc", ".ram").replace(".GBC", ".ram")
-            ram_uri = Uri.parse(ram_uri_str)
-            
-            destino_dir = app_storage_path()
-            destino_path = os.path.join(destino_dir, "rom_seleccionada.gbc.ram")
-            
-            copiar_desde_uri(ram_uri, destino_path)
-            print(f"[INFO] RAM externa encontrada y copiada: {destino_path}")
-            return True
-        except Exception as e:
-            print(f"[DEBUG] No se encontró RAM externa o fallo al copiar: {e}")
-            return False
-
     def copiar_rom_a_storage_interno(uri):
         destino_dir = app_storage_path()
         os.makedirs(destino_dir, exist_ok=True)
@@ -91,10 +58,6 @@ if platform == 'android':
         try:
             copiar_desde_uri(uri, destino_path)
             print(f"[INFO] Copiado ROM a: {destino_path}")
-            
-            # Intentar traer la RAM también
-            buscar_y_copiar_ram_externa(uri.toString())
-            
             return destino_path
         except Exception as e:
             print(f"[ERROR] No se pudo copiar: {e}")
