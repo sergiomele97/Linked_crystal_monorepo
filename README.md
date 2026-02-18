@@ -27,5 +27,4 @@ To play, download the latest APK release on your Android device:
 ## Development
 
 If you want to develop, our wiki will try to sum up the most important information you need.  
-
-> [Wiki link](https://github.com/sergiomele97/Linked_crystal_monorepo/wiki/00_Welcome)
+[Wiki link](https://github.com/sergiomele97/Linked_crystal_monorepo/wiki/00_Welcome)
