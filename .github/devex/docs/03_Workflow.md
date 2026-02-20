@@ -15,14 +15,10 @@ Antes de integrar, es obligatorio cumplir estos pasos:
 1. Comprobar funcionalidad OK en **Desktop**.
 2. Pasar los **tests** del sistema.
 
-## 4. Pull Request y Git History
-- Se pushea y se hace **PR a main en un único commit**.
-- **Nota:** La rama `features/nombrefeature` con sus commits pequeños **no se borra**; se puede reutilizar y/o usar como historial detallado.
+## 4. Compilación
+Se lanzar la pipeline que compila **APK** apuntando a la rama feature.
 
-## 5. CI/CD y Compilación
-Una vez integrados los cambios en `main`, se lanzarán las **CI/CDs automáticamente**, incluyendo la que compila el **APK**.
-
-## 6. QA Manual (Checklist APK)
+## 5. QA Manual (Checklist APK)
 La APK generada debe probarse manualmente revisando los siguientes puntos:
 
 - [ ] Permite seleccionar el rom.
@@ -34,3 +30,7 @@ La APK generada debe probarse manualmente revisando los siguientes puntos:
 - [ ] Permite guardar partida (Cerrar y volver a abrir).
 - [ ] Permite mandar mensajes en chat.
 - [ ] **(Pendiente)** Cable link.
+
+## 6. Pull Request y Git History
+- Se hace **PR a main en un único commit**.
+- **Nota:** La rama `features/nombrefeature` con sus commits pequeños **no se borra**; se puede reutilizar y/o usar como historial detallado.
