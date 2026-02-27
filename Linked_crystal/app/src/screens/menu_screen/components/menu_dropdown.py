@@ -24,8 +24,8 @@ class MenuDropdown(FloatLayout):
         btn2.bind(on_release=self.opcion2)
         self.add_widget(btn2)
 
-        # Android-only: Exportar RAM
-        if platform == 'android':
+        # Android-only: Exportar RAM (habilitado en desarrollo también para tests)
+        if platform == 'android' or self.devTools:
             btn_export = Button(text="Exportar RAM", size_hint=(1, 0.3), pos_hint={"x": 0, "y": 0.1})
             btn_export.bind(on_release=self.export_ram)
             self.add_widget(btn_export)
