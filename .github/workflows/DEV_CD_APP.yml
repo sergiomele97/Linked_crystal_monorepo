@@ -24,6 +24,8 @@ jobs:
       uses: actions/setup-python@v5
       with:
         python-version: "3.10"
+        cache: 'pip'
+        cache-dependency-path: Linked_crystal/app/requirements.txt
 
     - name: Install system dependencies
       run: |
@@ -34,22 +36,29 @@ jobs:
           libjpeg-dev libfreetype6-dev wget unzip \
           autoconf automake libltdl-dev libtool m4 pkg-config
 
+    - name: Cache pip downloads
+      uses: actions/cache@v4
+      with:
+        path: ~/.cache/pip
+        key: ${{ runner.os }}-pip-${{ hashFiles('Linked_crystal/app/requirements.txt') }}
+        restore-keys: |
+          ${{ runner.os }}-pip-
+
     - name: Restore Buildozer & Gradle cache
       uses: actions/cache@v4
       with:
         path: |
-          ~/.buildozer/android/platform/android-sdk
-          ~/.buildozer/android/platform/android-ndk-r25b
-          ~/.buildozer/android/platform/python-for-android
-          ~/.buildozer/android/platform/build-arm64-v8a/build/other_builds
+          ~/.buildozer
           ~/.gradle
-        key: ${{ runner.os }}-buildozer-${{ hashFiles('Linked_crystal/app/APKbuilder/buildozer.spec') }}
+          Linked_crystal/app/APKbuilder/.buildozer
+        key: ${{ runner.os }}-buildozer-${{ hashFiles('Linked_crystal/app/APKbuilder/buildozer.spec', 'Linked_crystal/app/requirements.txt') }}
         restore-keys: |
           ${{ runner.os }}-buildozer-
 
     - name: Install buildozer and dependencies
       run: |
         pip install --upgrade pip
+        # install only core tools here; additional runtime packages are fetched by buildozer
         pip install buildozer cython
 
     - name: Preinstall Android SDK build-tools
