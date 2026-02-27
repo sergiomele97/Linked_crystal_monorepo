@@ -41,4 +41,5 @@ urllib3==2.4.0
 virtualenv==20.31.2
 websockets==15.0.1
 python-dotenv==1.2.1
+plyer==2.1.0
 

@@ -1,5 +1,6 @@
 from kivy.uix.floatlayout import FloatLayout
 from kivy.uix.button import Button
+from kivy.utils import platform
 from kivy.properties import ObjectProperty
 
 from services.devTools.devTools import DevTools
@@ -23,12 +24,27 @@ class MenuDropdown(FloatLayout):
         btn2.bind(on_release=self.opcion2)
         self.add_widget(btn2)
 
+        # Android-only: Exportar RAM
+        if platform == 'android':
+            btn_export = Button(text="Exportar RAM", size_hint=(1, 0.3), pos_hint={"x": 0, "y": 0.1})
+            btn_export.bind(on_release=self.export_ram)
+            self.add_widget(btn_export)
+
     def opcion1(self, *args):
         self.devTools.listInternalStorageContent(self.father_screen)
         self.close()
 
     def opcion2(self, *args):
         print("Opción 2 seleccionada")
+        self.close()
+
+    def export_ram(self, *args):
+        # Delegar al father_screen para mantener la lógica en MenuScreen
+        try:
+            if self.father_screen and hasattr(self.father_screen, 'export_ram'):
+                self.father_screen.export_ram()
+        except Exception:
+            pass
         self.close()
 
     def open(self, caller=None):
