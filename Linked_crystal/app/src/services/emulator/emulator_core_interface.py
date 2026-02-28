@@ -103,7 +103,7 @@ class EmulatorCoreInterface:
         try:
             rom_dir = os.path.dirname(App.get_running_app().appData.romPath)
             RAMfile = (
-                os.path.join(rom_dir, "rom_seleccionada.gbc")
+                os.path.join(rom_dir, "gamerom.gbc")
                 if platform == "android"
                 else App.get_running_app().appData.romPath
             ) + ".ram"
