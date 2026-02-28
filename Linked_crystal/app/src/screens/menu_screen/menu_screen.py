@@ -52,47 +52,59 @@ class MenuScreen(Screen):
         self.manager.current = 'emulator'
 
     def export_ram(self):
-        """Exporta el archivo .ram desde el sandbox de la app a la ubicación elegida por el usuario (Android-only).
-        Implementación mínima: usa `plyer.filechooser.save_file` y copia el archivo.
+        """Exporta el archivo .ram desde el sandbox de la app usando el Share Intent de Android.
+        Esto permite al usuario guardar el archivo en cualquier ubicación o enviarlo por otras apps.
         """
-        if platform != 'android' or filechooser is None:
-            # No disponible fuera de Android o si plyer no está
+        if platform != 'android':
             try:
                 self.ids.output_label.text = "Exportar RAM solo disponible en Android"
             except Exception:
                 pass
             return
 
-        # Ruta local esperada dentro del sandbox
-        try:
-            from android.storage import app_storage_path
-            import os
-            local_ram = os.path.join(app_storage_path(), 'rom_seleccionada.gbc.ram')
-        except Exception:
-            local_ram = None
+        from android.storage import app_storage_path
+        local_ram = os.path.join(app_storage_path(), 'rom_seleccionada.gbc.ram')
 
-        if not local_ram or not os.path.exists(local_ram):
+        if not os.path.exists(local_ram):
             try:
                 self.ids.output_label.text = "No se encontró archivo .ram en el sandbox"
             except Exception:
                 pass
             return
 
-        # Pedir al usuario dónde guardar
+        # Intent nativo de Android para compartir (Exportar)
         try:
-            result = filechooser.save_file(title="Guardar RAM", suggested_filename='rom_seleccionada.gbc.ram')
-            if not result:
-                return
-            # plyer.filechooser.save_file puede devolver lista
-            dest_path = result[0] if isinstance(result, (list, tuple)) else result
-            # Copiar archivo
-            shutil.copyfile(local_ram, dest_path)
+            from jnius import autoclass, cast
+            PythonActivity = autoclass('org.kivy.android.PythonActivity')
+            Intent = autoclass('android.content.Intent')
+            File = autoclass('java.io.File')
+            FileProvider = autoclass('androidx.core.content.FileProvider')
+            
+            context = PythonActivity.mActivity
+            file_obj = File(local_ram)
+            
+            # Buildozer configura el FileProvider con el nombre del paquete + .fileprovider
+            authority = context.getPackageName() + ".fileprovider"
+            uri = FileProvider.getUriForFile(context, authority, file_obj)
+
+            shareIntent = Intent(Intent.ACTION_SEND)
+            shareIntent.setType("application/octet-stream")
+            shareIntent.putExtra(Intent.EXTRA_STREAM, uri)
+            shareIntent.addFlags(Intent.FLAG_GRANT_READ_URI_PERMISSION)
+            
+            # Crear el selector de aplicaciones (Chooser)
+            title = cast('java.lang.CharSequence', autoclass('java.lang.String')("Exportar RAM"))
+            chooserIntent = Intent.createChooser(shareIntent, title)
+            
+            context.startActivity(chooserIntent)
+            
             try:
-                self.ids.output_label.text = f"RAM exportada a: {dest_path}"
+                self.ids.output_label.text = "Selector de exportación abierto"
             except Exception:
                 pass
+                
         except Exception as e:
             try:
-                self.ids.output_label.text = f"Error exportando RAM: {e}"
+                self.ids.output_label.text = f"Error al exportar: {e}"
             except Exception:
                 pass
