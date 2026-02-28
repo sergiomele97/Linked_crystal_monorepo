@@ -52,8 +52,8 @@ class MenuScreen(Screen):
         self.manager.current = 'emulator'
 
     def export_ram(self):
-        """Exporta el archivo .ram desde el sandbox de la app usando el Share Intent de Android.
-        Copia el archivo al directorio de cache primero para asegurar compatibilidad con FileProvider.
+        """Exporta el archivo .ram usando el Storage Access Framework (SAF) de Android.
+        Esto abre el selector nativo para que el usuario elija dónde guardar el archivo.
         """
         if platform != 'android':
             try:
@@ -62,69 +62,67 @@ class MenuScreen(Screen):
                 pass
             return
 
-        from android.storage import app_storage_path, app_cache_path
+        from android.storage import app_storage_path
         local_ram = os.path.join(app_storage_path(), 'rom_seleccionada.gbc.ram')
 
         if not os.path.exists(local_ram):
             try:
-                self.ids.output_label.text = "No se encontró archivo .ram en el sandbox"
+                self.ids.output_label.text = "No se encontró archivo .ram"
             except Exception:
                 pass
             return
 
-        # Intent nativo de Android para compartir (Exportar)
+        # Intent nativo SAF (Storage Access Framework)
         try:
+            from android import activity
             from jnius import autoclass, cast
-            import shutil
-            
-            # 1. Copiar al cache para asegurar que el FileProvider tiene acceso (dirs configurados)
-            cache_dir = app_cache_path()
-            if not os.path.exists(cache_dir):
-                os.makedirs(cache_dir, exist_ok=True)
-            
-            cache_ram = os.path.join(cache_dir, 'export_ram.ram')
-            shutil.copyfile(local_ram, cache_ram)
             
             PythonActivity = autoclass('org.kivy.android.PythonActivity')
             Intent = autoclass('android.content.Intent')
-            File = autoclass('java.io.File')
-            FileProvider = autoclass('androidx.core.content.FileProvider')
             
-            context = PythonActivity.mActivity
-            file_obj = File(cache_ram)
-            
-            # Intentar primero con el authority estándar de Buildozer
-            authority = context.getPackageName() + ".fileprovider"
-            
-            try:
-                uri = FileProvider.getUriForFile(context, authority, file_obj)
-            except Exception as e_provider:
-                print(f"DEBUG: FileProvider failed with authority {authority}: {e_provider}")
-                # Re-lanzar para el bloque catch general
-                raise e_provider
+            def on_activity_result(requestCode, resultCode, intent_data):
+                if requestCode == 2:
+                    activity.unbind(on_activity_result=on_activity_result)
+                    if resultCode == -1 and intent_data is not None:
+                        # Usuario eligió destino correctamente
+                        uri = intent_data.getData()
+                        try:
+                            # Leer RAM local
+                            with open(local_ram, 'rb') as f_in:
+                                data = f_in.read()
+                            
+                            # Escribir a la URI seleccionada
+                            context = PythonActivity.mActivity
+                            resolver = context.getContentResolver()
+                            output_stream = resolver.openOutputStream(uri)
+                            output_stream.write(data)
+                            output_stream.close()
+                            
+                            self.ids.output_label.text = "¡RAM exportada correctamente!"
+                        except Exception as e:
+                            self.ids.output_label.text = f"Error al escribir: {e}"
+                    else:
+                        self.ids.output_label.text = "Exportación cancelada."
 
-            shareIntent = Intent(Intent.ACTION_SEND)
-            shareIntent.setType("application/octet-stream")
-            shareIntent.putExtra(Intent.EXTRA_STREAM, uri)
-            shareIntent.addFlags(Intent.FLAG_GRANT_READ_URI_PERMISSION)
+            # Registrar el callback para el resultado del Intent
+            activity.bind(on_activity_result=on_activity_result)
             
-            # Crear el selector de aplicaciones (Chooser)
-            title = cast('java.lang.CharSequence', autoclass('java.lang.String')("Exportar RAM"))
-            chooserIntent = Intent.createChooser(shareIntent, title)
+            # Crear Intent para crear un documento
+            intent = Intent(Intent.ACTION_CREATE_DOCUMENT)
+            intent.addCategory(Intent.CATEGORY_OPENABLE)
+            intent.setType("application/octet-stream")
+            intent.putExtra(Intent.EXTRA_TITLE, "rom_seleccionada.gbc.ram")
             
-            context.startActivity(chooserIntent)
+            currentActivity = cast('android.app.Activity', PythonActivity.mActivity)
+            currentActivity.startActivityForResult(intent, 2)
             
             try:
-                self.ids.output_label.text = "Selector de exportación abierto"
+                self.ids.output_label.text = "Selecciona destino para la RAM..."
             except Exception:
                 pass
                 
         except Exception as e:
-            import traceback
-            print(f"DEBUG: FULL EXPORT ERROR:\n{traceback.format_exc()}")
             try:
-                # Mostrar el error lo más completo posible
-                error_msg = str(e)
-                self.ids.output_label.text = f"Error: {error_msg[:150]}"
+                self.ids.output_label.text = f"Error SAF: {e}"
             except Exception:
                 pass
