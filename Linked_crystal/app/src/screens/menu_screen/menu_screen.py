@@ -53,7 +53,7 @@ class MenuScreen(Screen):
 
     def export_ram(self):
         """Exporta el archivo .ram desde el sandbox de la app usando el Share Intent de Android.
-        Esto permite al usuario guardar el archivo en cualquier ubicación o enviarlo por otras apps.
+        Copia el archivo al directorio de cache primero para asegurar compatibilidad con FileProvider.
         """
         if platform != 'android':
             try:
@@ -62,7 +62,7 @@ class MenuScreen(Screen):
                 pass
             return
 
-        from android.storage import app_storage_path
+        from android.storage import app_storage_path, app_cache_path
         local_ram = os.path.join(app_storage_path(), 'rom_seleccionada.gbc.ram')
 
         if not os.path.exists(local_ram):
@@ -75,17 +75,33 @@ class MenuScreen(Screen):
         # Intent nativo de Android para compartir (Exportar)
         try:
             from jnius import autoclass, cast
+            import shutil
+            
+            # 1. Copiar al cache para asegurar que el FileProvider tiene acceso (dirs configurados)
+            cache_dir = app_cache_path()
+            if not os.path.exists(cache_dir):
+                os.makedirs(cache_dir, exist_ok=True)
+            
+            cache_ram = os.path.join(cache_dir, 'export_ram.ram')
+            shutil.copyfile(local_ram, cache_ram)
+            
             PythonActivity = autoclass('org.kivy.android.PythonActivity')
             Intent = autoclass('android.content.Intent')
             File = autoclass('java.io.File')
             FileProvider = autoclass('androidx.core.content.FileProvider')
             
             context = PythonActivity.mActivity
-            file_obj = File(local_ram)
+            file_obj = File(cache_ram)
             
-            # Buildozer configura el FileProvider con el nombre del paquete + .fileprovider
+            # Intentar primero con el authority estándar de Buildozer
             authority = context.getPackageName() + ".fileprovider"
-            uri = FileProvider.getUriForFile(context, authority, file_obj)
+            
+            try:
+                uri = FileProvider.getUriForFile(context, authority, file_obj)
+            except Exception as e_provider:
+                print(f"DEBUG: FileProvider failed with authority {authority}: {e_provider}")
+                # Re-lanzar para el bloque catch general
+                raise e_provider
 
             shareIntent = Intent(Intent.ACTION_SEND)
             shareIntent.setType("application/octet-stream")
@@ -104,7 +120,11 @@ class MenuScreen(Screen):
                 pass
                 
         except Exception as e:
+            import traceback
+            print(f"DEBUG: FULL EXPORT ERROR:\n{traceback.format_exc()}")
             try:
-                self.ids.output_label.text = f"Error al exportar: {e}"
+                # Mostrar el error lo más completo posible
+                error_msg = str(e)
+                self.ids.output_label.text = f"Error: {error_msg[:150]}"
             except Exception:
                 pass
