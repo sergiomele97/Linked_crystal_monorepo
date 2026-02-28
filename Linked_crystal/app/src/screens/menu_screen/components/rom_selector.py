@@ -54,7 +54,7 @@ if platform == 'android':
     def copiar_rom_a_storage_interno(uri):
         destino_dir = app_storage_path()
         os.makedirs(destino_dir, exist_ok=True)
-        destino_path = os.path.join(destino_dir, "rom_seleccionada.gbc")
+        destino_path = os.path.join(destino_dir, "gamerom.gbc")
         try:
             copiar_desde_uri(uri, destino_path)
             print(f"[INFO] Copiado ROM a: {destino_path}")

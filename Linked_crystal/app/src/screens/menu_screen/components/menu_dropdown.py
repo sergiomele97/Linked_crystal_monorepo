@@ -11,24 +11,28 @@ class MenuDropdown(FloatLayout):
 
     def __init__(self, **kwargs):
         super().__init__(**kwargs)
-        self.size_hint = (0.3, 0.4)
-        self.pos_hint = {"x": 0.65, "y": 0.5}
+        self.size_hint = (0.35, 0.5)  # Aumentado un poco para el nuevo botón y ancho
+        self.pos_hint = {"x": 0.6, "y": 0.45}
         self.build_content()
 
     def build_content(self):
-        btn1 = Button(text="Opción 1", size_hint=(1, 0.3), pos_hint={"x": 0, "y": 0.7})
+        btn1 = Button(text="Opción 1", size_hint=(1, 0.2), pos_hint={"x": 0, "y": 0.8})
         btn1.bind(on_release=self.opcion1)
         self.add_widget(btn1)
 
-        btn2 = Button(text="Opción 2", size_hint=(1, 0.3), pos_hint={"x": 0, "y": 0.4})
+        btn2 = Button(text="Opción 2", size_hint=(1, 0.2), pos_hint={"x": 0, "y": 0.6})
         btn2.bind(on_release=self.opcion2)
         self.add_widget(btn2)
 
-        # Android-only: Exportar RAM (habilitado en desarrollo también para tests)
+        # Android-only: Exportar/Importar RAM (habilitado en desarrollo también para tests)
         if platform == 'android' or self.devTools:
-            btn_export = Button(text="Exportar RAM", size_hint=(1, 0.3), pos_hint={"x": 0, "y": 0.1})
+            btn_export = Button(text="Exportar RAM", size_hint=(1, 0.2), pos_hint={"x": 0, "y": 0.4})
             btn_export.bind(on_release=self.export_ram)
             self.add_widget(btn_export)
+
+            btn_import = Button(text="Importar RAM", size_hint=(1, 0.2), pos_hint={"x": 0, "y": 0.2})
+            btn_import.bind(on_release=self.import_ram)
+            self.add_widget(btn_import)
 
     def opcion1(self, *args):
         self.devTools.listInternalStorageContent(self.father_screen)
@@ -43,6 +47,15 @@ class MenuDropdown(FloatLayout):
         try:
             if self.father_screen and hasattr(self.father_screen, 'export_ram'):
                 self.father_screen.export_ram()
+        except Exception:
+            pass
+        self.close()
+
+    def import_ram(self, *args):
+        # Delegar al father_screen
+        try:
+            if self.father_screen and hasattr(self.father_screen, 'import_ram'):
+                self.father_screen.import_ram()
         except Exception:
             pass
         self.close()
