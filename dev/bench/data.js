@@ -1,5 +1,5 @@
 window.BENCHMARK_DATA = {
-  "lastUpdate": 1771181187748,
+  "lastUpdate": 1772363917068,
   "repoUrl": "https://github.com/sergiomele97/Linked_crystal_monorepo",
   "entries": {
     "Go Backend Performance": [
@@ -2460,6 +2460,53 @@ window.BENCHMARK_DATA = {
           {
             "name": "RAM per Client",
             "value": 133.33694458007812,
+            "unit": "KB"
+          },
+          {
+            "name": "Failure Count",
+            "value": 0,
+            "unit": "count"
+          },
+          {
+            "name": "Active Players",
+            "value": 500,
+            "unit": "count"
+          }
+        ]
+      },
+      {
+        "commit": {
+          "author": {
+            "name": "Sergio Melero Royo",
+            "username": "sergiomele97",
+            "email": "58886569+sergiomele97@users.noreply.github.com"
+          },
+          "committer": {
+            "name": "GitHub",
+            "username": "web-flow",
+            "email": "noreply@github.com"
+          },
+          "id": "6aab18f74ab979b26a3e1b75a06b4fb1b4b83be8",
+          "message": "Add workflow_dispatch trigger to DEV_CD_SERVER",
+          "timestamp": "2026-03-01T11:14:50Z",
+          "url": "https://github.com/sergiomele97/Linked_crystal_monorepo/commit/6aab18f74ab979b26a3e1b75a06b4fb1b4b83be8"
+        },
+        "date": 1772363916456,
+        "tool": "customSmallerIsBetter",
+        "benches": [
+          {
+            "name": "CPU Usage",
+            "value": 59.99999712000014,
+            "unit": "%"
+          },
+          {
+            "name": "Latency",
+            "value": 0.0003763146268513483,
+            "unit": "ms"
+          },
+          {
+            "name": "RAM per Client",
+            "value": 68.268515625,
             "unit": "KB"
           },
           {
