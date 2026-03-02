@@ -9,6 +9,42 @@ import time
 
 from env import STATIC_TOKEN, ENV, SSL_URL
 
+class SmartLinkQueue(queue.Queue):
+    """
+    Cola especial que nunca bloquea el hilo de emulación.
+    Si la cola está vacía o el cliente no está activo, devuelve inmediatamente 0xFF.
+    """
+    def __init__(self, client, *args, **kwargs):
+        super().__init__(*args, **kwargs)
+        self.client = client
+
+    def get(self, block=True, timeout=None):
+        """
+        Lógica de bloqueo estricto:
+        1. Si NO es bloqueante -> Sacamos lo que haya o devolvemos 0xFF.
+        2. Si SÍ es bloqueante:
+           - Si 'active' es False -> Devolvemos 0xFF inmediatamente.
+           - Si 'active' es True -> BLOQUEAMOS el hilo hasta que llegue algo.
+        """
+        if not block:
+            try: return super().get(block=False)
+            except queue.Empty: return 0xFF
+
+        # Mientras el cliente esté 'active' (intento de link o bridge), bloqueamos.
+        while getattr(self.client, 'active', False) and not self.client._stop_event.is_set():
+            try:
+                # Esperamos un pequeño intervalo para no saturar pero ser reactivos a stop_event
+                return super().get(block=True, timeout=0.05)
+            except queue.Empty:
+                # Seguimos esperando (bloqueando el hilo) hasta que recibamos algo o active sea False
+                time.sleep(0.001)
+                continue
+
+        return 0xFF
+
+    def get_nowait(self):
+        return self.get(block=False)
+
 class LinkClient:
     def __init__(self):
         self.token = STATIC_TOKEN
@@ -28,13 +64,14 @@ class LinkClient:
         self.thread = None
         self.loop = None
 
-        self.recv_queue = queue.Queue(maxsize=10000)
+        self.recv_queue = SmartLinkQueue(self, maxsize=10000)
         self.send_queue_async = None
         self.target_url = None
 
         # --- TELEMETRÍA ---
         self.count_sent = 0
         self.count_recv = 0
+        self.active = False
         self.bridged = False
         self.last_log_time = time.time()
 
@@ -50,12 +87,15 @@ class LinkClient:
         self._stop_event.clear()
         self.count_sent = 0
         self.count_recv = 0
+        self.active = True
         self.bridged = False
         self.thread = threading.Thread(target=self._run_loop, daemon=True)
         self.thread.start()
 
     def stop(self):
         self._stop_event.set()
+        self.active = False
+        self.bridged = False
         if self.loop:
             try:
                 self.loop.call_soon_threadsafe(self.loop.stop)
@@ -77,17 +117,13 @@ class LinkClient:
 
     def get_byte(self):
         """
-        MODIFICADO: Si la cola está vacía, esperamos un tiempo mínimo 
-        en lugar de devolver basura (0xFF) inmediatamente.
+        Lee un byte de la cola inteligente.
+        Si active=True, esta llamada BLOQUEARÁ el hilo hasta recibir datos.
         """
-        try:
-            # Esperamos hasta 1ms. Si no hay nada, devolvemos 0xFF.
-            # Esto da margen a que el recv_loop rellene la cola.
-            b = self.recv_queue.get(timeout=0.001)
+        b = self.recv_queue.get(block=True)
+        if b != 0xFF:
             self.count_recv += 1
-            return b
-        except queue.Empty:
-            return 0xFF
+        return b
 
     def _run_loop(self):
         asyncio.set_event_loop(asyncio.new_event_loop())
@@ -101,6 +137,9 @@ class LinkClient:
             self.loop.run_until_complete(self._main())
         except Exception as e:
             print(f"[LinkClient] Loop asyncio colapsado: {e}")
+        finally:
+            self.active = False
+            self.bridged = False
 
     def _stats_logger(self):
         while not self._stop_event.is_set():
