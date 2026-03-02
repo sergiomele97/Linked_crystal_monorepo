@@ -164,6 +164,7 @@ class LinkClient:
                     try: self.send_queue_async.get_nowait()
                     except: break
 
+                self.bridged = False
                 async with websockets.connect(
                     self.target_url,
                     ssl=self.ssl_context,
@@ -192,6 +193,7 @@ class LinkClient:
                         except: pass
                         
             except Exception as e:
+                self.bridged = False
                 print(f"[LinkClient] Error/Desconexión: {e}")
                 await asyncio.sleep(2) 
 
@@ -228,4 +230,7 @@ class LinkClient:
                         self.bridged = True
                 # Eliminado sleep(0) para máxima prioridad
         except:
+            self.bridged = False
             return
+        finally:
+            self.bridged = False
