@@ -225,9 +225,14 @@ class LinkClient:
                     if blocked_since is None:
                         blocked_since = time.time()
                     
-                    elapsed = time.time() - blocked_since
+                    # El tiempo de timeout real es desde lo que haya ocurrido más tarde:
+                    # empezar a esperar o recibir el último paquete.
+                    recv_time = self.last_recv_time if self.last_recv_time is not None else 0.0
+                    effective_wait_start = max(blocked_since, recv_time)
+                    elapsed = time.time() - effective_wait_start
+                    
                     if elapsed > 30.0:
-                        print(f"[LinkClient] ⚠️ Timeout de 30s detectado (hilo principal bloqueado). Cerrando.")
+                        print(f"[LinkClient] ⚠️ Timeout de 30s detectado (sin actividad y bloqueado). Cerrando.")
                         self.timeout_reached = True
                         self.stop()
                         break

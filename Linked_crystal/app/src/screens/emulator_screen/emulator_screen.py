@@ -75,7 +75,7 @@ class EmulatorScreen(Screen):
                 self.ids.link_status_dot.text = "Linked!"
                 self.ids.link_status_dot.color = (0, 1, 0, 1) # Green
                 self.show_info_message(
-                    "The app might freeze (max 30 seconds) during link protocol, these behavior is expected.",
+                    "The app might freeze (max 30 seconds) during link protocol, this behavior is expected.",
                     color=(1, 1, 1, 1)
                 )
             else:
