@@ -20,23 +20,24 @@ class SmartLinkQueue(queue.Queue):
 
     def get(self, block=True, timeout=None):
         """
-        Lógica de bloqueo estricto:
-        1. Si NO es bloqueante -> Sacamos lo que haya o devolvemos 0xFF.
-        2. Si SÍ es bloqueante:
-           - Si 'active' es False -> Devolvemos 0xFF inmediatamente.
-           - Si 'active' es True -> BLOQUEAMOS el hilo hasta que llegue algo.
+        Lógica de bloqueo selectivo (3 casos):
+        1. Desconectado (active=False) -> 0xFF inmediato.
+        2. Esperando (active=True, bridged=False) -> 0xFF inmediato.
+        3. En Bridge (active=True, bridged=True) -> BLOQUEO estricto.
         """
         if not block:
             try: return super().get(block=False)
             except queue.Empty: return 0xFF
 
-        # Mientras el cliente esté 'active' (intento de link o bridge), bloqueamos.
-        while getattr(self.client, 'active', False) and not self.client._stop_event.is_set():
+        # Caso 1 y 2: No activo o esperando compañero -> No bloqueamos
+        if not getattr(self.client, 'active', False) or not getattr(self.client, 'bridged', False):
+            return 0xFF
+
+        # Caso 3: Bridge activo -> Bloqueamos el hilo hasta que llegue algo
+        while getattr(self.client, 'active', False) and getattr(self.client, 'bridged', False) and not self.client._stop_event.is_set():
             try:
-                # Esperamos un pequeño intervalo para no saturar pero ser reactivos a stop_event
                 return super().get(block=True, timeout=0.05)
             except queue.Empty:
-                # Seguimos esperando (bloqueando el hilo) hasta que recibamos algo o active sea False
                 time.sleep(0.001)
                 continue
 
@@ -74,6 +75,7 @@ class LinkClient:
         self.active = False
         self.bridged = False
         self.last_log_time = time.time()
+        self.last_recv_time = time.time()
 
     def start(self, host, port, my_id, target_id):
         if self.thread and self.thread.is_alive():
@@ -179,11 +181,15 @@ class LinkClient:
                     self.count_recv = 0
                     print(f"[LinkClient] ✔ Conectado y Sincronizado.")
                     
+                    self.last_recv_time = time.time()
                     send_task = asyncio.create_task(self.send_loop(ws))
                     recv_task = asyncio.create_task(self.recv_loop(ws))
                     
+                    # Iniciamos el watchdog fuera si no existe o lo manejamos aquí
+                    watchdog_task = asyncio.create_task(self.watchdog_loop())
+                    
                     done, pending = await asyncio.wait(
-                        {send_task, recv_task}, 
+                        {send_task, recv_task, watchdog_task}, 
                         return_when=asyncio.FIRST_COMPLETED
                     )
                     
@@ -196,6 +202,20 @@ class LinkClient:
                 self.bridged = False
                 print(f"[LinkClient] Error/Desconexión: {e}")
                 await asyncio.sleep(2) 
+
+    async def watchdog_loop(self):
+        """Tarea que monitoriza si la conexión se ha quedado colgada."""
+        try:
+            while not self._stop_event.is_set():
+                await asyncio.sleep(1.0)
+                # Si estamos bridged y han pasado más de 5s sin recibir nada
+                if self.active and self.bridged:
+                    if time.time() - self.last_recv_time > 5.0:
+                        print("[LinkClient] ⚠️ Timeout de 5s detectado. Cerrando para desbloquear.")
+                        self.stop()
+                        break
+        except:
+            pass
 
     async def send_loop(self, ws):
         try:
@@ -217,6 +237,7 @@ class LinkClient:
             while not self._stop_event.is_set():
                 data = await ws.recv()
                 if isinstance(data, (bytes, bytearray)):
+                    self.last_recv_time = time.time()
                     # Procesamiento masivo para ganar microsegundos
                     for b in data:
                         try:
