@@ -82,6 +82,7 @@ class LinkClient:
         self.active = False
         self.bridged = False
         self.is_main_thread_waiting = False
+        self.timeout_reached = False
         self.last_log_time = time.time()
         self.last_recv_time = time.time()
 
@@ -99,6 +100,7 @@ class LinkClient:
         self.count_recv = 0
         self.active = True
         self.bridged = False
+        self.timeout_reached = False
         self.thread = threading.Thread(target=self._run_loop, daemon=True)
         self.thread.start()
 
@@ -225,7 +227,8 @@ class LinkClient:
                     
                     elapsed = time.time() - blocked_since
                     if elapsed > 30.0:
-                        print(f"[LinkClient] ⚠️ Timeout de 10s detectado (hilo principal bloqueado). Cerrando.")
+                        print(f"[LinkClient] ⚠️ Timeout de 30s detectado (hilo principal bloqueado). Cerrando.")
+                        self.timeout_reached = True
                         self.stop()
                         break
                 else:

@@ -55,6 +55,7 @@ class EmulatorCoreInterface:
         return {
             "connected": connected,
             "bridged": getattr(self.link_client, 'bridged', False),
+            "timeout_reached": getattr(self.link_client, 'timeout_reached', False),
             "tx": self.link_client.count_sent,
             "rx": self.link_client.count_recv
         }

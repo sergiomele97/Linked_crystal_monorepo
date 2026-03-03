@@ -4,6 +4,7 @@ from kivy.properties import StringProperty
 from kivy.lang import Builder
 from kivy.app import App
 from kivy.clock import Clock
+from kivy.animation import Animation
 
 from screens.emulator_screen.components.controlpad import ControlPad
 from screens.emulator_screen.components.menu_dropdown import MenuDropdown
@@ -73,12 +74,56 @@ class EmulatorScreen(Screen):
             if status.get("bridged", False):
                 self.ids.link_status_dot.text = "Linked!"
                 self.ids.link_status_dot.color = (0, 1, 0, 1) # Green
+                self.show_info_message(
+                    "The app might freeze (max 30 seconds) during link protocol, these behavior is expected.",
+                    color=(1, 1, 1, 1)
+                )
             else:
                 self.ids.link_status_dot.text = "Waiting..."
                 self.ids.link_status_dot.color = (1, 1, 0, 1) # Yellow
+                self.hide_info_message()
         else:
             panel.opacity = 0
             panel.disabled = True
+            
+            # Gestionar mensaje de timeout si acaba de ocurrir
+            if status.get("timeout_reached", False) and not hasattr(self, '_timeout_anim_active'):
+                self._timeout_anim_active = True
+                self.show_info_message(
+                    "The other player didn't send any packets, 30 second timeout reach.",
+                    color=(1, 0, 0, 1)
+                )
+                
+                # Programar desaparición a los 10 segundos
+                Clock.schedule_once(self.hide_info_message, 10)
+            elif not status.get("timeout_reached", False) and not getattr(self, '_timeout_anim_active', False):
+                self.hide_info_message()
+
+    def show_info_message(self, text, color=(1, 1, 1, 1)):
+        label = self.ids.link_info_label
+        
+        if label.text == text and label.opacity > 0:
+            return
+            
+        label.text = text
+        label.color = color
+        
+        Animation.stop_all(label)
+        anim = Animation(opacity=1, duration=0.5)
+        anim.start(label)
+
+    def hide_info_message(self, dt=None):
+        label = self.ids.link_info_label
+        if label.opacity == 0:
+            return
+            
+        Animation.stop_all(label)
+        anim = Animation(opacity=0, duration=0.5)
+        def on_complete(*args):
+            label.text = ""
+            setattr(self, '_timeout_anim_active', False)
+        anim.bind(on_complete=on_complete)
+        anim.start(label)
 
     def disconnect_link_action(self):
         if self.emulator:
