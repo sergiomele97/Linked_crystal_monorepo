@@ -67,6 +67,9 @@ class EmulatorScreen(Screen):
         panel = self.ids.link_stats_panel
         
         if status["connected"]:
+            # Resetear flag de timeout ya que estamos conectados
+            setattr(self, '_timeout_anim_active', False)
+            
             panel.opacity = 1
             panel.disabled = False
             self.ids.link_tx_label.text = f"Packets: {status['tx']}"
@@ -87,16 +90,18 @@ class EmulatorScreen(Screen):
             panel.disabled = True
             
             # Gestionar mensaje de timeout si acaba de ocurrir
-            if status.get("timeout_reached", False) and not hasattr(self, '_timeout_anim_active'):
-                self._timeout_anim_active = True
-                self.show_info_message(
-                    "The other player didn't send any packets, 30 second timeout reach.",
-                    color=(1, 0, 0, 1)
-                )
-                
-                # Programar desaparición a los 10 segundos
-                Clock.schedule_once(self.hide_info_message, 10)
-            elif not status.get("timeout_reached", False) and not getattr(self, '_timeout_anim_active', False):
+            if status.get("timeout_reached", False):
+                if not getattr(self, '_timeout_anim_active', False):
+                    self._timeout_anim_active = True
+                    self.show_info_message(
+                        "The other player didn't send any packets, 30 second timeout reached.",
+                        color=(1, 0, 0, 1)
+                    )
+                    # Programar desaparición a los 10 segundos
+                    Clock.schedule_once(self.hide_info_message, 10)
+            else:
+                # Si no hay timeout activo, podemos resetear el flag para la próxima vez
+                setattr(self, '_timeout_anim_active', False)
                 self.hide_info_message()
 
     def show_info_message(self, text, color=(1, 1, 1, 1)):
@@ -104,6 +109,10 @@ class EmulatorScreen(Screen):
         
         if label.text == text and label.opacity > 0:
             return
+            
+        # Si no es un mensaje de error, reseteamos el flag de bloqueo de anim del timeout
+        if color != (1, 0, 0, 1):
+            setattr(self, '_timeout_anim_active', False)
             
         label.text = text
         label.color = color
@@ -121,7 +130,6 @@ class EmulatorScreen(Screen):
         anim = Animation(opacity=0, duration=0.5)
         def on_complete(*args):
             label.text = ""
-            setattr(self, '_timeout_anim_active', False)
         anim.bind(on_complete=on_complete)
         anim.start(label)
 
