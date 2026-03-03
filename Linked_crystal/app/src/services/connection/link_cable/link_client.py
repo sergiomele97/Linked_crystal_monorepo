@@ -34,12 +34,19 @@ class SmartLinkQueue(queue.Queue):
             return 0xFF
 
         # Caso 3: Bridge activo -> Bloqueamos el hilo hasta que llegue algo
-        while getattr(self.client, 'active', False) and getattr(self.client, 'bridged', False) and not self.client._stop_event.is_set():
-            try:
-                return super().get(block=True, timeout=0.05)
-            except queue.Empty:
-                time.sleep(0.001)
-                continue
+        if hasattr(self.client, 'is_main_thread_waiting'):
+            self.client.is_main_thread_waiting = True
+            
+        try:
+            while getattr(self.client, 'active', False) and getattr(self.client, 'bridged', False) and not self.client._stop_event.is_set():
+                try:
+                    return super().get(block=True, timeout=0.05)
+                except queue.Empty:
+                    time.sleep(0.001)
+                    continue
+        finally:
+            if hasattr(self.client, 'is_main_thread_waiting'):
+                self.client.is_main_thread_waiting = False
 
         return 0xFF
 
@@ -74,6 +81,7 @@ class LinkClient:
         self.count_recv = 0
         self.active = False
         self.bridged = False
+        self.is_main_thread_waiting = False
         self.last_log_time = time.time()
         self.last_recv_time = time.time()
 
@@ -205,15 +213,24 @@ class LinkClient:
 
     async def watchdog_loop(self):
         """Tarea que monitoriza si la conexión se ha quedado colgada."""
+        blocked_since = None
         try:
             while not self._stop_event.is_set():
-                await asyncio.sleep(1.0)
-                # Si estamos bridged y han pasado más de 5s sin recibir nada
-                if self.active and self.bridged:
-                    if time.time() - self.last_recv_time > 5.0:
-                        print("[LinkClient] ⚠️ Timeout de 5s detectado. Cerrando para desbloquear.")
+                await asyncio.sleep(0.5)
+                
+                # Solo contamos si el hilo principal está bloqueado Y hay bridge
+                if self.active and self.bridged and getattr(self, 'is_main_thread_waiting', False):
+                    if blocked_since is None:
+                        blocked_since = time.time()
+                    
+                    elapsed = time.time() - blocked_since
+                    if elapsed > 30.0:
+                        print(f"[LinkClient] ⚠️ Timeout de 10s detectado (hilo principal bloqueado). Cerrando.")
                         self.stop()
                         break
+                else:
+                    # Si no está bloqueado o cambió el estado, reseteamos el contador
+                    blocked_since = None
         except:
             pass
 
