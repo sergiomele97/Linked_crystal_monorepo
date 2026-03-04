@@ -6,30 +6,27 @@ import os
 # Add src to path. Unit tests are in app/tests/unit/, so src is ../../src
 sys.path.append(os.path.abspath(os.path.join(os.path.dirname(__file__), '../../src')))
 
-# Mock External Dependencies
-sys.modules['websockets'] = MagicMock()
-sys.modules['asyncio'] = MagicMock()
-sys.modules['threading'] = MagicMock()
+# Mocking strategy: We patch sys.modules ONLY during the import of the manager
+# to avoid polluting the global state for other tests in the same process.
+mock_modules = {
+    'kivy': MagicMock(),
+    'kivy.app': MagicMock(),
+    'kivy.core.window': MagicMock(),
+    'kivy.network.urlrequest': MagicMock(),
+    'kivy.uix.popup': MagicMock(),
+    'kivy.uix.button': MagicMock(),
+    'kivy.uix.scrollview': MagicMock(),
+    'kivy.uix.gridlayout': MagicMock(),
+    'kivy.metrics': MagicMock(),
+    'kivy.clock': MagicMock(),
+    'kivy.uix.label': MagicMock(),
+    'env': MagicMock(),
+    'websockets': MagicMock(),
+}
 
-# Mock Kivy Dependencies BEFORE importing connection_manager
-sys.modules['kivy'] = MagicMock()
-sys.modules['kivy.app'] = MagicMock()
-sys.modules['kivy.core.window'] = MagicMock()
-sys.modules['kivy.network.urlrequest'] = MagicMock()
-sys.modules['kivy.uix.popup'] = MagicMock()
-sys.modules['kivy.uix.button'] = MagicMock()
-sys.modules['kivy.uix.scrollview'] = MagicMock()
-sys.modules['kivy.uix.gridlayout'] = MagicMock()
-sys.modules['kivy.metrics'] = MagicMock()
-sys.modules['kivy.clock'] = MagicMock()
-sys.modules['kivy.uix.label'] = MagicMock()
-
-# Mock env
-sys.modules['env'] = MagicMock()
-sys.modules['env'].URL = "http://mock-url"
-
-# Now we can import the module to test
-from services.connection.main_conn.connection_manager import ConnectionManager
+with patch.dict('sys.modules', mock_modules):
+    sys.modules['env'].URL = "http://mock-url"
+    from services.connection.main_conn.connection_manager import ConnectionManager
 
 class TestVersionCheck(unittest.TestCase):
     def setUp(self):

@@ -57,6 +57,18 @@
                 background_color: 1, 0.2, 0.2, 1
                 on_release: root.disconnect_link_action()
 
+        Label:
+            id: link_info_label
+            text: ""
+            font_size: sp(11)
+            color: 1, 1, 1, 1
+            size_hint: 0.8, 0.05
+            pos_hint: {"center_x": 0.5, "y": 0.42}
+            opacity: 0
+            halign: "center"
+            valign: "middle"
+            text_size: self.width, None
+
         VideoDisplay:
             id: video_display
             size_hint: 1, 0.45
