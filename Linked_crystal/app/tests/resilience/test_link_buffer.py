@@ -48,6 +48,7 @@ class TestLinkClient(unittest.TestCase):
     def test_get_byte_success(self):
         client = LinkClient()
         client.active = True
+        client.bridged = True 
         client.recv_queue.put_nowait(10)
         val = client.get_byte()
         self.assertEqual(val, 10)
