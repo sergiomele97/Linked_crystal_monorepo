@@ -66,5 +66,5 @@
             size_hint: 0.1, 0.1
             pos_hint: {"x": 0.88, "y": 0.91}
             on_release: root.open_menu(self)
-            opacity: 1 if (ENV in ["local", "desarrollo"] or platform == "android") else 0
-            disabled: not (ENV in ["local", "desarrollo"] or platform == "android")
+            opacity: 1 if (ENV in ["local", "development"] or platform == "android") else 0
+            disabled: not (ENV in ["local", "development"] or platform == "android")

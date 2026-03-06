@@ -17,7 +17,7 @@ class MenuDropdown(FloatLayout):
         self.build_content()
 
     def build_content(self):
-        if ENV in ["local", "desarrollo"]:
+        if ENV in ["local", "development"]:
             btn1 = Button(text="Opción 1", size_hint=(1, 0.2), pos_hint={"x": 0, "y": 0.8})
             btn1.bind(on_release=self.opcion1)
             self.add_widget(btn1)
