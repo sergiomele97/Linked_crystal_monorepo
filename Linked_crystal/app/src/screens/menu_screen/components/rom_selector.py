@@ -90,7 +90,7 @@ else:
 
         contenido = BoxLayout(orientation='vertical')
         selector = FileChooserListView(filters=["*.GBC", "*.gbc"], path=".")
-        btn_select = Button(text="Seleccionar ROM", size_hint_y=None, height="40dp")
+        btn_select = Button(text="Select ROM", size_hint_y=None, height="40dp")
 
         def seleccionar_archivo(instance):
             selected = selector.selection
