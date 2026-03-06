@@ -1,10 +1,10 @@
 [app]
 
 # (str) Title of your application
-title = My Application
+title = Linked Crystal
 
 # (str) Package name
-package.name = myapp
+package.name = linkedcrystal
 
 # (str) Package domain (needed for android/ios packaging)
 package.domain = com.linkedcrystal
