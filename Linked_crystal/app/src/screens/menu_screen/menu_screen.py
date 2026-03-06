@@ -37,17 +37,17 @@ class MenuScreen(Screen):
         def cuando_selecciona_archivo(destino_path):
             if destino_path:
                 App.get_running_app().appData.romPath = destino_path
-                self.ids.label_rom.text = f"ROM seleccionada:\n{os.path.basename(destino_path)}"
+                self.ids.label_rom.text = f"Selected ROM:\n{os.path.basename(destino_path)}"
                 self.rom_cargado = True
             else:
-                self.ids.label_rom.text = "Archivo no válido."
+                self.ids.label_rom.text = "Invalid file."
         select_rom(self, cuando_selecciona_archivo)
 
     def elegir_servidor(self):
         self.connectionManager.getServerListAndSelect(self)
 
     def iniciar_juego(self):
-        self.ids.output_label.text = f"¡Iniciando juego!"
+        self.ids.output_label.text = f"Starting game!"
         emulator_screen = self.manager.get_screen('emulator')
         self.manager.current = 'emulator'
 
@@ -57,7 +57,7 @@ class MenuScreen(Screen):
         """
         if platform != 'android':
             try:
-                self.ids.output_label.text = "Exportar RAM solo disponible en Android"
+                self.ids.output_label.text = "Export RAM is only available on Android"
             except Exception:
                 pass
             return
@@ -67,7 +67,7 @@ class MenuScreen(Screen):
 
         if not os.path.exists(local_ram):
             try:
-                self.ids.output_label.text = "No se encontró archivo .ram"
+                self.ids.output_label.text = "RAM file not found"
             except Exception:
                 pass
             return
@@ -98,11 +98,11 @@ class MenuScreen(Screen):
                             output_stream.write(data)
                             output_stream.close()
                             
-                            self.ids.output_label.text = "¡RAM exportada correctamente!"
+                            self.ids.output_label.text = "RAM exported successfully!"
                         except Exception as e:
                             self.ids.output_label.text = f"Error al escribir: {e}"
                     else:
-                        self.ids.output_label.text = "Exportación cancelada."
+                        self.ids.output_label.text = "Export cancelled."
 
             # Registrar el callback para el resultado del Intent
             activity.bind(on_activity_result=on_activity_result)
@@ -117,7 +117,7 @@ class MenuScreen(Screen):
             currentActivity.startActivityForResult(intent, 2)
             
             try:
-                self.ids.output_label.text = "Selecciona destino para la RAM..."
+                self.ids.output_label.text = "Select destination for the RAM..."
             except Exception:
                 pass
                 
@@ -133,7 +133,7 @@ class MenuScreen(Screen):
         """
         if platform != 'android':
             try:
-                self.ids.output_label.text = "Importar RAM solo disponible en Android"
+                self.ids.output_label.text = "Import RAM is only available on Android"
             except Exception:
                 pass
             return
@@ -170,11 +170,11 @@ class MenuScreen(Screen):
                                     f_out.write(buf[:read])
                             input_stream.close()
                             
-                            self.ids.output_label.text = "¡RAM importada con éxito!"
+                            self.ids.output_label.text = "RAM imported successfully!"
                         except Exception as e:
-                            self.ids.output_label.text = f"Error al importar: {e}"
+                            self.ids.output_label.text = f"Error while importing: {e}"
                     else:
-                        self.ids.output_label.text = "Importación cancelada."
+                        self.ids.output_label.text = "Import cancelled."
 
             # Registrar el callback
             activity.bind(on_activity_result=on_activity_result)
@@ -188,7 +188,7 @@ class MenuScreen(Screen):
             currentActivity.startActivityForResult(intent, 3)
             
             try:
-                self.ids.output_label.text = "Selecciona el archivo .ram a importar..."
+                self.ids.output_label.text = "Select the .ram file to import..."
             except Exception:
                 pass
                 
