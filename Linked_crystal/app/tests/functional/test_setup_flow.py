@@ -46,7 +46,7 @@ class TestSetupFlow(unittest.TestCase):
             
             self.assertEqual(self.mock_app.appData.romPath, "/path/game.gbc")
             self.assertTrue(self.screen.rom_cargado)
-            self.assertEqual(self.screen.ids.label_rom.text, "ROM seleccionada:\ngame.gbc")
+            self.assertEqual(self.screen.ids.label_rom.text, "Selected ROM:\ngame.gbc")
 
     def test_server_selection_flow(self):
         self.screen.elegir_servidor()
