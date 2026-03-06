@@ -17,24 +17,22 @@ class MenuDropdown(FloatLayout):
         self.build_content()
 
     def build_content(self):
+        btn_export = Button(text="Export RAM", size_hint=(1, 0.2), pos_hint={"x": 0, "y": 0.8})
+        btn_export.bind(on_release=self.export_ram)
+        self.add_widget(btn_export)
+
+        btn_import = Button(text="Import RAM", size_hint=(1, 0.2), pos_hint={"x": 0, "y": 0.6})
+        btn_import.bind(on_release=self.import_ram)
+        self.add_widget(btn_import)
+
         if ENV in ["local", "development"]:
-            btn1 = Button(text="Opción 1", size_hint=(1, 0.2), pos_hint={"x": 0, "y": 0.8})
+            btn1 = Button(text="Opción 1", size_hint=(1, 0.2), pos_hint={"x": 0, "y": 0.4})
             btn1.bind(on_release=self.opcion1)
             self.add_widget(btn1)
 
-            btn2 = Button(text="Opción 2", size_hint=(1, 0.2), pos_hint={"x": 0, "y": 0.6})
+            btn2 = Button(text="Opción 2", size_hint=(1, 0.2), pos_hint={"x": 0, "y": 0.2})
             btn2.bind(on_release=self.opcion2)
             self.add_widget(btn2)
-
-        # Android-only: Exportar/Importar RAM (habilitado en desarrollo también para tests)
-        if platform == 'android' or self.devTools:
-            btn_export = Button(text="Export RAM", size_hint=(1, 0.2), pos_hint={"x": 0, "y": 0.4})
-            btn_export.bind(on_release=self.export_ram)
-            self.add_widget(btn_export)
-
-            btn_import = Button(text="Import RAM", size_hint=(1, 0.2), pos_hint={"x": 0, "y": 0.2})
-            btn_import.bind(on_release=self.import_ram)
-            self.add_widget(btn_import)
 
     def opcion1(self, *args):
         self.devTools.listInternalStorageContent(self.father_screen)
