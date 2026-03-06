@@ -10,6 +10,7 @@ from services.connection.main_conn.connection_manager import ConnectionManager
 class LinkedCrystalApp(App):
     def __init__(self, **kwargs):
         super().__init__(**kwargs)
+        self.icon = 'resources/image/LinkedCrystalIcon.png'
         self.appData = appData()
         self.connection_manager = ConnectionManager()
         Window.softinput_mode = "below_target"
