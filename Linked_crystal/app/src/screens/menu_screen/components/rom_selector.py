@@ -106,7 +106,7 @@ else:
         contenido.add_widget(selector)
         contenido.add_widget(btn_select)
 
-        popup = Popup(title="Selecciona un ROM .gbc",
+        popup = Popup(title="Select ROM .gbc",
                       content=contenido,
                       size_hint=(0.9, 0.9))
         popup.open()
