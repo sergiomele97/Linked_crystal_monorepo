@@ -1,5 +1,5 @@
 window.BENCHMARK_DATA = {
-  "lastUpdate": 1772366467193,
+  "lastUpdate": 1772885505623,
   "repoUrl": "https://github.com/sergiomele97/Linked_crystal_monorepo",
   "entries": {
     "Go Backend Performance": [
@@ -2549,6 +2549,51 @@ window.BENCHMARK_DATA = {
           {
             "name": "Latency",
             "value": 0.000370408033025228,
+            "unit": "ms"
+          },
+          {
+            "name": "RAM per Client",
+            "value": 68.780515625,
+            "unit": "KB"
+          },
+          {
+            "name": "Failure Count",
+            "value": 0,
+            "unit": "count"
+          },
+          {
+            "name": "Active Players",
+            "value": 500,
+            "unit": "count"
+          }
+        ]
+      },
+      {
+        "commit": {
+          "author": {
+            "name": "sergiomele97",
+            "username": "sergiomele97"
+          },
+          "committer": {
+            "name": "sergiomele97",
+            "username": "sergiomele97"
+          },
+          "id": "95b42a081524a2ed52411ca37dced33fbf729dfa",
+          "message": "Features/optimizar back",
+          "timestamp": "2026-03-04T16:14:54Z",
+          "url": "https://github.com/sergiomele97/Linked_crystal_monorepo/pull/59/commits/95b42a081524a2ed52411ca37dced33fbf729dfa"
+        },
+        "date": 1772885504972,
+        "tool": "customSmallerIsBetter",
+        "benches": [
+          {
+            "name": "CPU Usage",
+            "value": 59.99999554800034,
+            "unit": "%"
+          },
+          {
+            "name": "Latency",
+            "value": 0.0003072044848213429,
             "unit": "ms"
           },
           {
