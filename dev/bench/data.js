@@ -1,5 +1,5 @@
 window.BENCHMARK_DATA = {
-  "lastUpdate": 1772885505623,
+  "lastUpdate": 1772886227197,
   "repoUrl": "https://github.com/sergiomele97/Linked_crystal_monorepo",
   "entries": {
     "Go Backend Performance": [
@@ -2599,6 +2599,55 @@ window.BENCHMARK_DATA = {
           {
             "name": "RAM per Client",
             "value": 68.780515625,
+            "unit": "KB"
+          },
+          {
+            "name": "Failure Count",
+            "value": 0,
+            "unit": "count"
+          },
+          {
+            "name": "Active Players",
+            "value": 500,
+            "unit": "count"
+          }
+        ]
+      },
+      {
+        "commit": {
+          "author": {
+            "email": "58886569+sergiomele97@users.noreply.github.com",
+            "name": "Sergio Melero Royo",
+            "username": "sergiomele97"
+          },
+          "committer": {
+            "email": "noreply@github.com",
+            "name": "GitHub",
+            "username": "web-flow"
+          },
+          "distinct": true,
+          "id": "c204f4ab1b60b2d3fc93c8558c810b7136f24650",
+          "message": "Features/optimizar back (#59)\n\n* Enviar paquetes solo a los clientes en nuestro mismo mapa\n\n* add tests map filtering",
+          "timestamp": "2026-03-07T13:22:36+01:00",
+          "tree_id": "6d2be65139736add70d34af7b4a7221c00a2fd4b",
+          "url": "https://github.com/sergiomele97/Linked_crystal_monorepo/commit/c204f4ab1b60b2d3fc93c8558c810b7136f24650"
+        },
+        "date": 1772886226140,
+        "tool": "customSmallerIsBetter",
+        "benches": [
+          {
+            "name": "CPU Usage",
+            "value": 40.000009784002394,
+            "unit": "%"
+          },
+          {
+            "name": "Latency",
+            "value": 0.0003049030291785758,
+            "unit": "ms"
+          },
+          {
+            "name": "RAM per Client",
+            "value": 94.13731642759562,
             "unit": "KB"
           },
           {
