@@ -53,5 +53,32 @@ class TestPacketDispatcher(unittest.TestCase):
         self.assertEqual(len(self.mock_app.appData.serverPackets), 1)
         self.assertEqual(self.mock_app.appData.serverPackets[0].player_id, 2)
 
+    def test_reconnection_id_update(self):
+        # 1. First connection (ID 5)
+        self.dispatcher.handle_data((5).to_bytes(4, "little"))
+        self.assertEqual(self.dispatcher.my_id, 5)
+        
+        # 2. Reconnection (ID 6)
+        self.dispatcher.handle_data((6).to_bytes(4, "little"))
+        self.assertEqual(self.dispatcher.my_id, 6)
+        self.assertEqual(self.mock_app.appData.userID, 6)
+
+        # 3. Verify filtering uses new ID
+        p_old = Packet(player_id=5, x=10, y=10).to_bytes()
+        p_new = Packet(player_id=6, x=20, y=20).to_bytes()
+        
+        payload = bytes([0x01]) + p_old + p_new
+        self.dispatcher.handle_data(payload)
+        
+        # Should contain p_old (ID 5) because we are now ID 6
+        # Should NOT contain p_new (ID 6)
+        self.assertEqual(len(self.mock_app.appData.serverPackets), 1)
+        self.assertEqual(self.mock_app.appData.serverPackets[0].player_id, 5)
+
+    def test_reset(self):
+        self.dispatcher.my_id = 10
+        self.dispatcher.reset()
+        self.assertIsNone(self.dispatcher.my_id)
+
 if __name__ == "__main__":
     unittest.main()

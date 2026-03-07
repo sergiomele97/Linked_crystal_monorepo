@@ -93,6 +93,7 @@ class ConnectionLoop:
                 continue
 
             try:
+                self.dispatcher.reset()
                 async with await self.client.connect(base_url) as ws:
                     log("✔ Connected")
                     if not was_connected:

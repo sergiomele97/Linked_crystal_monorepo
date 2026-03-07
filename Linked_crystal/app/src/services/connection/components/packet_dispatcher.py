@@ -14,15 +14,19 @@ class PacketDispatcher:
     def set_chat_manager(self, chat_manager):
         self.chat_manager = chat_manager
 
+    def reset(self):
+        self.my_id = None
+        log("PacketDispatcher Reset")
+
     def handle_data(self, data):
         if not data:
             return
 
         # Initial Handshake (Raw ID)
-        if len(data) == 4 and self.my_id is None:
+        if len(data) == 4:
             self.my_id = int.from_bytes(data, "little")
             self.app.appData.userID = self.my_id
-            log(f"My ID: {self.my_id}")
+            log(f"My ID Updated: {self.my_id}")
             return
 
         # Multiplexed Data
