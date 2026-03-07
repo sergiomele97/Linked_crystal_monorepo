@@ -15,6 +15,11 @@ type Client struct {
 	closed    chan struct{}
 	id        int
 	addr      string
+
+	// Map location for broadcast filtering
+	mu        sync.RWMutex
+	MapBank   int32
+	MapNumber int32
 }
 
 func newClient(conn *websocket.Conn, sendBuf int, id int) *Client {
@@ -24,6 +29,9 @@ func newClient(conn *websocket.Conn, sendBuf int, id int) *Client {
 		closed: make(chan struct{}),
 		id:     id,
 		addr:   conn.RemoteAddr().String(),
+		// Default to a null map until first packet
+		MapBank:   -1,
+		MapNumber: -1,
 	}
 }
 

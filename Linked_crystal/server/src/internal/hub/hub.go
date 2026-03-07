@@ -34,33 +34,52 @@ func BroadcastLoop() {
 	for {
 		select {
 		case <-ticker.C:
-			accum := make([]Packet, 0, 256)
+			// 1. Group packets by Map (Bank + Number)
+			// Key: (MapBank << 16) | MapNumber
+			mapGroups := make(map[int32][]Packet)
+
 			for id := 0; id < MaxClients; id++ {
 				v := latestPackets[id].Load()
 				if v == nil {
 					continue
 				}
 				if p, ok := v.(*Packet); ok && p != nil {
-					accum = append(accum, *p)
+					mapKey := (p.MapBank << 16) | p.MapNumber
+					mapGroups[mapKey] = append(mapGroups[mapKey], *p)
+					// Reset so we don't send the same position twice if no update
 					latestPackets[id].Store((*Packet)(nil))
 				}
 			}
 
-			if len(accum) == 0 {
+			if len(mapGroups) == 0 {
 				continue
 			}
 
-			message := SerializePackets(accum)
+			// 2. Pre-serialize messages for each map
+			serializedMaps := make(map[int32][]byte)
+			for mapKey, packets := range mapGroups {
+				serializedMaps[mapKey] = SerializePackets(packets)
+			}
+
 			start := time.Now()
 			sent := 0
 
+			// 3. Send to clients based on their current map
 			clients.Range(func(key, value any) bool {
 				c := key.(*Client)
-				select {
-				case c.send <- message:
-					sent++
-				default:
-					c.Close()
+
+				c.mu.RLock()
+				clientMapKey := (c.MapBank << 16) | c.MapNumber
+				c.mu.RUnlock()
+
+				// Only send if we have data for this map
+				if msg, ok := serializedMaps[clientMapKey]; ok {
+					select {
+					case c.send <- msg:
+						sent++
+					default:
+						c.Close()
+					}
 				}
 				return true
 			})
