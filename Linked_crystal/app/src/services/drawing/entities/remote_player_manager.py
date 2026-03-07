@@ -4,6 +4,8 @@ from services.drawing.entities.remote_player_entity import RemotePlayerEntity
 class RemotePlayerManager:
 
     MISSING_TICKS_LIMIT = 100 
+    VISIBLE_DISTANCE_X = 11
+    VISIBLE_DISTANCE_Y = 10
 
     def __init__(self, ramData, serverPackets, onScreenPlayers):
         self.ram = ramData
@@ -21,10 +23,17 @@ class RemotePlayerManager:
             
             self.players_missing_ticks[pid] = 0
 
+            # 🛠️ OPTIMIZACION: Distance Culling
+            # No procesamos ni dibujamos jugadores que están fuera de la pantalla
+            dx = abs(packet.player_x_coord - self.ram.player_x_coord)
+            dy = abs(packet.player_y_coord - self.ram.player_y_coord)
+            is_visible = dx <= self.VISIBLE_DISTANCE_X and dy <= self.VISIBLE_DISTANCE_Y
+
             if (
                 not packet.IsOverworld or
                 packet.map_bank != self.ram.map_bank or
-                packet.map_number != self.ram.map_number
+                packet.map_number != self.ram.map_number or
+                not is_visible
             ):
                 if pid in self.onScreenPlayers:
                     del self.onScreenPlayers[pid]
