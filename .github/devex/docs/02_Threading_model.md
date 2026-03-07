@@ -13,12 +13,15 @@ graph TD
     AUDIO[Hilo de Audio - AudioManager]
     LINK[Hilo de Red - LinkClient]
     CONN[Hilo de Conexión - ConnectionLoop]
+    WD[Watchdog Task - Asyncio]
 
     UI -- "Inputs / UI Updates" --> EMU
     EMU -- "Frames / RAM Data" --> UI
     EMU -- "Datos de Audio" --> AUDIO
-    EMU -- "Byte de Cable (Síncrono)" --> LINK
-    LINK -- "Byte Recibido (Bloqueante)" --> EMU
+    EMU -- "Byte de Cable (Síncrono/Bloqueante)" --> LINK
+    LINK -- "Byte Recibido / 0xFF (Failsafe)" --> EMU
+    LINK -- "Monitoriza Bloqueo" --> WD
+    WD -- "Trigger stop() tras 30s" --> LINK
     CONN -- "Datos de App / Chat" --> UI
 ```
 
@@ -52,7 +55,11 @@ graph TD
 *   **Propósito:** Gestionar la comunicación WebSocket para la emulación del cable link.
 *   **Archivo:** `services/connection/link_cable/link_client.py`
 *   **Naturaleza:** Es un hilo híbrido que corre un loop de `asyncio` para la red.
-*   **Sincronización:** Utiliza `SmartLinkQueue`. Cuando el emulador pide un byte, este hilo puede llegar a bloquear al emulador si no hay datos disponibles del compañero.
+*   **Sincronización:** Utiliza `SmartLinkQueue`. 
+*   **Mecanismo de Bloqueo Inteligente:**
+    *   **Estado Inactivo/Esperando:** El emulador recibe `0xFF` instantáneamente (sin bloqueo) para mantener la fluidez de la UI.
+    *   **Estado Bridged:** El emulador **bloquea** el hilo de emulación esperando datos del compañero para garantizar la sincronización del trade/batalla.
+    *   **Watchdog (Failsafe):** Una tarea de `asyncio` monitoriza si el hilo de emulación lleva bloqueado más de 30 segundos sin recibir datos. Si ocurre, fuerza una desconexión para liberar la UI y evitar que la app se congele.
 
 ### 5. Hilo de Conexión General (`ConnectionLoop`)
 *   **Propósito:** Mantener la conexión con el servidor para datos persistentes, chat y estados globales.
