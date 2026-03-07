@@ -9,6 +9,14 @@ if platform == 'android':
     AudioTrack = autoclass("android.media.AudioTrack")
     AudioFormat = autoclass("android.media.AudioFormat")
     AudioManager = autoclass("android.media.AudioManager")
+    AudioAttributes = autoclass("android.media.AudioAttributes")
+    # Note: Builder usually requires a specific way to call in jnius if it's an inner class
+    try:
+        AudioAttributesBuilder = autoclass("android.media.AudioAttributes$Builder")
+        AudioFormatBuilder = autoclass("android.media.AudioFormat$Builder")
+    except:
+        AudioAttributesBuilder = None
+        AudioFormatBuilder = None
 else:
     import sounddevice as sd
 
@@ -23,7 +31,7 @@ class AudioManagerKivy:
         self.sample_rate = None
 
         self._playback_buffer = collections.deque()
-        self._buffer_lock = threading.Lock()
+        self._buffer_lock = threading.Condition(threading.Lock())
 
         # Desktop
         self.audio_stream = None
@@ -99,6 +107,7 @@ class AudioManagerKivy:
         # Encolar
         with self._buffer_lock:
             self._playback_buffer.append(arr)
+            self._buffer_lock.notify()
 
     # -------------------------
     # Inicialización de streams
@@ -161,11 +170,24 @@ class AudioManagerKivy:
 
             channel_config = AudioFormat.CHANNEL_OUT_MONO if channels == 1 else AudioFormat.CHANNEL_OUT_STEREO
             encoding = AudioFormat.ENCODING_PCM_16BIT
-            try: min_buf = AudioTrack.getMinBufferSize(sample_rate, channel_config, encoding)
-            except: min_buf = max(sample_rate * channels // 8, 4096)
+            try: 
+                min_buf = AudioTrack.getMinBufferSize(sample_rate, channel_config, encoding)
+                # Aplicamos un multiplicador para evitar underruns en Android
+                min_buf = max(min_buf, 4096) * 2 
+            except: 
+                min_buf = max(sample_rate * channels // 4, 8192)
 
-            self.audio_track = AudioTrack(AudioManager.STREAM_MUSIC, sample_rate, channel_config,
-                                          encoding, min_buf, AudioTrack.MODE_STREAM)
+            # Intentamos usar la API moderna (AudioAttributes) si está disponible
+            if AudioAttributesBuilder and AudioFormatBuilder:
+                attrs = AudioAttributesBuilder().setUsage(AudioAttributes.USAGE_GAME)\
+                          .setContentType(AudioAttributes.CONTENT_TYPE_MUSIC).build()
+                fmt = AudioFormatBuilder().setSampleRate(sample_rate)\
+                          .setEncoding(encoding).setChannelMask(channel_config).build()
+                self.audio_track = AudioTrack(attrs, fmt, min_buf, AudioTrack.MODE_STREAM, 0)
+            else:
+                self.audio_track = AudioTrack(AudioManager.STREAM_MUSIC, sample_rate, channel_config,
+                                              encoding, min_buf, AudioTrack.MODE_STREAM)
+            
             self.audio_track.play()
             self.android_audio_initialized = True
 
@@ -179,16 +201,37 @@ class AudioManagerKivy:
 
     def _android_writer_loop(self):
         while self.android_audio_initialized:
-            chunk = None
+            chunks_to_write = []
             with self._buffer_lock:
-                if self._playback_buffer:
-                    chunk = self._playback_buffer.popleft()
-            if chunk is None:
-                time.sleep(0.005)
+                # Esperamos a que haya datos o a que se detenga el audio
+                while not self._playback_buffer and self.android_audio_initialized:
+                    self._buffer_lock.wait(timeout=0.1)
+                
+                if not self.android_audio_initialized:
+                    break
+                
+                # Consumimos varios fragmentos a la vez para reducir llamadas JNI (Batching)
+                # Limitamos a unos ~40ms de audio para no introducir latencia excesiva
+                max_samples = self.sample_rate // 25 
+                current_samples = 0
+                while self._playback_buffer and current_samples < max_samples:
+                    c = self._playback_buffer.popleft()
+                    chunks_to_write.append(c)
+                    current_samples += len(c)
+
+            if not chunks_to_write:
                 continue
+
             try:
-                self.audio_track.write(chunk.tobytes(), 0, len(chunk.tobytes()))
-            except: time.sleep(0.01)
+                # Combinamos los fragmentos en uno solo
+                if len(chunks_to_write) > 1:
+                    final_data = np.concatenate(chunks_to_write).tobytes()
+                else:
+                    final_data = chunks_to_write[0].tobytes()
+                
+                self.audio_track.write(final_data, 0, len(final_data))
+            except Exception:
+                time.sleep(0.01)
 
     # -------------------------
     # Cleanup
@@ -200,7 +243,11 @@ class AudioManagerKivy:
             except: pass
             self.audio_stream = None
         if self.audio_track:
-            try: self.audio_track.stop(); self.audio_track.release()
+            try: 
+                self.android_audio_initialized = False
+                with self._buffer_lock:
+                    self._buffer_lock.notify_all() # Despertar hilo escritor
+                self.audio_track.stop(); 
+                self.audio_track.release()
             except: pass
             self.audio_track = None
-            self.android_audio_initialized = False
