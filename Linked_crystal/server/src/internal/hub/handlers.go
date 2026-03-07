@@ -101,6 +101,13 @@ func HandleConnection(w http.ResponseWriter, r *http.Request) {
 			// ✂️ El punto del PANIC: Validamos el ID antes de guardar
 			if client.id >= 0 && client.id < len(latestPackets) {
 				latestPackets[client.id].Store(&p)
+
+				// Update client's current map for filtering
+				client.mu.Lock()
+				client.MapBank = p.MapBank
+				client.MapNumber = p.MapNumber
+				client.mu.Unlock()
+
 				RecordMetrics(1, 0, time.Since(start))
 			}
 
