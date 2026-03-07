@@ -13,14 +13,8 @@ sys.path.insert(0, os.path.abspath(os.path.join(os.path.dirname(__file__), '../.
 from kivy.config import Config
 Config.set('graphics', 'backend', 'headless')
 
-try:
-    from services.chat.chat_manager import ChatManager
-    from screens.emulator_screen.components.chat_interface import ChatInterface
-except Exception as e:
-    print(f"FAILED TO IMPORT IN CHAT TESTS: {e}")
-    import traceback
-    traceback.print_exc()
-    sys.exit(1)
+from services.chat.chat_manager import ChatManager
+from screens.emulator_screen.components.chat_interface import ChatInterface
 
 class TestChatSignals(unittest.TestCase):
     def setUp(self):

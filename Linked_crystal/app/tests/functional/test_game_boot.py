@@ -14,14 +14,8 @@ sys.path.insert(0, os.path.abspath(os.path.join(os.path.dirname(__file__), '../.
 from kivy.config import Config
 Config.set('graphics', 'backend', 'headless')
 
-try:
-    from services.emulator.emulator_core_interface import EmulatorCoreInterface
-    from models.appData import appData
-except Exception as e:
-    print(f"FAILED TO IMPORT IN DISCOVERY: {e}")
-    import traceback
-    traceback.print_exc()
-    raise
+from services.emulator.emulator_core_interface import EmulatorCoreInterface
+from models.appData import appData
 
 class TestGameBoot(unittest.TestCase):
     def setUp(self):

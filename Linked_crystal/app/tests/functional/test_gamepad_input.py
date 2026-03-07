@@ -13,14 +13,8 @@ sys.path.insert(0, os.path.abspath(os.path.join(os.path.dirname(__file__), '../.
 from kivy.config import Config
 Config.set('graphics', 'backend', 'headless')
 
-try:
-    from screens.emulator_screen.components.controlpad import ControlPad
-    from services.emulator.emulator_core_interface import EmulatorCoreInterface
-except Exception as e:
-    print(f"FAILED TO IMPORT IN DISCOVERY: {e}")
-    import traceback
-    traceback.print_exc()
-    raise
+from screens.emulator_screen.components.controlpad import ControlPad
+from services.emulator.emulator_core_interface import EmulatorCoreInterface
 
 class TestGamepadInput(unittest.TestCase):
     def setUp(self):

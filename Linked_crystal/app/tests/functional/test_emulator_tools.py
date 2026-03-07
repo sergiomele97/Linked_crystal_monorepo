@@ -18,13 +18,7 @@ patch('kivy.lang.Builder.load_file').start()
 from kivy.config import Config
 Config.set('graphics', 'backend', 'headless')
 
-try:
-    from screens.emulator_screen.emulator_screen import EmulatorScreen
-except Exception as e:
-    print(f"FAILED TO IMPORT IN EMULATOR TOOLS TESTS: {e}")
-    import traceback
-    traceback.print_exc()
-    sys.exit(1)
+from screens.emulator_screen.emulator_screen import EmulatorScreen
 
 class TestEmulatorTools(unittest.TestCase):
     def setUp(self):
