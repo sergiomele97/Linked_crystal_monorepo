@@ -8,6 +8,9 @@ import os
 # Add src to path
 sys.path.insert(0, os.path.abspath(os.path.join(os.path.dirname(__file__), '../../src')))
 
+# Add src to path
+sys.path.insert(0, os.path.abspath(os.path.join(os.path.dirname(__file__), '../../src')))
+
 from services.connection.link_cable.link_client import LinkClient
 
 class TestLinkScenarios(unittest.IsolatedAsyncioTestCase):
@@ -19,7 +22,6 @@ class TestLinkScenarios(unittest.IsolatedAsyncioTestCase):
         self.client.target_url = "ws://mock"
         self.client.send_queue_async = asyncio.Queue()
 
-    @unittest.skip("Causa skip: regresión fix perdida calidad de merge link cable")
     async def test_bridge_establishment(self):
         # T-UI-04 (Backend part): Verify receipt of "bridged" sets state
         
@@ -28,22 +30,33 @@ class TestLinkScenarios(unittest.IsolatedAsyncioTestCase):
         cm_mock.__aenter__.return_value = ws_mock
         cm_mock.__aexit__.return_value = None
         
-        # Async generator for websocket messages
-        async def async_gen():
-            yield "bridged"
-            # Give time for processing then exit
-            await asyncio.sleep(0.01)
-            self.client._stop_event.set()
+        # We use an event because self.client.bridged is reset to False when the loop stops
+        was_bridged_event = asyncio.Event()
         
-        ws_mock.__aiter__.side_effect = async_gen
+        # Configure recv to return "bridged" once, then set stop event
+        async def mock_recv():
+            if not self.client.bridged:
+                return "bridged"
+            
+            # If we reach here, it means the previous "bridged" message was processed
+            # and self.client.bridged should be True
+            if self.client.bridged:
+                was_bridged_event.set()
+            
+            # Once bridged, we stop the loop
+            self.client._stop_event.set()
+            return b"" # dummy data to let loop finish
+        
+        ws_mock.recv.side_effect = mock_recv
         
         # Patch connect where it is used
         with patch('services.connection.link_cable.link_client.websockets.connect', return_value=cm_mock):
+            # We don't want real sleeps during tests
             with patch('asyncio.sleep', new_callable=AsyncMock):
                 await self.client._main()
         
         # Assertions
-        self.assertTrue(self.client.bridged, "Client should be in bridged state after receiving 'bridged' message")
+        self.assertTrue(was_bridged_event.is_set(), "Client should have been in bridged state at some point after receiving 'bridged'")
 
 if __name__ == "__main__":
     unittest.main()
