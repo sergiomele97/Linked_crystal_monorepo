@@ -101,15 +101,17 @@ jobs:
 
     - name: Prepare Keystore
       run: |
-        echo "${{ secrets.PRO_KEYSTORE_BASE64 }}" | base64 -d > release.keystore
+        echo "${{ secrets.PRO_KEYSTORE_BASE64 }}" | base64 -d > ${{ github.workspace }}/release.keystore
+        ls -l ${{ github.workspace }}/release.keystore
 
     - name: Build Release Bundle (AAB)
       working-directory: Linked_crystal/app/APKbuilder
       run: |
         # 1. Patch production settings in buildozer.spec
-        sed -i 's/^android.release_artifact =.*/android.release_artifact = aab/' buildozer.spec
-        sed -i 's/^android.archs =.*/android.archs = armeabi-v7a, arm64-v8a/' buildozer.spec
-        sed -i 's/^android.api =.*/android.api = 34/' buildozer.spec
+        # Use a more aggressive sed to ensure it's set and uncommented
+        sed -i 's/.*android.release_artifact =.*/android.release_artifact = aab/' buildozer.spec
+        sed -i 's/.*android.archs =.*/android.archs = armeabi-v7a, arm64-v8a/' buildozer.spec
+        sed -i 's/.*android.api =.*/android.api = 34/' buildozer.spec
         
         # 2. Build Release
         buildozer android release
@@ -117,8 +119,8 @@ jobs:
         ANDROIDSDK: $HOME/.buildozer/android/platform/android-sdk
         ANDROIDNDK: $HOME/.buildozer/android/platform/android-ndk-r25b
         JAVA_HOME: /usr/lib/jvm/java-17-openjdk-amd64
-        # Signing Env Vars for Python-for-android
-        P4A_RELEASE_KEYSTORE: ../../release.keystore
+        # Signing Env Vars for Python-for-android (Absolute Path)
+        P4A_RELEASE_KEYSTORE: ${{ github.workspace }}/release.keystore
         P4A_RELEASE_KEYSTORE_PASSWD: ${{ secrets.PRO_KEYSTORE_PWD }}
         P4A_RELEASE_KEYALIAS: ${{ secrets.PRO_KEY_ALIAS }}
         P4A_RELEASE_KEYALIAS_PASSWD: ${{ secrets.PRO_KEY_PWD }}
