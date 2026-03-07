@@ -1,10 +1,10 @@
 [app]
 
 # (str) Title of your application
-title = My Application
+title = Linked Crystal
 
 # (str) Package name
-package.name = myapp
+package.name = linkedcrystal
 
 # (str) Package domain (needed for android/ios packaging)
 package.domain = com.linkedcrystal
@@ -50,7 +50,7 @@ requirements = python3,kivy,plyer,setuptools,pillow,cython,pyboy,websockets,cert
 #presplash.filename = %(source.dir)s/data/presplash.png
 
 # (str) Icon of the application
-#icon.filename = %(source.dir)s/data/icon.png
+icon.filename = %(source.dir)s/resources/image/LinkedCrystalIcon.png
 
 # (list) Supported orientations
 # Valid options are: landscape, portrait, portrait-reverse or landscape-reverse

@@ -8,7 +8,7 @@ def log(message):
     Logs a message to the console and the debug log manager if in local/development environment.
     """
     global LOG_BUFFER
-    if ENV in ["local", "desarrollo"]:
+    if ENV in ["local", "development"]:
         print(message)
         
         # Buffer the message

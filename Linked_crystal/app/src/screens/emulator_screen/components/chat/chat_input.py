@@ -15,7 +15,7 @@ class ChatInput(BoxLayout):
 
         self.text_input = TextInput(
             multiline=False,
-            hint_text="Escribe un mensaje...",
+            hint_text="Write a message...",
             background_color=(0.2, 0.2, 0.2, 1),
             foreground_color=(1, 1, 1, 1),
             cursor_color=(1, 1, 1, 1),

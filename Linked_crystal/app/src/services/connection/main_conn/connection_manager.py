@@ -37,7 +37,7 @@ class ConnectionManager:
         url = f"{self.base_url}/version"
         
         parent_screen.loading = True
-        parent_screen.ids.label_servidor.text = "Verificando versión..."
+        parent_screen.ids.label_servidor.text = "Verifying version..."
         parent_screen.ids.loading_spinner.anim_delay = 0.05
 
         def _success(req, result):
@@ -46,7 +46,7 @@ class ConnectionManager:
                 from version import __version__ as client_version
                 
                 if server_version > client_version:
-                     self._show_update_popup(f"Versión del servidor ({server_version}) es mayor a la tuya ({client_version}). Actualiza la app.")
+                     self._show_update_popup(f"Server version ({server_version}) is greater than yours ({client_version}). Update the app.")
                      parent_screen.loading = False
                      parent_screen.ids.loading_spinner.anim_delay = -1
                      return
@@ -71,7 +71,7 @@ class ConnectionManager:
 
     def _fetch_servers(self, parent_screen):
         url = f"{self.base_url}/servers"
-        parent_screen.ids.label_servidor.text = "Cargando servidores..."
+        parent_screen.ids.label_servidor.text = "Loading servers..."
 
         def _success(req, result):
             try:
@@ -79,7 +79,7 @@ class ConnectionManager:
                     result = json.loads(result)
                 self.server_list = result
             except Exception as e:
-                parent_screen.ids.label_servidor.text = f"Error parseando JSON: {e}"
+                parent_screen.ids.label_servidor.text = f"Error parsing JSON: {e}"
                 parent_screen.loading = False
                 parent_screen.ids.loading_spinner.anim_delay = -1
                 return
@@ -91,7 +91,7 @@ class ConnectionManager:
         def _error(req, error):
             parent_screen.loading = False
             parent_screen.ids.loading_spinner.anim_delay = -1
-            parent_screen.ids.label_servidor.text = "Error cargando servidores"
+            parent_screen.ids.label_servidor.text = "Error loading servers"
 
         UrlRequest(
             url,
@@ -114,7 +114,7 @@ class ConnectionManager:
         content.add_widget(label)
         
         # No dismiss button, forcing update (or restart)
-        popup = Popup(title="Actualización Requerida",
+        popup = Popup(title="Update Required",
                       content=content,
                       size_hint=(0.8, 0.4),
                       auto_dismiss=False)
@@ -125,7 +125,7 @@ class ConnectionManager:
         contenido = GridLayout(cols=1, spacing=dp(10), padding=dp(10), size_hint_y=None)
         contenido.bind(minimum_height=contenido.setter('height'))
 
-        popup = Popup(title="Selecciona un servidor",
+        popup = Popup(title="Select a server",
                       content=scroll,
                       size_hint=(0.8, 0.6))
 
@@ -148,7 +148,7 @@ class ConnectionManager:
     def _select_server(self, servidor, parent_screen, popup):
         self.selected_server = servidor
         parent_screen.servidor_elegido = True
-        parent_screen.ids.label_servidor.text = f"Servidor elegido:\n {servidor}"
+        parent_screen.ids.label_servidor.text = f"Server chosen:\n {servidor}"
         popup.dismiss()
 
         # Iniciar conexión automática

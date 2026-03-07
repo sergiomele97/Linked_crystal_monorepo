@@ -14,17 +14,17 @@ class MenuDropdown(FloatLayout):
 
     def __init__(self, **kwargs):
         super().__init__(**kwargs)
-        self.size_hint = (0.3, 0.5)
+        self.size_hint = (0.35, 0.5)
         self.pos_hint = {"x": 0.65, "y": 0.05}
         self.build_content()
         self.teclado_visible = False
 
     def build_content(self):
-        if ENV in ["local", "desarrollo"]:
+        if ENV in ["local", "development"]:
             btn1 = Button(
                 text="Save RAM",
-                size_hint=(1, 0.3),
-                pos_hint={"x": 0, "y": 0.7},
+                size_hint=(1, 0.2),
+                pos_hint={"x": 0, "y": 0.6},
                 background_color=(0.25, 0.55, 0.8, 1),
                 color=(1, 1, 1, 1)
             )
@@ -33,19 +33,19 @@ class MenuDropdown(FloatLayout):
 
         btn2 = Button(
             text="Link",
-            size_hint=(1, 0.3),
-            pos_hint={"x": 0, "y": 0.35},
+            size_hint=(1, 0.2),
+            pos_hint={"x": 0, "y": 0.8},
             background_color=(0.25, 0.55, 0.8, 1),
             color=(1, 1, 1, 1)
         )
         btn2.bind(on_release=self.opcion2)
         self.add_widget(btn2)
 
-        if ENV in ["local", "desarrollo"]:
+        if ENV in ["local", "development"]:
             btn3 = Button(
                 text="Debug logs",
-                size_hint=(1, 0.3),
-                pos_hint={"x": 0, "y": 0},
+                size_hint=(1, 0.2),
+                pos_hint={"x": 0, "y": 0.4},
                 background_color=(0.25, 0.55, 0.8, 1),
                 color=(1, 1, 1, 1)
             )

@@ -22,6 +22,7 @@ Se lanzar la pipeline que compila **APK** apuntando a la rama feature.
 La APK generada debe probarse manualmente revisando los siguientes puntos:
 
 - [ ] Permite seleccionar el rom.
+- [ ] Permite importar y exportar la ram.
 - [ ] Permite conectarse al servidor.
 - [ ] Permite lanzar el emulador.
 - [ ] El gamepad responde.
