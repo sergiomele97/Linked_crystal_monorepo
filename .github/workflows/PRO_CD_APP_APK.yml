@@ -1,0 +1,136 @@
+name: PRO_CD_APP_APK
+
+on:
+  workflow_dispatch:
+
+jobs:
+  build:
+    environment: production
+    runs-on: ubuntu-latest
+    timeout-minutes: 400
+
+    steps:
+    - name: Checkout repository
+      uses: actions/checkout@v4
+      with:
+        ref: ${{ github.ref }}
+        
+    - name: Set up Python
+      uses: actions/setup-python@v5
+      with:
+        python-version: "3.10"
+        cache: 'pip'
+        cache-dependency-path: Linked_crystal/app/requirements.txt
+
+    - name: Install system dependencies
+      run: |
+        sudo apt-get update -y
+        sudo apt-get install -y \
+          python3-pip python3-setuptools git zip openjdk-17-jdk \
+          libffi-dev libssl-dev libsqlite3-dev zlib1g-dev \
+          libjpeg-dev libfreetype6-dev wget unzip \
+          autoconf automake libltdl-dev libtool m4 pkg-config
+
+    - name: Cache pip downloads
+      uses: actions/cache@v4
+      with:
+        path: ~/.cache/pip
+        key: ${{ runner.os }}-pip-${{ hashFiles('Linked_crystal/app/requirements.txt') }}
+        restore-keys: |
+          ${{ runner.os }}-pip-
+
+    - name: Restore Buildozer & Gradle cache
+      uses: actions/cache@v4
+      with:
+        path: |
+          ~/.buildozer
+          ~/.gradle
+          Linked_crystal/app/APKbuilder/.buildozer
+        key: ${{ runner.os }}-buildozer-pro-apk-${{ hashFiles('Linked_crystal/app/APKbuilder/buildozer.spec', 'Linked_crystal/app/requirements.txt') }}
+        restore-keys: |
+          ${{ runner.os }}-buildozer-pro-apk-
+          ${{ runner.os }}-buildozer-pro-
+          ${{ runner.os }}-buildozer-
+
+    - name: Install buildozer and dependencies
+      run: |
+        pip install --upgrade pip
+        pip install buildozer cython
+
+    - name: Preinstall Android SDK build-tools
+      run: |
+        mkdir -p ~/.buildozer/android/platform
+        cd ~/.buildozer/android/platform
+        if [ ! -d "android-sdk" ]; then
+          echo "Installing Android SDK..."
+          mkdir android-sdk
+          cd android-sdk
+          wget https://dl.google.com/android/repository/commandlinetools-linux-9477386_latest.zip -O cmdtools.zip
+          unzip -q cmdtools.zip -d cmdline-tools
+          rm cmdtools.zip
+          mkdir -p cmdline-tools/latest
+          mv cmdline-tools/cmdline-tools/* cmdline-tools/latest/ || true
+          yes | cmdline-tools/latest/bin/sdkmanager --licenses
+          yes | cmdline-tools/latest/bin/sdkmanager "platform-tools" "build-tools;34.0.0" "platforms;android-34"
+        else
+          echo "Android SDK already cached."
+        fi
+
+    - name: Fix sdkmanager path for Buildozer
+      run: |
+        mkdir -p ~/.buildozer/android/platform/android-sdk/tools/bin
+        ln -sf ~/.buildozer/android/platform/android-sdk/cmdline-tools/latest/bin/sdkmanager ~/.buildozer/android/platform/android-sdk/tools/bin/sdkmanager
+
+    - name: Use python-for-android 2024.01.21
+      run: |
+        if [ ! -d "$HOME/.buildozer/android/platform/python-for-android" ]; then
+          git clone --depth=1 --branch release-2024.01.21 https://github.com/kivy/python-for-android $HOME/.buildozer/android/platform/python-for-android
+        else
+          echo "python-for-android already cached."
+        fi
+    
+    - name: Generate config.py
+      working-directory: Linked_crystal/app/src
+      run: python generate_config.py
+      env:
+        STATIC_TOKEN: ${{ secrets.STATIC_TOKEN }}
+        ENV: production
+        PORT: ${{ vars.PORT }}
+        SERVERS: ${{ vars.SERVERS }}
+        URL: ${{ vars.URL }}
+        SSL_URL: ${{ vars.SSL_URL }}
+
+    - name: Prepare Keystore
+      run: |
+        echo "${{ secrets.PRO_KEYSTORE_BASE64 }}" | base64 -d > ${{ github.workspace }}/release.keystore
+        ls -l ${{ github.workspace }}/release.keystore
+
+    - name: Build Release APK
+      working-directory: Linked_crystal/app/APKbuilder
+      run: |
+        # 1. Patch production settings in buildozer.spec
+        sed -i 's/.*android.release_artifact =.*/android.release_artifact = apk/' buildozer.spec
+        sed -i 's/.*android.archs =.*/android.archs = armeabi-v7a, arm64-v8a/' buildozer.spec
+        sed -i 's/.*android.api =.*/android.api = 34/' buildozer.spec
+        
+        # 2. Build Release
+        buildozer android release
+      env:
+        ANDROIDSDK: $HOME/.buildozer/android/platform/android-sdk
+        ANDROIDNDK: $HOME/.buildozer/android/platform/android-ndk-r25b
+        JAVA_HOME: /usr/lib/jvm/java-17-openjdk-amd64
+        # Signing Env Vars for Python-for-android
+        P4A_RELEASE_KEYSTORE: ${{ github.workspace }}/release.keystore
+        P4A_RELEASE_KEYSTORE_PASSWD: ${{ secrets.PRO_KEYSTORE_PWD }}
+        P4A_RELEASE_KEYALIAS: ${{ secrets.PRO_KEY_ALIAS }}
+        P4A_RELEASE_KEYALIAS_PASSWD: ${{ secrets.PRO_KEY_PWD }}
+        # Numeric version override
+        APP_ANDROID_NUMERIC_VERSION: ${{ github.run_number }}
+
+    - name: Upload Signed APK
+      uses: actions/upload-artifact@v4
+      with:
+        name: LinkedCrystal-Release-APK
+        path: Linked_crystal/app/APKbuilder/bin/*.apk
+        retention-days: 14
+        overwrite: true
