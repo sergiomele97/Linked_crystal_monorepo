@@ -15,6 +15,16 @@ if platform == 'android':
     Uri = autoclass('android.net.Uri')
 
     def solicitar_permisos(callback=None):
+        VERSION = autoclass('android.os.Build$VERSION')
+        SDK_INT = VERSION.SDK_INT
+        
+        # In Android 13+ (API 33+), READ_EXTERNAL_STORAGE is deprecated for non-media files.
+        # ACTION_GET_CONTENT provides temporary URI access, so we skip manual permission requests.
+        if SDK_INT >= 33:
+            if callback:
+                callback()
+            return
+
         def permisos_callback(permissions, grants):
             if all(grants) and callback:
                 callback()
