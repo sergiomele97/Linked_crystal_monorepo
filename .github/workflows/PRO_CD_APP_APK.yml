@@ -1,4 +1,4 @@
-name: PRO_CD_APP
+name: PRO_CD_APP_APK
 
 on:
   workflow_dispatch:
@@ -46,8 +46,9 @@ jobs:
           ~/.buildozer
           ~/.gradle
           Linked_crystal/app/APKbuilder/.buildozer
-        key: ${{ runner.os }}-buildozer-pro-${{ hashFiles('Linked_crystal/app/APKbuilder/buildozer.spec', 'Linked_crystal/app/requirements.txt') }}
+        key: ${{ runner.os }}-buildozer-pro-apk-${{ hashFiles('Linked_crystal/app/APKbuilder/buildozer.spec', 'Linked_crystal/app/requirements.txt') }}
         restore-keys: |
+          ${{ runner.os }}-buildozer-pro-apk-
           ${{ runner.os }}-buildozer-pro-
           ${{ runner.os }}-buildozer-
 
@@ -104,12 +105,11 @@ jobs:
         echo "${{ secrets.PRO_KEYSTORE_BASE64 }}" | base64 -d > ${{ github.workspace }}/release.keystore
         ls -l ${{ github.workspace }}/release.keystore
 
-    - name: Build Release Bundle (AAB)
+    - name: Build Release APK
       working-directory: Linked_crystal/app/APKbuilder
       run: |
         # 1. Patch production settings in buildozer.spec
-        # Use a more aggressive sed to ensure it's set and uncommented
-        sed -i 's/.*android.release_artifact =.*/android.release_artifact = aab/' buildozer.spec
+        sed -i 's/.*android.release_artifact =.*/android.release_artifact = apk/' buildozer.spec
         sed -i 's/.*android.archs =.*/android.archs = armeabi-v7a, arm64-v8a/' buildozer.spec
         sed -i 's/.*android.api =.*/android.api = 34/' buildozer.spec
         
@@ -119,7 +119,7 @@ jobs:
         ANDROIDSDK: $HOME/.buildozer/android/platform/android-sdk
         ANDROIDNDK: $HOME/.buildozer/android/platform/android-ndk-r25b
         JAVA_HOME: /usr/lib/jvm/java-17-openjdk-amd64
-        # Signing Env Vars for Python-for-android (Absolute Path)
+        # Signing Env Vars for Python-for-android
         P4A_RELEASE_KEYSTORE: ${{ github.workspace }}/release.keystore
         P4A_RELEASE_KEYSTORE_PASSWD: ${{ secrets.PRO_KEYSTORE_PWD }}
         P4A_RELEASE_KEYALIAS: ${{ secrets.PRO_KEY_ALIAS }}
@@ -127,10 +127,10 @@ jobs:
         # Numeric version override
         APP_ANDROID_NUMERIC_VERSION: ${{ github.run_number }}
 
-    - name: Upload Signed AAB
+    - name: Upload Signed APK
       uses: actions/upload-artifact@v4
       with:
-        name: LinkedCrystal-Release-Bundle
-        path: Linked_crystal/app/APKbuilder/bin/*.aab
+        name: LinkedCrystal-Release-APK
+        path: Linked_crystal/app/APKbuilder/bin/*.apk
         retention-days: 14
         overwrite: true
