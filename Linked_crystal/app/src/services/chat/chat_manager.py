@@ -19,7 +19,7 @@ class ChatManager(EventDispatcher):
         if not text:
             return
 
-        self.add_message(text, sender="Tú")
+        self.add_message(text, sender="You")
 
         app = App.get_running_app()
         if hasattr(app, "connection_manager"):
