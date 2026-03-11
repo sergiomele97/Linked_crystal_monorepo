@@ -14,7 +14,6 @@ FULL_SCREEN_CASES = (
     SupLeftTiles.PC, 
     SupLeftTiles.PARTY_MENU, 
     SupLeftTiles.PKM_DETAIL, 
-    SupLeftTiles.POKEDEX, 
     SupLeftTiles.POKEDEX_DETAIL, 
     SupLeftTiles.BAG, 
     SupLeftTiles.PKGEAR, 
