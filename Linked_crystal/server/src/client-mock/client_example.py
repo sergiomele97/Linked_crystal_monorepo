@@ -14,7 +14,8 @@ load_dotenv()
 ENV = os.getenv("ENV", "local")
 STATIC_TOKEN = os.getenv("STATIC_TOKEN", "demo_token")
 SSL_URL = os.getenv("SSL_URL")  # Not needed in local
-SERVER_URL = os.getenv("SERVER_URL", "ws://localhost:8080/ws")
+# CAMBIO: Usar SERVERS del .env
+SERVER_URL = os.getenv("SERVERS", "ws://localhost:8080/ws")
 FULL_URL = f"{SERVER_URL}?token={STATIC_TOKEN}"
 
 ssl_context = None
@@ -56,14 +57,17 @@ async def run_client():
 
     while True:
         try:
-            async with websockets.connect(
-                FULL_URL,
-                ssl=ssl_context,
-                server_hostname=server_hostname,
-                ping_interval=10,
-                ping_timeout=5,
-                close_timeout=3,
-            ) as ws:
+            # CAMBIO: Solo pasar ssl si la URL empieza por wss
+            kwargs = {
+                "ping_interval": 10,
+                "ping_timeout": 5,
+                "close_timeout": 3,
+            }
+            if FULL_URL.startswith("wss"):
+                kwargs["ssl"] = ssl_context
+                kwargs["server_hostname"] = server_hostname
+
+            async with websockets.connect(FULL_URL, **kwargs) as ws:
 
                 backoff = 1
 
