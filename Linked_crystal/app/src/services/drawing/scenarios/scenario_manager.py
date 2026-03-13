@@ -28,6 +28,8 @@ class ScenarioManager:
             return True
         elif self.ramData.tiles["sup_center"] == Tiles.SAVING_MENU_SUP_CENTER:
             return True
+        elif self.ramData.tiles["sup_left"] == 52 and self.ramData.tiles["sup_center"] == 52:
+            return True
         return False
     
     def isMenu(self):

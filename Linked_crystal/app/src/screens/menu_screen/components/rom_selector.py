@@ -13,8 +13,32 @@ if platform == 'android':
     PythonActivity = autoclass('org.kivy.android.PythonActivity')
     Intent = autoclass('android.content.Intent')
     Uri = autoclass('android.net.Uri')
+    OpenableColumns = autoclass('android.provider.OpenableColumns')
+
+    def obtener_nombre_original(uri):
+        context = PythonActivity.mActivity
+        content_resolver = context.getContentResolver()
+        cursor = content_resolver.query(uri, None, None, None, None)
+        name = "Unknown ROM"
+        if cursor is not None and cursor.moveToFirst():
+            name_index = cursor.getColumnIndex(OpenableColumns.DISPLAY_NAME)
+            if name_index != -1:
+                name = cursor.getString(name_index)
+            cursor.close()
+        return name
+
 
     def solicitar_permisos(callback=None):
+        VERSION = autoclass('android.os.Build$VERSION')
+        SDK_INT = VERSION.SDK_INT
+        
+        # In Android 13+ (API 33+), READ_EXTERNAL_STORAGE is deprecated for non-media files.
+        # ACTION_GET_CONTENT provides temporary URI access, so we skip manual permission requests.
+        if SDK_INT >= 33:
+            if callback:
+                callback()
+            return
+
         def permisos_callback(permissions, grants):
             if all(grants) and callback:
                 callback()
@@ -95,8 +119,11 @@ else:
         def seleccionar_archivo(instance):
             selected = selector.selection
             if selected and selected[0].lower().endswith(".gbc"):
-                App.get_running_app().appData.romPath = selected[0]
-                screen_instance.ids.label_rom.text = f"Selected ROM:\n{os.path.basename(App.get_running_app().appData.romPath)}"
+                selected_path = selected[0]
+                original_name = os.path.basename(selected_path)
+                App.get_running_app().appData.romPath = selected_path
+                App.get_running_app().appData.originalRomName = original_name
+                screen_instance.ids.label_rom.text = f"Selected ROM:\n{original_name}"
                 screen_instance.rom_cargado = True
                 popup.dismiss()
             else:
@@ -116,10 +143,14 @@ else:
 def select_rom(screen_instance, callback):
     def handle_selection(uri):
         if uri:
+            original_name = ""
+            if platform == 'android':
+                original_name = obtener_nombre_original(uri)
+            
             path = copiar_rom_a_storage_interno(uri)
-            callback(path)
+            callback(path, original_name)
         else:
-            callback(None)
+            callback(None, None)
 
     solicitar_permisos(lambda: abrir_selector_nativo(handle_selection)
                         if platform == 'android'

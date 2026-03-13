@@ -10,7 +10,7 @@ class ChatManager(EventDispatcher):
     
     def receive_message(self, sender_id, text):
         """Called by ConnectionLoop when a message arrives."""
-        sender_name = f"Jugador {sender_id}"
+        sender_name = f"Player {sender_id}"
         self.add_message(text, sender=sender_name)
 
     def send_message(self, text):
@@ -19,7 +19,7 @@ class ChatManager(EventDispatcher):
         if not text:
             return
 
-        self.add_message(text, sender="Tú")
+        self.add_message(text, sender="You")
 
         app = App.get_running_app()
         if hasattr(app, "connection_manager"):

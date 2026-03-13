@@ -4,8 +4,16 @@ from kivy.utils import platform
 
 if platform == 'android':
     from android.permissions import request_permissions, Permission
+    from jnius import autoclass
 
     def solicitar_permisos():
+        VERSION = autoclass('android.os.Build$VERSION')
+        SDK_INT = VERSION.SDK_INT
+        
+        # In Android 13+ (API 33+), READ_EXTERNAL_STORAGE is deprecated for non-media files.
+        if SDK_INT >= 33:
+            return
+
         request_permissions([
             Permission.READ_EXTERNAL_STORAGE,
             Permission.WRITE_EXTERNAL_STORAGE

@@ -21,6 +21,10 @@ class SynchronizationManager:
 
         if dx == 0 and dy == 0:
             return "none"
+        
+        # Avoid false positives when resetting sprite_coords (npcs/menu)
+        if abs(dx) > 8 or abs(dy) > 8:
+            return "none"
 
         return (
             "right" if abs(dx) > abs(dy) and dx > 0 else

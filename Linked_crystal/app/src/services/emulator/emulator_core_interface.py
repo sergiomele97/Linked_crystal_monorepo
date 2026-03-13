@@ -61,7 +61,7 @@ class EmulatorCoreInterface:
         }
 
     def _initialize(self):
-        solicitar_permisos()
+        Clock.schedule_once(lambda dt: solicitar_permisos(), 0)
 
         if not os.path.exists(App.get_running_app().appData.romPath):
             if self.on_text_output:

@@ -34,10 +34,11 @@ class MenuScreen(Screen):
         self.dropdown.open(caller)
 
     def abrir_explorador(self):
-        def cuando_selecciona_archivo(destino_path):
+        def cuando_selecciona_archivo(destino_path, original_name):
             if destino_path:
                 App.get_running_app().appData.romPath = destino_path
-                self.ids.label_rom.text = f"Selected ROM:\n{os.path.basename(destino_path)}"
+                App.get_running_app().appData.originalRomName = original_name
+                self.ids.label_rom.text = f"Selected ROM:\n{original_name}"
                 self.rom_cargado = True
             else:
                 self.ids.label_rom.text = "Invalid file."
