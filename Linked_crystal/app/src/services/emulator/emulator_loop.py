@@ -31,7 +31,7 @@ class EmulationLoop:
     #Services
         self.audioManager = AudioManagerKivy(self.pyboy)
         self.ramScrapper = RamScrapper(self.pyboy, self.ramData)
-        self.ramHooks = RamHooks(self.ramData, self.on_save)
+        self.ramHooks = RamHooks(self.ramData, self.pyboy, self.on_save)
         self.drawingManager = DrawingManager(self.ramData, self.serverPackets, self.pyboy, self.on_frame)
     #Others
         self.running = False
@@ -63,7 +63,6 @@ class EmulationLoop:
             self.ramScrapper.update_ram_data()
             self.drawingManager.update_frame()
             self.audioManager.update_audio()
-            self.ramHooks.handle_hooks()
             
         else:
             self.stop()

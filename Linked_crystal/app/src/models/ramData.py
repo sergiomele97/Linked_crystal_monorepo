@@ -14,7 +14,6 @@ class RamData:
         self.map_number = 0
         self.map_bank = 0
 
-        self.is_saving = 0
         self.wram_bank = 0
 
     def __str__(self):
@@ -25,7 +24,6 @@ class RamData:
             f"👾 Sprites X: {self.x_coord_sprite}\n"
             f"👾 Sprites Y: {self.y_coord_sprite}\n"
             f"🖥️  Tiles: {self.tiles}\n"
-            f"💾 Saving: {self.is_saving}\n"
             f"🏦 WRAM Bank: {self.wram_bank}\n"
             f"----------------------"
         )
