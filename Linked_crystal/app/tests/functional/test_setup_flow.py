@@ -42,7 +42,7 @@ class TestSetupFlow(unittest.TestCase):
             self.screen.abrir_explorador()
             args, _ = mock_select_rom.call_args
             callback = args[1]
-            callback("/path/game.gbc")
+            callback("/path/game.gbc", "game.gbc")
             
             self.assertEqual(self.mock_app.appData.romPath, "/path/game.gbc")
             self.assertTrue(self.screen.rom_cargado)
