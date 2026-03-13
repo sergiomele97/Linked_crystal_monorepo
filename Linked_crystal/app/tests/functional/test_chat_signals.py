@@ -37,7 +37,7 @@ class TestChatSignals(unittest.TestCase):
         self.chat_mgr.receive_message(sender_id=5, text="Hola mundo")
         
         self.assertEqual(len(self.chat_mgr.messages), 1)
-        self.assertEqual(self.chat_mgr.messages[0]['sender'], "Jugador 5")
+        self.assertEqual(self.chat_mgr.messages[0]['sender'], "Player 5")
         self.assertEqual(self.chat_mgr.messages[0]['text'], "Hola mundo")
 
     def test_send_message_logic(self):
@@ -46,7 +46,7 @@ class TestChatSignals(unittest.TestCase):
         
         # Check internal state
         self.assertEqual(len(self.chat_mgr.messages), 1)
-        self.assertEqual(self.chat_mgr.messages[0]['sender'], "Tú")
+        self.assertEqual(self.chat_mgr.messages[0]['sender'], "You")
         
         # Check network call
         self.mock_conn_mgr.connectionLoop.send_chat.assert_called_once_with("Mensaje de prueba")

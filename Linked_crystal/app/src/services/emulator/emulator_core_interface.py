@@ -101,6 +101,10 @@ class EmulatorCoreInterface:
             self.pyboy.button_release(button_name)
 
     def save_RAM(self):
+        """
+        Guarda la SRAM del juego de forma atómica para evitar corrupción de datos.
+        """
+        temp_file = ""
         try:
             rom_dir = os.path.dirname(App.get_running_app().appData.romPath)
             RAMfile = (
@@ -108,17 +112,32 @@ class EmulatorCoreInterface:
                 if platform == "android"
                 else App.get_running_app().appData.romPath
             ) + ".ram"
+            
+            temp_file = RAMfile + ".tmp"
 
-            with open(RAMfile, "wb") as f:
+            with open(temp_file, "wb") as f:
                 self.pyboy.save_state(f, True)
+                f.flush()
+                try: os.fsync(f.fileno())
+                except: pass
+
+            if os.path.exists(RAMfile):
+                os.remove(RAMfile)
+            os.rename(temp_file, RAMfile)
 
             file_size = os.path.getsize(RAMfile)
-            self.on_text_output(f"[DEBUG] Ram guardada: {RAMfile} ({file_size} bytes)")
-            log(f"[DEBUG] Ram guardada: {RAMfile} ({file_size} bytes)")
+            log(f"[INFO] SRAM guardada exitosamente: {RAMfile} ({file_size} bytes)")
+            if self.on_text_output:
+                self.on_text_output(f"Partida guardada ({file_size} bytes)")
 
         except Exception as e:
+            msg = f"Error crítico al guardar SRAM: {e}"
+            log(f"[ERROR] {msg}")
             if self.on_text_output:
-                Clock.schedule_once(
-                    lambda dt, err=e: self.on_text_output(f"Error guardando RAM: {err}"), 0
-                )
+                Clock.schedule_once(lambda dt: self.on_text_output(msg), 0)
+            
+            # Limpieza del temporal en caso de error
+            if temp_file and os.path.exists(temp_file):
+                try: os.remove(temp_file)
+                except: pass
                 
