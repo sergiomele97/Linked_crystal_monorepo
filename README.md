@@ -13,8 +13,7 @@ Our aim is to convert **Pokémon Crystal** into an MMO experience that everyone 
 
 ## Play the Game
 
-To play, download the latest APK release on your Android device.  
-Current version: [v0.9.0-beta](https://github.com/sergiomele97/Linked_crystal_monorepo/releases/download/v0.9.0-beta/LinkedCrystal-Release-APK-v0_9_0_beta.zip)
+To play, download the latest APK release on your Android device: [v0.9.0-beta](https://github.com/sergiomele97/Linked_crystal_monorepo/releases/download/v0.9.0-beta/LinkedCrystal-Release-APK-v0_9_0_beta.zip)
 >For more information about this release, check the [release section](https://github.com/sergiomele97/Linked_crystal_monorepo/releases/tag/v0.9.0-beta).
 
 ## Roadmap
