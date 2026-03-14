@@ -9,6 +9,7 @@ class SupLeftTiles(IntEnum):
     BAG = 40
     PKGEAR = 70
     TRAINER_CARD = 35
+    TRADE_SCREEN = 63
 
 FULL_SCREEN_CASES = (
     SupLeftTiles.PC, 
@@ -17,7 +18,8 @@ FULL_SCREEN_CASES = (
     SupLeftTiles.POKEDEX_DETAIL, 
     SupLeftTiles.BAG, 
     SupLeftTiles.PKGEAR, 
-    SupLeftTiles.TRAINER_CARD
+    SupLeftTiles.TRAINER_CARD,
+    SupLeftTiles.TRADE_SCREEN
 )
 
 class Tiles(IntEnum):
