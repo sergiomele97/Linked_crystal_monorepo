@@ -17,11 +17,11 @@ class MenuDropdown(FloatLayout):
         self.build_content()
 
     def build_content(self):
-        btn_export = Button(text="Export RAM", size_hint=(1, 0.2), pos_hint={"x": 0, "y": 0.8})
+        btn_export = Button(text="Export save", size_hint=(1, 0.2), pos_hint={"x": 0, "y": 0.8})
         btn_export.bind(on_release=self.export_ram)
         self.add_widget(btn_export)
 
-        btn_import = Button(text="Import RAM", size_hint=(1, 0.2), pos_hint={"x": 0, "y": 0.6})
+        btn_import = Button(text="Import save", size_hint=(1, 0.2), pos_hint={"x": 0, "y": 0.6})
         btn_import.bind(on_release=self.import_ram)
         self.add_widget(btn_import)
 
