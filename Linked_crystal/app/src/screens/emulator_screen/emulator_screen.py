@@ -57,6 +57,20 @@ class EmulatorScreen(Screen):
             self.dropdown = MenuDropdown()
             self.dropdown.father_screen = self
         self.dropdown.open(caller)
+        
+    def toggle_speed(self):
+        if hasattr(self, 'emulator') and hasattr(self.emulator, 'loop') and self.emulator.loop:
+            current_speed = getattr(self.emulator.loop, 'speed_multiplier', 1)
+            new_speed = 2 if current_speed == 1 else 1
+            self.emulator.loop.set_speed(new_speed)
+            
+            if self.emulator.pyboy:
+                self.emulator.pyboy.set_emulation_speed(new_speed)
+                
+            self.show_info_message(f"Speed: x{new_speed}", color=(0.5, 1, 0.5, 1))
+            Clock.schedule_once(self.hide_info_message, 2)
+            return new_speed
+        return 1
     
     
     def update_link_stats(self, dt):

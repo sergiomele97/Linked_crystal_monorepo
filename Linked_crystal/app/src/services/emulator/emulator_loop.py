@@ -36,6 +36,10 @@ class EmulationLoop:
     #Others
         self.running = False
         self._clock_event = None
+        self.speed_multiplier = 1
+
+    def set_speed(self, multiplier):
+        self.speed_multiplier = multiplier
 
 
     def start(self, fps=60):
@@ -59,16 +63,23 @@ class EmulationLoop:
         if not self.running or not self.pyboy:
             return False
 
-        if self.pyboy.tick():
-            self.ramScrapper.update_ram_data()
-            self.drawingManager.update_frame()
-            self.audioManager.update_audio()
-            
-        else:
-            self.stop()
-            if self.on_text_output:
-                Clock.schedule_once(
-                    lambda dt: self.on_text_output("Emulación finalizada"), 0
-                )
-            return False
+        for i in range(self.speed_multiplier):
+            if self.pyboy.tick():
+                self.ramScrapper.update_ram_data()
+                
+                if self.speed_multiplier == 1:
+                    self.audioManager.update_audio()
+                elif i == 0:
+                    self.audioManager.update_audio(mute=True)
+                
+                if i == self.speed_multiplier - 1:
+                    self.drawingManager.update_frame()
+                
+            else:
+                self.stop()
+                if self.on_text_output:
+                    Clock.schedule_once(
+                        lambda dt: self.on_text_output("Emulación finalizada"), 0
+                    )
+                return False
 

@@ -51,13 +51,16 @@ class AudioManagerKivy:
     # -------------------------
     # API compatible
     # -------------------------
-    def update_audio(self):
+    def update_audio(self, mute=False):
         """Lee audio de PyBoy y encola para reproducción."""
         try:
             audio_len = getattr(self.pyboy.sound, "raw_buffer_head", 0)
             if audio_len <= 0:
                 return
             audio_buffer = self.pyboy.sound.ndarray[:audio_len]
+            if mute:
+                audio_buffer = np.zeros_like(audio_buffer)
+
             sample_rate = getattr(self.pyboy.sound, "sample_rate", None)
             if sample_rate:
                 self.play_audio_buffer(audio_buffer, sample_rate)

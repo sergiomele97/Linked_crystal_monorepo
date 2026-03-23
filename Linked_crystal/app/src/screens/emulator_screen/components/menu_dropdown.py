@@ -20,17 +20,6 @@ class MenuDropdown(FloatLayout):
         self.teclado_visible = False
 
     def build_content(self):
-        if ENV in ["local", "development"]:
-            btn1 = Button(
-                text="Save RAM",
-                size_hint=(1, 0.2),
-                pos_hint={"x": 0, "y": 0.6},
-                background_color=(0.25, 0.55, 0.8, 1),
-                color=(1, 1, 1, 1)
-            )
-            btn1.bind(on_release=self.opcion1)
-            self.add_widget(btn1)
-
         btn2 = Button(
             text="Link",
             size_hint=(1, 0.2),
@@ -41,11 +30,31 @@ class MenuDropdown(FloatLayout):
         btn2.bind(on_release=self.opcion2)
         self.add_widget(btn2)
 
+        self.btn_speed = Button(
+            text="Speed: x2",
+            size_hint=(1, 0.2),
+            pos_hint={"x": 0, "y": 0.6},
+            background_color=(0.25, 0.55, 0.8, 1),
+            color=(1, 1, 1, 1)
+        )
+        self.btn_speed.bind(on_release=self.opcion_speed)
+        self.add_widget(self.btn_speed)
+
         if ENV in ["local", "development"]:
+            btn1 = Button(
+                text="Save RAM",
+                size_hint=(1, 0.2),
+                pos_hint={"x": 0, "y": 0.4},
+                background_color=(0.25, 0.55, 0.8, 1),
+                color=(1, 1, 1, 1)
+            )
+            btn1.bind(on_release=self.opcion1)
+            self.add_widget(btn1)
+
             btn3 = Button(
                 text="Debug logs",
                 size_hint=(1, 0.2),
-                pos_hint={"x": 0, "y": 0.4},
+                pos_hint={"x": 0, "y": 0.2},
                 background_color=(0.25, 0.55, 0.8, 1),
                 color=(1, 1, 1, 1)
             )
@@ -67,6 +76,10 @@ class MenuDropdown(FloatLayout):
         self.link_interface.mostrar_teclado_link()
         self.teclado_visible = True
 
+    def opcion_speed(self, *args):
+        self.father_screen.toggle_speed()
+        self.close()
+
     def opcion3(self, *args):
         self.close()
         self.debug_log_interface = DebugLogInterface(father_screen=self.father_screen)
@@ -84,6 +97,11 @@ class MenuDropdown(FloatLayout):
         if not self.parent:
             self.father_screen.add_widget(self)
         self.father_screen.bind(on_touch_down=self._on_touch_down_outside)
+        
+        if hasattr(self.father_screen, 'emulator') and hasattr(self.father_screen.emulator, 'loop') and self.father_screen.emulator.loop:
+            speed = getattr(self.father_screen.emulator.loop, 'speed_multiplier', 1)
+            target_speed = 2 if speed == 1 else 1
+            self.btn_speed.text = f"Speed: x{target_speed}"
 
     def close(self, *args):
         if self.parent:
