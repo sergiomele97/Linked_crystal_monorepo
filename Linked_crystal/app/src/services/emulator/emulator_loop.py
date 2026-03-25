@@ -71,9 +71,8 @@ class EmulationLoop:
                     self.audioManager.update_audio()
                 elif i == 0:
                     self.audioManager.update_audio(mute=True)
-                
-                if i == self.speed_multiplier - 1:
-                    self.drawingManager.update_frame()
+            
+                self.drawingManager.update_frame()
                 
             else:
                 self.stop()
