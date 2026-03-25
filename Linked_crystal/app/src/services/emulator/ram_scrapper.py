@@ -58,3 +58,4 @@ class RamScrapper:
         self.localPacket.map_bank = self.ramData.map_bank
 
         self.localPacket.IsOverworld = True
+        self.localPacket.speed = getattr(self, 'speed', 1)

@@ -23,7 +23,7 @@ class DrawingManager:
         self.spriteRenderer.load_sprite_sheet("resources/image/OW_default_sprite.png")
         self.scenarioManager = ScenarioManager(self.ramData)
 
-    def update_frame(self):
+    def update_frame(self, local_speed=1):
         if self.on_frame:
             frame_array = self.pyboy.screen.ndarray.copy()
 
@@ -32,7 +32,7 @@ class DrawingManager:
             self.scenarioManager.updateScenario()
 
             for player in self.onScreenPlayers.values():
-                player.updateFineCoords()
+                player.updateFineCoords(local_speed)
                 x_render_coord, y_render_coord = self.synchronizationManager.calculate_render_coords(
                     player.x_fine_coord, player.y_fine_coord
                 )

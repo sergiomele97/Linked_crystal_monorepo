@@ -47,6 +47,8 @@ class RemotePlayerEntity:
         self.direction = "down"
         self.is_moving = False
         self.current_sprite = 0
+        self.move_tick = 0.0
+        self.remote_speed = 1
 
     # ---------------------------------------------------------
     #         Actualiza target y dirección 
@@ -59,6 +61,7 @@ class RemotePlayerEntity:
 
             self.target_x = packet.player_x_coord
             self.target_y = packet.player_y_coord
+            self.remote_speed = getattr(packet, 'speed', 1)
 
             self.is_moving = True
 
@@ -72,19 +75,30 @@ class RemotePlayerEntity:
     # ---------------------------------------------------------------
     #        Actualiza posición fina relativa a mundo (render_x/y)
     # ---------------------------------------------------------------
-    def updateFineCoords(self):
+    def updateFineCoords(self, local_speed=1):
         if not self.is_moving:
             return
 
-        if not hasattr(self, "move_tick"):
-            self.move_tick = 0
+        # Calcular cuánto avanzar en este tick
+        advance = self.remote_speed / local_speed
+        
+        # Guardar tick previo para calcular incremento de delta
+        prev_tick_int = int(self.move_tick)
+        self.move_tick += advance
+        curr_tick_int = int(self.move_tick)
 
-        delta = self.PIXEL_MOVEMENT_CORRECTION[self.move_tick]
-
-        prev_delta = (
-            self.PIXEL_MOVEMENT_CORRECTION[self.move_tick - 1]
-            if self.move_tick > 0 else 0
-        )
+        # Si no hemos cruzado un tick entero, no hay movimiento de píxeles nuevo hoy 
+        # (a menos que advance sea >= 1)
+        
+        # En el sistema original de Crystal, cada tick de los 16 tiene un delta acumulado.
+        # PIXEL_MOVEMENT_CORRECTION es el desplazamiento ACUMULADO en cada tick.
+        
+        target_idx = min(curr_tick_int, 15)
+        prev_idx = min(prev_tick_int, 15)
+        
+        delta = self.PIXEL_MOVEMENT_CORRECTION[target_idx]
+        prev_delta = self.PIXEL_MOVEMENT_CORRECTION[prev_idx]
+        
         step_size = delta - prev_delta
 
         target_px_x = self.target_x * self.TILE_SIZE
@@ -101,14 +115,12 @@ class RemotePlayerEntity:
             direction = 1 if dy > 0 else -1
             self.y_fine_coord += direction * step_size
 
-        if self.move_tick < 8:
+        if curr_tick_int < 8:
             step_frame = "step_right"
         else:
             step_frame = "step_left"
 
         self.current_sprite = self.FRAME_MAP[self.direction][step_frame]
-
-        self.move_tick += 1
 
         if self.move_tick >= 16:
             self.x_fine_coord = target_px_x
@@ -117,4 +129,4 @@ class RemotePlayerEntity:
             self.current_sprite = self.FRAME_MAP[self.direction]["idle"]
 
             self.is_moving = False
-            del self.move_tick
+            self.move_tick = 0.0

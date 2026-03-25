@@ -3,13 +3,14 @@ class Packet:
     Representa un paquete de datos del jugador.
     """
 
-    def __init__(self, player_id=0, x=50, y=50, map_number=0, map_bank=0, IsOverworld=0):
+    def __init__(self, player_id=0, x=50, y=50, map_number=0, map_bank=0, IsOverworld=0, speed=1):
         self.player_id = player_id
         self.player_x_coord = x
         self.player_y_coord = y
         self.map_number = map_number
         self.map_bank = map_bank
         self.IsOverworld = IsOverworld
+        self.speed = speed
 
     # ------------------------
     # Serialización para enviar
@@ -17,13 +18,14 @@ class Packet:
     def to_bytes(self):
         import struct
         return struct.pack(
-            "<I2i2iI",
+            "<I2i2i2I",
             self.player_id,
             self.player_x_coord,
             self.player_y_coord,
             self.map_number,
             self.map_bank,
-            self.IsOverworld
+            self.IsOverworld,
+            self.speed
         )
 
     # ------------------------
@@ -32,8 +34,8 @@ class Packet:
     @classmethod
     def from_bytes(cls, data):
         import struct
-        player_id, x, y, map_number, map_bank, IsOverworld = struct.unpack("<I2i2iI", data)
-        return cls(player_id, x, y, map_number, map_bank, IsOverworld)
+        player_id, x, y, map_number, map_bank, IsOverworld, speed = struct.unpack("<I2i2i2I", data)
+        return cls(player_id, x, y, map_number, map_bank, IsOverworld, speed)
 
     # ------------------------
     # Representación en string (humana)
@@ -45,7 +47,8 @@ class Packet:
             f"y={self.player_y_coord}, "
             f"map={self.map_number}, "
             f"bank={self.map_bank}, "
-            f"IsOverworld={self.IsOverworld})"
+            f"IsOverworld={self.IsOverworld}, "
+            f"speed={self.speed})"
         )
 
     # ------------------------

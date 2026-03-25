@@ -14,11 +14,12 @@ type Packet struct {
 	MapNumber   int32
 	MapBank     int32
 	IsOverworld uint32
+	Speed       uint32
 }
 
 var bufferPool = sync.Pool{
 	New: func() any {
-		return bytes.NewBuffer(make([]byte, 0, 24*100))
+		return bytes.NewBuffer(make([]byte, 0, 28*100))
 	},
 }
 
@@ -29,7 +30,7 @@ func SerializePackets(data []Packet) []byte {
 
 	buf.WriteByte(0x01) // Game Data Type
 
-	var tmp [24]byte
+	var tmp [28]byte
 	for _, p := range data {
 		binary.LittleEndian.PutUint32(tmp[0:4], p.PlayerID)
 		binary.LittleEndian.PutUint32(tmp[4:8], uint32(p.PlayerX))
@@ -37,6 +38,7 @@ func SerializePackets(data []Packet) []byte {
 		binary.LittleEndian.PutUint32(tmp[12:16], uint32(p.MapNumber))
 		binary.LittleEndian.PutUint32(tmp[16:20], uint32(p.MapBank))
 		binary.LittleEndian.PutUint32(tmp[20:24], p.IsOverworld)
+		binary.LittleEndian.PutUint32(tmp[24:28], p.Speed)
 		buf.Write(tmp[:])
 	}
 

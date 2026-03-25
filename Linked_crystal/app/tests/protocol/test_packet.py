@@ -11,26 +11,28 @@ class TestPacket(unittest.TestCase):
             y=200,
             map_number=3,
             map_bank=4,
-            IsOverworld=1
+            IsOverworld=1,
+            speed=2
         )
         
         # Test to_bytes
         data = p.to_bytes()
-        self.assertEqual(len(data), 24)
+        self.assertEqual(len(data), 28)
         
         # Verify specific bytes using struct.unpack (Little-Endian)
-        # Format: "<I2i2iI" -> Uint32, Int32, Int32, Int32, Int32, Uint32
-        unpacked = struct.unpack("<I2i2iI", data)
+        # Format: "<I2i2i2I" -> Uint32, Int32, Int32, Int32, Int32, Uint32, Uint32
+        unpacked = struct.unpack("<I2i2i2I", data)
         self.assertEqual(unpacked[0], 1)
         self.assertEqual(unpacked[1], 100)
         self.assertEqual(unpacked[2], 200)
         self.assertEqual(unpacked[3], 3)
         self.assertEqual(unpacked[4], 4)
         self.assertEqual(unpacked[5], 1)
+        self.assertEqual(unpacked[6], 2)
 
     def test_deserialization(self):
         # T-PRO-01: Packet Deserialization
-        raw_data = struct.pack("<I2i2iI", 5, 50, 60, 7, 8, 0)
+        raw_data = struct.pack("<I2i2i2I", 5, 50, 60, 7, 8, 0, 1)
         p = Packet.from_bytes(raw_data)
         
         self.assertEqual(p.player_id, 5)
@@ -39,6 +41,7 @@ class TestPacket(unittest.TestCase):
         self.assertEqual(p.map_number, 7)
         self.assertEqual(p.map_bank, 8)
         self.assertEqual(p.IsOverworld, 0)
+        self.assertEqual(p.speed, 1)
 
 if __name__ == "__main__":
     unittest.main()

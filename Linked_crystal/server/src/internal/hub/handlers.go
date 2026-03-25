@@ -83,7 +83,7 @@ func HandleConnection(w http.ResponseWriter, r *http.Request) {
 
 		if typeByte == 0x01 { // Game Data
 			// ✂️ SEGURIDAD: Payload debe ser suficiente para los offsets usados
-			if len(payload) < 24 {
+			if len(payload) < 28 {
 				continue
 			}
 
@@ -97,6 +97,7 @@ func HandleConnection(w http.ResponseWriter, r *http.Request) {
 			p.MapNumber = int32(binary.LittleEndian.Uint32(payload[12:16]))
 			p.MapBank = int32(binary.LittleEndian.Uint32(payload[16:20]))
 			p.IsOverworld = binary.LittleEndian.Uint32(payload[20:24])
+			p.Speed = binary.LittleEndian.Uint32(payload[24:28])
 
 			// ✂️ El punto del PANIC: Validamos el ID antes de guardar
 			if client.id >= 0 && client.id < len(latestPackets) {

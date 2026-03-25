@@ -37,9 +37,11 @@ class EmulationLoop:
         self.running = False
         self._clock_event = None
         self.speed_multiplier = 1
+        self.ramScrapper.speed = self.speed_multiplier
 
     def set_speed(self, multiplier):
         self.speed_multiplier = multiplier
+        self.ramScrapper.speed = multiplier
 
 
     def start(self, fps=60):
@@ -72,7 +74,7 @@ class EmulationLoop:
                 elif i == 0:
                     self.audioManager.update_audio(mute=True)
             
-                self.drawingManager.update_frame()
+                self.drawingManager.update_frame(self.speed_multiplier)
                 
             else:
                 self.stop()

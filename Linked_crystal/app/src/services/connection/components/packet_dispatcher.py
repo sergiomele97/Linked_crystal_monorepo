@@ -3,7 +3,7 @@ from kivy.app import App
 from services.logger import log
 
 class PacketDispatcher:
-    PACKET_SIZE = 24
+    PACKET_SIZE = 28
 
     def __init__(self):
         self.my_id = None
