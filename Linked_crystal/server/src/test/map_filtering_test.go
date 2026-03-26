@@ -142,17 +142,18 @@ func TestMapFiltering(t *testing.T) {
 }
 
 func sendGamePacket(t *testing.T, conn *websocket.Conn, bank, number, x int32) {
-	pkt := make([]byte, 25)
+	pkt := make([]byte, 29)
 	pkt[0] = 0x01
 	binary.LittleEndian.PutUint32(pkt[5:9], uint32(x))
 	binary.LittleEndian.PutUint32(pkt[13:17], uint32(number))
 	binary.LittleEndian.PutUint32(pkt[17:21], uint32(bank))
 	binary.LittleEndian.PutUint32(pkt[21:25], 1)
+	binary.LittleEndian.PutUint32(pkt[25:29], 0) // Speed = 0
 	conn.WriteMessage(websocket.BinaryMessage, pkt)
 }
 
 func sendMapPacket(t *testing.T, conn *websocket.Conn, bank, number int32) {
-	pkt := make([]byte, 25)
+	pkt := make([]byte, 29)
 	pkt[0] = 0x01
 	binary.LittleEndian.PutUint32(pkt[13:17], uint32(number))
 	binary.LittleEndian.PutUint32(pkt[17:21], uint32(bank))

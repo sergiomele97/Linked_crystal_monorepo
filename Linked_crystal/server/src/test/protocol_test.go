@@ -34,46 +34,41 @@ func TestProtocol(t *testing.T) {
 		defer connB.Close()
 
 		// IMPORTANT: Client B must send a packet to initialize its map on server
-		pktB := make([]byte, 25)
+		pktB := make([]byte, 29)
 		pktB[0] = 0x01
 		binary.LittleEndian.PutUint32(pktB[13:17], 0) // MapNumber = 0
-		binary.LittleEndian.PutUint32(pktB[17:21], 0) // MapBank = 0
+		binary.LittleEndian.PutUint32(pktB[17:21], 0) // MapBank  = 0
 		if err := connB.WriteMessage(websocket.BinaryMessage, pktB); err != nil {
 			t.Fatalf("Failed to initialize receiver map: %v", err)
 		}
 
 		// Client A: Sender
-		connA, _ = connectClient(t, url)
-		defer connA.Close()
+		// (Already connected at line 29)
 
 		// Send 0x01 Packet WITH Map info (Bank 0, Map 0)
-		pktA := make([]byte, 25)
+		pktA := make([]byte, 29)
 		pktA[0] = 0x01
 		binary.LittleEndian.PutUint32(pktA[5:9], 100)  // X = 100
 		binary.LittleEndian.PutUint32(pktA[9:13], 200) // Y = 200
 		binary.LittleEndian.PutUint32(pktA[13:17], 0)  // MapNumber = 0
 		binary.LittleEndian.PutUint32(pktA[17:21], 0)  // MapBank = 0
 		binary.LittleEndian.PutUint32(pktA[21:25], 1)  // IsOverworld = 1
+		binary.LittleEndian.PutUint32(pktA[25:29], 0)  // Speed = 0
 
 		if err := connA.WriteMessage(websocket.BinaryMessage, pktA); err != nil {
 			t.Fatalf("Failed to send game packet: %v", err)
 		}
 
 		// Wait for broadcast
-		timeout := time.After(1 * time.Second)
+		connB.SetReadDeadline(time.Now().Add(1 * time.Second))
 		found := false
 		for !found {
-			select {
-			case <-timeout:
-				t.Fatal("Timeout waiting for game broadcast")
-			default:
-				_, msg, err := connB.ReadMessage()
-				if err != nil {
-					t.Fatalf("Read error: %v", err)
-				}
-				if len(msg) >= 25 && msg[0] == 0x01 {
-					found = true
-				}
+			_, msg, err := connB.ReadMessage()
+			if err != nil {
+				t.Fatalf("Timeout or Read error: %v", err)
+			}
+			if len(msg) >= 29 && msg[0] == 0x01 {
+				found = true
 			}
 		}
 		t.Logf("✅ Client %d received broadcast", idB)
