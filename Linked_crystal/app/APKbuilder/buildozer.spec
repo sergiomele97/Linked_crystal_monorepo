@@ -29,7 +29,7 @@ source.include_exts = py,png,jpg,kv,atlas,GBC,gbc,pxd,pyx,ttf,bin,ogg,zip
 #source.exclude_patterns = license,images/*/*.jpg
 
 # (str) Application versioning (method 1)
-version = 0.1
+version = 0.9.1
 
 # (str) Application versioning (method 2)
 # version.regex = __version__ = ['"](.*)['"]
