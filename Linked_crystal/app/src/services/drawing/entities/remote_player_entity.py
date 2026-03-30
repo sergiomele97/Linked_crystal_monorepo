@@ -49,28 +49,45 @@ class RemotePlayerEntity:
         self.current_sprite = 0
         self.move_tick = 0.0
         self.remote_speed = 1
+        self.pending_target = None  # Buffer para el siguiente movimiento
 
     # ---------------------------------------------------------
     #         Actualiza target y dirección 
     # ---------------------------------------------------------
     def update_from_network(self, packet):
-        if (self.is_moving):
-            return
-        if (packet.player_x_coord != self.target_x or 
-            packet.player_y_coord != self.target_y):
+        self.remote_speed = getattr(packet, 'speed', 1)
+        
+        pk_x = packet.player_x_coord
+        pk_y = packet.player_y_coord
 
-            self.target_x = packet.player_x_coord
-            self.target_y = packet.player_y_coord
-            self.remote_speed = getattr(packet, 'speed', 1)
+        if not self.is_moving:
+            # Si no nos estamos moviendo, evaluamos si el nuevo paquete
+            # indica una posición distinta a la actual.
+            if pk_x != self.target_x or pk_y != self.target_y:
+                self._start_move(pk_x, pk_y)
+        else:
+            # Si ya estamos en movimiento, comprobamos si el paquete
+            # trae un destino distinto al actual (un movimiento futuro).
+            if pk_x != self.target_x or pk_y != self.target_y:
+                self.pending_target = (pk_x, pk_y)
 
-            self.is_moving = True
+    def _start_move(self, tx, ty):
+        """Inicializa un nuevo tramo de movimiento."""
+        old_tx, old_ty = self.target_x, self.target_y
+        self.target_x = tx
+        self.target_y = ty
+        self.is_moving = True
+        self.move_tick = 0.0
 
-            dx = self.target_x - self.x_fine_coord / self.TILE_SIZE
-            dy = self.target_y - self.y_fine_coord / self.TILE_SIZE
-            if abs(dx) > abs(dy):
-                self.direction = "right" if dx > 0 else "left"
-            else:
-                self.direction = "down" if dy > 0 else "up"
+        # Calcular dirección basada en el desplazamiento desde la posición teórica actual
+        # (que debería ser el target anterior)
+        dx = self.target_x - old_tx
+        dy = self.target_y - old_ty
+        
+        if abs(dx) > abs(dy):
+            self.direction = "right" if dx > 0 else "left"
+        elif abs(dy) > 0:
+            self.direction = "down" if dy > 0 else "up"
 
     # ---------------------------------------------------------------
     #        Actualiza posición fina relativa a mundo (render_x/y)
@@ -126,7 +143,17 @@ class RemotePlayerEntity:
             self.x_fine_coord = target_px_x
             self.y_fine_coord = target_px_y
 
-            self.current_sprite = self.FRAME_MAP[self.direction]["idle"]
-
             self.is_moving = False
             self.move_tick = 0.0
+
+            # Si teníamos un movimiento en cola, empezamos el siguiente tramo inmediatamente
+            if self.pending_target:
+                next_tx, next_ty = self.pending_target
+                self.pending_target = None
+                # Solo iniciamos si es realmente un cambio de posición
+                if next_tx != self.target_x or next_ty != self.target_y:
+                    self._start_move(next_tx, next_ty)
+                else:
+                    self.current_sprite = self.FRAME_MAP[self.direction]["idle"]
+            else:
+                self.current_sprite = self.FRAME_MAP[self.direction]["idle"]

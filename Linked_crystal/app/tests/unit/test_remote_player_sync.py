@@ -1,4 +1,5 @@
 import unittest
+from unittest.mock import MagicMock
 import sys
 import os
 
@@ -10,61 +11,78 @@ from models.packet import Packet
 
 class TestRemotePlayerSync(unittest.TestCase):
     def setUp(self):
-        # Initial position at (10, 10), which is (160, 160) in fine coords
+        # Initialize at (10, 10)
         self.player = RemotePlayerEntity(player_id=1, initial_x=10, initial_y=10)
 
-    def test_sync_r1_l1(self):
-        # Remote Speed 1, Local Speed 1 -> advance = 1.0
-        # Each tick moves according to PIXEL_MOVEMENT_CORRECTION
-        # 16 ticks total to complete movement
-        p = Packet(player_id=1, x=11, y=10, speed=1)
-        self.player.update_from_network(p)
+    def test_initial_state(self):
+        self.assertEqual(self.player.target_x, 10)
+        self.assertEqual(self.player.target_y, 10)
+        self.assertFalse(self.player.is_moving)
+
+    def test_single_move(self):
+        # Packet for (10, 11)
+        packet = Packet(player_id=1, x=10, y=11, speed=1)
+        self.player.update_from_network(packet)
         
-        self.assertEqual(self.player.remote_speed, 1)
         self.assertTrue(self.player.is_moving)
+        self.assertEqual(self.player.target_x, 10)
+        self.assertEqual(self.player.target_y, 11)
+        self.assertEqual(self.player.direction, "down")
+        self.assertIsNone(self.player.pending_target)
+
+    def test_buffered_move(self):
+        # Start move to (10, 11)
+        packet1 = Packet(player_id=1, x=10, y=11, speed=1)
+        self.player.update_from_network(packet1)
         
-        # Call 16 times
-        for i in range(16):
+        # While moving, receive packet for (10, 12)
+        packet2 = Packet(player_id=1, x=10, y=12, speed=1)
+        self.player.update_from_network(packet2)
+        
+        # Should be buffered
+        self.assertEqual(self.player.target_x, 10)
+        self.assertEqual(self.player.target_y, 11)
+        self.assertEqual(self.player.pending_target, (10, 12))
+        
+        # Advance till end of move 1
+        for _ in range(16):
             self.player.updateFineCoords(local_speed=1)
             
-        self.assertFalse(self.player.is_moving)
-        self.assertEqual(self.player.x_fine_coord, 11 * 16) # 176
+        # Move 1 should be finished and Move 2 should be started immediately
+        self.assertTrue(self.player.is_moving)
+        self.assertEqual(self.player.target_x, 10)
+        self.assertEqual(self.player.target_y, 12)
+        self.assertIsNone(self.player.pending_target)
+        self.assertEqual(self.player.move_tick, 0.0)
 
-    def test_sync_r2_l1(self):
-        # Remote Speed 2, Local Speed 1 -> advance = 2.0
-        # Should complete in 8 local frames
-        p = Packet(player_id=1, x=11, y=10, speed=2)
-        self.player.update_from_network(p)
+    def test_speed_propagation(self):
+        # Remote at x2
+        packet = Packet(player_id=1, x=10, y=11, speed=2)
+        self.player.update_from_network(packet)
+        self.assertEqual(self.player.remote_speed, 2)
         
-        for i in range(8):
+        # At local x1, it should finish in 8 ticks
+        for _ in range(8):
             self.player.updateFineCoords(local_speed=1)
-            
-        self.assertFalse(self.player.is_moving)
-        self.assertEqual(self.player.x_fine_coord, 11 * 16)
-
-    def test_sync_r1_l2(self):
-        # Remote Speed 1, Local Speed 2 -> advance = 0.5
-        # Should complete in 32 local frames
-        p = Packet(player_id=1, x=11, y=10, speed=1)
-        self.player.update_from_network(p)
         
-        for i in range(32):
-            self.player.updateFineCoords(local_speed=2)
-            
         self.assertFalse(self.player.is_moving)
-        self.assertEqual(self.player.x_fine_coord, 11 * 16)
+        self.assertEqual(self.player.x_fine_coord, 10 * 16)
+        self.assertEqual(self.player.y_fine_coord, 11 * 16)
 
-    def test_sync_r2_l2(self):
-        # Remote Speed 2, Local Speed 2 -> advance = 1.0
-        # Should complete in 16 local frames
-        p = Packet(player_id=1, x=11, y=10, speed=2)
-        self.player.update_from_network(p)
+    def test_direction_on_chained_move(self):
+        # Move Down: (10, 10) -> (10, 11)
+        self.player.update_from_network(Packet(player_id=1, x=10, y=11))
         
-        for i in range(16):
-            self.player.updateFineCoords(local_speed=2)
+        # Queue Move Right: (10, 11) -> (11, 11)
+        self.player.update_from_network(Packet(player_id=1, x=11, y=11))
+        
+        # Finish first move
+        for _ in range(16):
+            self.player.updateFineCoords()
             
-        self.assertFalse(self.player.is_moving)
-        self.assertEqual(self.player.x_fine_coord, 11 * 16)
+        # Second move starts
+        self.assertTrue(self.player.is_moving)
+        self.assertEqual(self.player.direction, "right")
 
 if __name__ == '__main__':
     unittest.main()
